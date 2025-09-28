@@ -397,6 +397,8 @@ def main():
   ap.add_argument("--lang", default=LANG)
   ap.add_argument("--winning_out", required=True)
   ap.add_argument("--sets_out", required=True)
+
+  # ✅ 只留這一行，整數 1/0 控制是否 headless（預設 1 = 關視窗）
   ap.add_argument("--headless", type=int, default=1, help="1=headless, 0=show browser")
 
   args = ap.parse_args()
