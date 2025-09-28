@@ -1,0 +1,62 @@
+{
+  "spec": {
+    "mode": "ARAM",
+    "tier": "d2_plus",
+    "window": "7d"
+  },
+  "build": {
+    "boots": "鞋子",
+    "order": [
+      "治癒",
+      "未來市集",
+      "傳奇：敏捷",
+      "致命一擊",
+      "瞬疾步法"
+    ]
+  },
+  "rationale": {
+    "dynamic_thresholds": {
+      "P50": 0.05,
+      "P75": 0.22,
+      "W50": 0.5,
+      "W75": 0.9,
+      "GlobalAvgWin": 0.4975956666666666,
+      "PickCut": 0.1,
+      "WinCut": 0.5,
+      "Tau": 0.5
+    },
+    "supports": [],
+    "top_sets_used": 2,
+    "note": "加入 explain 軌跡與參數可調。",
+    "explain": {
+      "decisions": [
+        {
+          "item": "治癒",
+          "sup": 0.5,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "淨化",
+          "sup": 0.5,
+          "cut": 1.0,
+          "action": "reject"
+        }
+      ],
+      "selected_before_ordering": [
+        "治癒",
+        "未來市集",
+        "傳奇：敏捷",
+        "致命一擊",
+        "瞬疾步法"
+      ],
+      "ordered_final": [
+        "治癒",
+        "未來市集",
+        "傳奇：敏捷",
+        "致命一擊",
+        "瞬疾步法"
+      ]
+    }
+  }
+}

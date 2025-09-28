@@ -1,0 +1,68 @@
+{
+  "spec": {
+    "mode": "ARAM",
+    "tier": "d2_plus",
+    "window": "7d"
+  },
+  "build": {
+    "boots": "輕魔之靴",
+    "order": [
+      "凱旋",
+      "輕魔之靴",
+      "致命一擊",
+      "瞬疾步法",
+      "傳奇：敏捷"
+    ]
+  },
+  "rationale": {
+    "dynamic_thresholds": {
+      "P50": 0.04,
+      "P75": 0.17,
+      "W50": 0.5,
+      "W75": 0.58205,
+      "GlobalAvgWin": 0.40473714285714285,
+      "PickCut": 0.1,
+      "WinCut": 0.5,
+      "Tau": 0.5
+    },
+    "supports": [],
+    "top_sets_used": 2,
+    "note": "加入 explain 軌跡與參數可調。",
+    "explain": {
+      "decisions": [
+        {
+          "item": "凱旋",
+          "sup": 0.5,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "傳奇：敏捷",
+          "sup": 0.5,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "瞬疾步法",
+          "sup": 0.5,
+          "cut": 1.0,
+          "action": "reject"
+        }
+      ],
+      "selected_before_ordering": [
+        "凱旋",
+        "輕魔之靴",
+        "致命一擊",
+        "瞬疾步法",
+        "傳奇：敏捷"
+      ],
+      "ordered_final": [
+        "凱旋",
+        "輕魔之靴",
+        "致命一擊",
+        "瞬疾步法",
+        "傳奇：敏捷"
+      ]
+    }
+  }
+}

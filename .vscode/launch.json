@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run main",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/main.py",
+      "console": "integratedTerminal",
+      "args": [
+        "--winning", "${workspaceFolder}/data/samples/winning_items.sample.csv",
+        "--sets",    "${workspaceFolder}/data/samples/actually_sets.sample.csv",
+        "--out",     "${workspaceFolder}/outputs/varus_aram_d2_7d.json"
+      ]
+    }
+  ]
+}

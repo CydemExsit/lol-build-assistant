@@ -1,0 +1,68 @@
+{
+  "spec": {
+    "mode": "ARAM",
+    "tier": "d2_plus",
+    "window": "7d"
+  },
+  "build": {
+    "boots": "輕魔之靴",
+    "order": [
+      "即刻衝擊",
+      "治癒",
+      "虛弱",
+      "奧術彗星",
+      "焦灼"
+    ]
+  },
+  "rationale": {
+    "dynamic_thresholds": {
+      "P50": 0.15,
+      "P75": 0.2925,
+      "W50": 0.5780000000000001,
+      "W75": 0.95,
+      "GlobalAvgWin": 0.5746952380952381,
+      "PickCut": 0.15,
+      "WinCut": 0.5780000000000001,
+      "Tau": 0.5
+    },
+    "supports": [],
+    "top_sets_used": 2,
+    "note": "加入 explain 軌跡與參數可調。",
+    "explain": {
+      "decisions": [
+        {
+          "item": "奧術彗星",
+          "sup": 0.5,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "光輝披風",
+          "sup": 0.5,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "即刻衝擊",
+          "sup": 0.5,
+          "cut": 1.0,
+          "action": "reject"
+        }
+      ],
+      "selected_before_ordering": [
+        "即刻衝擊",
+        "治癒",
+        "虛弱",
+        "奧術彗星",
+        "焦灼"
+      ],
+      "ordered_final": [
+        "即刻衝擊",
+        "治癒",
+        "虛弱",
+        "奧術彗星",
+        "焦灼"
+      ]
+    }
+  }
+}

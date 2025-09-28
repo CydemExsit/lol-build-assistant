@@ -1,0 +1,122 @@
+[
+  {
+    "url": "https://match.adsrvr.org/track/rid?ttd_pid=tpfrvh0&fmt=json",
+    "keys": [
+      "TDID",
+      "TDID_LOOKUP",
+      "TDID_CREATED_AT"
+    ]
+  },
+  {
+    "url": "https://id.hadron.ad.gt/api/v1/pbhid?partner_id=720&_it=prebid&t=1&src=id&domain=lolalytics.com&gdpr=0&us_privacy=1---",
+    "keys": []
+  },
+  {
+    "url": "https://c.amazon-adsystem.com/cdn/prod/config?src=600&u=https%3A%2F%2Flolalytics.com&pubid=da657530-03e5-4306-95bc-d4eb370426c9",
+    "keys": [
+      "3pvendor",
+      "3pmetadata",
+      "3psamplerate"
+    ]
+  },
+  {
+    "url": "https://id.crwdcntrl.net/id?gdpr_applies=false&c=17611",
+    "keys": [
+      "profile_id",
+      "core_id",
+      "expiry_ts"
+    ]
+  },
+  {
+    "url": "https://bcp.crwdcntrl.net/6/map",
+    "keys": [
+      "pid",
+      "c",
+      "ids"
+    ]
+  },
+  {
+    "url": "https://gum.criteo.com/sid/json?origin=prebid&topUrl=https%3A%2F%2Flolalytics.com%2F&domain=lolalytics.com&cw=1&lsw=1&us_privacy=1---&gdpr=0",
+    "keys": [
+      "bundle",
+      "bidId",
+      "pixels"
+    ]
+  },
+  {
+    "url": "https://floors.nitropay.com/f?s=138&c=TW&fp=7daad6d4e76580cdaa6a8eb3c36b551a",
+    "keys": []
+  },
+  {
+    "url": "https://geo.privacymanager.io/",
+    "keys": [
+      "country",
+      "region"
+    ]
+  },
+  {
+    "url": "https://id5-sync.com/api/config/prebid",
+    "keys": [
+      "fetchCall",
+      "extensionsCall"
+    ]
+  },
+  {
+    "url": "https://lbs.eu-1-id5-sync.com/lbs/v1",
+    "keys": [
+      "lbs"
+    ]
+  },
+  {
+    "url": "https://lb.eu-1-id5-sync.com/lb/v1",
+    "keys": [
+      "lb",
+      "ttl"
+    ]
+  },
+  {
+    "url": "https://id5-sync.com/gm/v3",
+    "keys": [
+      "generic",
+      "responses"
+    ]
+  },
+  {
+    "url": "https://id5-sync.com/gm/v3",
+    "keys": [
+      "generic",
+      "responses"
+    ]
+  },
+  {
+    "url": "https://api.btloader.com/country?o=6278260873756672",
+    "keys": [
+      "country",
+      "isRestricted"
+    ]
+  },
+  {
+    "url": "https://id.hadron.ad.gt/api/v1/pbhid?partner_id=720&_it=prebid&t=1&src=id&domain=lolalytics.com&gdpr=0&us_privacy=1---",
+    "keys": []
+  },
+  {
+    "url": "https://c.amazon-adsystem.com/cdn/prod/config?src=600&u=https%3A%2F%2Flolalytics.com&pubid=da657530-03e5-4306-95bc-d4eb370426c9",
+    "keys": [
+      "3pvendor",
+      "3pmetadata",
+      "3psamplerate"
+    ]
+  },
+  {
+    "url": "https://gum.criteo.com/sid/json?origin=prebid&topUrl=https%3A%2F%2Flolalytics.com%2F&domain=lolalytics.com&bundle=5Xfe419kWDV3Z3MlMkZlT053RWhFQ1VtU3k1QXROM0dubjZmJTJGZWxRR1NyQlRVTHE1bG04NFhPN1RsMHB3aDY3OSUyRmZnT3EwMkc4TkI4SVpmeTBVbXQ0RkZwM3c4QlozaTByZE9vSFhXcmFyeEkxWGs1dDNLS2t6WlNiY2Vqbkh0dWlqM0VjYw&cw=1&lsw=1&us_privacy=1---&gdpr=0",
+    "keys": [
+      "bundle",
+      "bidId",
+      "pixels"
+    ]
+  },
+  {
+    "url": "https://floors.nitropay.com/f?s=138&c=TW&fp=7daad6d4e76580cdaa6a8eb3c36b551a",
+    "keys": []
+  }
+]

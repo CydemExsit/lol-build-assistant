@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Scrape Varus ARAM D2+ 7d",
+      "type": "shell",
+      "command": "python ${workspaceFolder}/src/scrape_lolalytics.py --hero varus --mode aram --tier d2_plus --patch 7 --lang zh_tw --winning_out ${workspaceFolder}/data/raw/varus_aram_d2_plus_7d_winning.csv --sets_out ${workspaceFolder}/data/raw/varus_aram_d2_plus_7d_sets.csv"
+    },
+    {
+      "label": "Build Varus ARAM D2+ 7d",
+      "type": "shell",
+      "dependsOn": "Scrape Varus ARAM D2+ 7d",
+      "command": "python -m src.main --winning ${workspaceFolder}/data/raw/varus_aram_d2_plus_7d_winning.csv --sets ${workspaceFolder}/data/raw/varus_aram_d2_plus_7d_sets.csv --out ${workspaceFolder}/outputs/varus_aram_d2_7d.json --explain --topk 50 --cover 0.8"
+    }
+  ]
+}
