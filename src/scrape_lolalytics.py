@@ -61,7 +61,7 @@ def _parse_winning_items(page):
     page.wait_for_selector("img[src*='/item64/']", timeout=30000)
 
     def _looks_like_items_container(candidate) -> bool:
-        """Check if the candidate contains several rows of item icons and percents."""
+        """檢查容器是否包含多列道具圖示與百分比"""
         try:
             return candidate.evaluate(
                 """
@@ -69,17 +69,17 @@ def _parse_winning_items(page):
                     const rows = Array.from(root.querySelectorAll(':scope > *')).length
                         ? Array.from(root.querySelectorAll(':scope > *'))
                         : Array.from(root.children);
-                    if (!rows.length) {
-                        return false;
-                    }
+                    if (!rows.length) return false;
+
                     let ok = 0;
                     for (const row of rows) {
                         const imgs = row.querySelectorAll("img[src*='/item64/']");
                         if (!imgs.length) continue;
+
                         const texts = Array.from(row.querySelectorAll('*'))
-                            .map((el) => (el.textContent || '').trim())
-                            .filter(Boolean);
-                        const percents = texts.filter((t) => t.includes('%'));
+                          .map(el => (el.textContent || '').trim())
+                          .filter(Boolean);
+                        const percents = texts.filter(t => t.includes('%'));
                         if (percents.length >= 2) {
                             ok += 1;
                             if (ok >= 2) return true;
@@ -93,6 +93,7 @@ def _parse_winning_items(page):
             return False
 
     def _find_items_block(scope):
+        # 嘗試在指定區塊內找到符合結構的容器
         for selector in [
             "css=:scope div.flex:has(img[src*='/item64/'])",
             "css=:scope div.grid:has(img[src*='/item64/'])",
@@ -102,7 +103,6 @@ def _parse_winning_items(page):
                 loc = scope.locator(selector)
             except Exception:
                 continue
-            count = 0
             try:
                 count = loc.count()
             except Exception:
@@ -132,6 +132,7 @@ def _parse_winning_items(page):
         return _find_items_block(section)
 
     container = None
+    # 先用較穩定的 data-* 區段鎖定
     for selector in [
         "[data-lolalytics-e2e='winning-items']",
         "[data-e2e='winning-items']",
@@ -143,8 +144,8 @@ def _parse_winning_items(page):
         if container:
             break
 
+    # 找不到就全頁掃描符合視覺結構的容器
     if container is None:
-        # Fallback: scan for flex-like containers that visually match the rows.
         candidates = page.locator("css=div:has(img[src*='/item64/'])")
         try:
             total = candidates.count()
@@ -159,6 +160,7 @@ def _parse_winning_items(page):
     if container is None:
         raise RuntimeError("winning items container not found")
 
+    # 逐列解析
     rows = container.locator("css=:scope > *:has(img[src*='/item64/'])")
     if rows.count() == 0:
         rows = container.locator("css=:scope *:has(> img[src*='/item64/'])")
@@ -183,7 +185,6 @@ def _parse_winning_items(page):
         data.append({"img": src, "name": name, "win_rate": win_rate, "pick_rate": pick_rate})
 
     return pd.DataFrame(data, columns=["img", "name", "win_rate", "pick_rate"])
-
 
 def _click_sets_five(page) -> None:
     """
@@ -218,30 +219,19 @@ def _parse_sets_5(page) -> pd.DataFrame:
     for img0 in candidates:
         # 找到包含這張圖的最接近父層 div（列容器）
         row = img0.locator("xpath=ancestor::div[1]")
-        # 試著把列容器放大到含有五張 data-id 的那層
-        # （保守做法：往上找，直到同一層能找到 0_~4_）
+        # 放大到含有五張 data-id 的那層
         for _ in range(4):
-            want = True
-            for k in range(5):
-              # 逐列確認這一列是不是 5 件道具
-              if row.locator(f"img[data-id^='{k}_']").count() == 0:
-                  continue
-            if want:
+            ok_row = all(row.locator(f"img[data-id^='{k}_']").count() > 0 for k in range(5))
+            if ok_row:
                 break
             row = row.locator("xpath=ancestor::div[1]")
 
         # 最後確認一次
-        ok = True
-        imgs = []
-        for k in range(5):
-            q = row.locator(f"img[data-id^='{k}_']").first
-            if q.count() == 0:
-                ok = False
-                break
-            imgs.append(q)
+        ok = all(row.locator(f"img[data-id^='{k}_']").count() > 0 for k in range(5))
         if not ok:
             continue
 
+        imgs = [row.locator(f"img[data-id^='{k}_']").first for k in range(5)]
         names = []
         for q in imgs:
             n, _ = _name_from_img(q)
