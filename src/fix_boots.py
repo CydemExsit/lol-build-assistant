@@ -1,78 +1,73 @@
-# -*- coding: utf-8 -*-
+# src/fix_boots.py
 from __future__ import annotations
-import argparse, json, re
+import argparse, json
 from pathlib import Path
 import pandas as pd
 
-# 升級靴關鍵詞；避免把「鞋子」(未升級) 選到
-BOOT_RE = re.compile(r"(?:靴|護脛)")
+BOOT_HINT = "靴|鞋|護脛|Greaves|Treads|Tabi|Boots"
 
-def _read_csv(p: Path) -> pd.DataFrame:
-    df = pd.read_csv(p)
-    df.columns = [c.strip() for c in df.columns]
-    return df
+def _to_unit(s):
+    v = pd.to_numeric(s, errors="coerce").fillna(0.0).astype(float)
+    return v.where(v <= 1.0, v / 100.0)
 
-def _choose_from_sets(sets_csv: Path) -> str | None:
-    if not sets_csv.exists():
-        return None
-    df = _read_csv(sets_csv)
-    if "items" not in df.columns:
+def pick_boot_from_winning(winning_csv: Path) -> str | None:
+    if not winning_csv.exists():
+        print(f"[warn] winning.csv not found: {winning_csv}")
         return None
 
-    # 權重來源：set_pick_rate（沒有就當 1）
-    w = pd.to_numeric(df.get("set_pick_rate", 1.0), errors="coerce").fillna(1.0)
-
-    weight: dict[str, float] = {}
-    for items_str, ww in zip(df["items"].astype(str), w):
-        for it in items_str.split("|"):
-            it = it.strip()
-            if not it: 
-                continue
-            if it == "鞋子":          # 明確排除未升級靴
-                continue
-            if BOOT_RE.search(it):    # 只算升級靴
-                weight[it] = weight.get(it, 0.0) + float(ww)
-
-    if not weight:
-        return None
-    return sorted(weight.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
-
-def _fallback_from_winning(win_csv: Path) -> str | None:
-    if not win_csv.exists():
-        return None
-    df = _read_csv(win_csv)
-    need = {"name", "pick_rate"}
-    if not need.issubset(df.columns):
+    df = pd.read_csv(winning_csv, encoding="utf-8")
+    if df.empty or "name" not in df.columns:
+        print("[warn] winning.csv empty or missing 'name'")
         return None
 
-    cand = df.loc[(df["name"] != "鞋子") & (df["name"].astype(str).str.contains(BOOT_RE, regex=True, na=False))].copy()
+    # 對齊欄位名稱
+    if "pick_rate" not in df.columns and "pick" in df.columns:
+        df["pick_rate"] = df["pick"]
+    if "win_rate" not in df.columns and "win" in df.columns:
+        df["win_rate"] = df["win"]
+    if "pick_rate" not in df.columns or "win_rate" not in df.columns:
+        print("[warn] winning.csv missing pick_rate/win_rate")
+        return None
+
+    # 僅保留疑似靴子，排除「鞋子」
+    name = df["name"].astype(str)
+    mask = name.str.contains(BOOT_HINT, regex=True, na=False) & (name != "鞋子")
+    cand = df.loc[mask, ["name", "pick_rate", "win_rate"]].copy()
     if cand.empty:
         return None
-    cand.loc[:, "pick_rate"] = pd.to_numeric(cand["pick_rate"], errors="coerce").fillna(0.0)
-    cand = cand.sort_values(["pick_rate", "name"], ascending=[False, True])
-    return str(cand.iloc[0]["name"])
 
-def _patch_json_boot(json_path: Path, boots_name: str) -> None:
-    data = json.loads(json_path.read_text(encoding="utf-8"))
-    data.setdefault("build", {})
-    data["build"]["boots"] = boots_name
-    json_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    # 數值正規化
+    cand["pick_rate"] = _to_unit(cand["pick_rate"])
+    cand["win_rate"]  = _to_unit(cand["win_rate"])
+
+    # 依 選取率↓、勝率↓ 排序
+    cand = cand.sort_values(["pick_rate", "win_rate"], ascending=[False, False])
+
+    best = cand.iloc[0]["name"].strip()
+    return best or None
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--json", required=True, help="要覆寫的輸入/輸出 JSON（build.boots）")
-    ap.add_argument("--sets_csv", required=True, help="Actually Built Sets csv")
-    ap.add_argument("--winning_csv", help="Winning Items csv（回退來源）")
+    ap.add_argument("--json", required=True, help="path to build json (will be updated in-place)")
+    ap.add_argument("--winning_csv", required=True)
+    ap.add_argument("--sets_csv", required=False)  # 兼容 batch 參數，實際不使用
     args = ap.parse_args()
 
-    best = _choose_from_sets(Path(args.sets_csv))
-    if not best and args.winning_csv:
-        best = _fallback_from_winning(Path(args.winning_csv))
-    if not best:
-        best = "鞋子"  # 兩邊都找不到升級靴才回退
+    json_path = Path(args.json)
+    boots = pick_boot_from_winning(Path(args.winning_csv))
 
-    _patch_json_boot(Path(args.json), best)
-    print(f"[ok] boots -> {best}")
+    # 載入/更新 JSON
+    cfg = json.loads(json_path.read_text(encoding="utf-8"))
+    if "build" not in cfg:
+        cfg["build"] = {}
+
+    if boots:
+        print(f"[ok] boots -> {boots}")
+        cfg["build"]["boots"] = boots
+    else:
+        print("[warn] boots -> 無法從 winning.csv 判定，沿用 JSON 內容")
+
+    json_path.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
 
 if __name__ == "__main__":
     main()

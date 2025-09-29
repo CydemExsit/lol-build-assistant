@@ -7,8 +7,8 @@
   "build": {
     "boots": "輕魔之靴",
     "order": [
-      "點燃",
       "淨化",
+      "輕魔之靴",
       "致命一擊",
       "傳奇：敏捷",
       "瞬疾步法"
@@ -16,13 +16,13 @@
   },
   "rationale": {
     "dynamic_thresholds": {
-      "P50": 0.16,
-      "P75": 0.19,
+      "P50": 0.11,
+      "P75": 0.1975,
       "W50": 0.5,
-      "W75": 0.789,
-      "GlobalAvgWin": 0.5222128571428571,
-      "PickCut": 0.16,
-      "WinCut": 0.5222128571428571,
+      "W75": 0.7300000000000001,
+      "GlobalAvgWin": 0.4942625000000001,
+      "PickCut": 0.11,
+      "WinCut": 0.5,
       "Tau": 0.5
     },
     "supports": [],
@@ -31,70 +31,22 @@
     "explain": {
       "decisions": [
         {
-          "item": "點燃",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "過度生長",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "超量治療",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "不死之握",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "傳奇：敏捷",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "士兵去質器",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "致命一擊",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "銀河視界",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "三倍藥水",
-          "sup": 0.0,
+          "item": "淨化",
+          "sup": 0.5,
           "cut": 1.0,
           "action": "reject"
         }
       ],
       "selected_before_ordering": [
-        "點燃",
         "淨化",
+        "輕魔之靴",
         "致命一擊",
         "傳奇：敏捷",
         "瞬疾步法"
       ],
       "ordered_final": [
-        "點燃",
         "淨化",
+        "輕魔之靴",
         "致命一擊",
         "傳奇：敏捷",
         "瞬疾步法"

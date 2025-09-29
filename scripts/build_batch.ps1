@@ -12,14 +12,9 @@ foreach ($h in $Heroes) {
   $json= "$out/${h}_${Mode}_${Patch}d.json"
   $md  = "$out/${h}_${Mode}_${Patch}d.md"
 
-  # ✅ 關視窗
-  python src/scrape_lolalytics.py --headless 1 --hero $h --mode $Mode --tier $Tier --patch $Patch --lang $Lang --winning_out $win --sets_out $set
-
+  python src/scrape_lolalytics.py --hero $h --mode $Mode --tier $Tier --patch $Patch --lang $Lang --winning_out $win --sets_out $set --no-headless
+  if ($LASTEXITCODE -ne 0) { Write-Host "scraper failed for $h"; exit $LASTEXITCODE }
   python -m src.main --winning $win --sets $set --out $json --explain --topk 50 --cover 0.8
-
-  # ✅ 用資料本身挑升級靴（先看 sets，加權 pick；缺時回退 winning）
-  python src/fix_boots.py --json $json --sets_csv $set --winning_csv $win
-
   python src/render_build.py --in_json $json --sets_csv $set --out_md $md
 }
 Write-Host "DONE."

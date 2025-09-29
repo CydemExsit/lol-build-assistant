@@ -1,105 +1,109 @@
+# src/render_build.py
 from __future__ import annotations
 import argparse, json, re
 from pathlib import Path
 import pandas as pd
 
-# ====== 取鞋：從 winning.csv 精準挑一雙 ======================================
+def _percentish_to_unit(x):
+    """把看起來像百分比的數字（>1）轉為 0~1；保留 NaN -> 0"""
+    s = pd.to_numeric(x, errors="coerce")
+    s = s.fillna(0.0).astype(float)
+    return s.where(s <= 1.0, s / 100.0)
 
-UPGRADED_HINTS = [
-    "之靴","護脛","艾歐尼亞之靴","明朗之靴","狂戰士護脛","法師之靴","水星之靴",
-    "鋼鐵護脛","輕靈之靴","機動靴","離群之靴",
-    "Greaves","Treads","Sorcerer","Ionian","Mercury","Plated","Swiftness","Mobility"
-]
+def _fmt_pct(v: float) -> str:
+    try:
+        if pd.isna(v):
+            return "-"
+        # v 若已是 0~1，直接乘 100；否則視為已是百分比
+        x = float(v)
+        if x <= 1.0:
+            x *= 100.0
+        return f"{x:.2f}%"
+    except Exception:
+        return "-"
 
-def _normalize_rates(df: pd.DataFrame) -> pd.DataFrame:
-    for col in ("win_rate", "pick_rate"):
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-            df[col] = df[col].where(df[col] <= 1, df[col]/100.0)
-    return df
+def _guess_hero_from_path(p: Path) -> str:
+    # e.g. varus_aram_d2_plus_7d_sets.csv -> varus
+    m = re.match(r"([a-z0-9]+)_", p.name, flags=re.I)
+    return m.group(1).lower() if m else p.stem
 
-def _is_boot_row(name: str) -> bool:
-    if not isinstance(name, str): return False
-    n = name.strip().lower()
-    if not n: return False
-    if n in {"鞋子","boots","boots of speed"}:  # 基礎靴
-        return True
-    return any(k.lower() in n for k in UPGRADED_HINTS)
+def render_markdown(in_json: Path, sets_csv: Path) -> str:
+    cfg = json.loads(in_json.read_text(encoding="utf-8"))
 
-def _is_upgraded_boot(name: str) -> bool:
-    n = (name or "").lower()
-    if n in {"鞋子","boots","boots of speed"}: return False
-    return any(k.lower() in n for k in UPGRADED_HINTS)
+    # ---- 基本資訊 ----
+    spec = cfg.get("spec", {})
+    mode   = spec.get("mode", "").upper() or "ARAM"
+    tier   = spec.get("tier", "")
+    window = spec.get("window", "")
 
-def pick_boot_from_winning(winning_csv: str) -> str | None:
-    p = Path(winning_csv)
-    if not p.exists(): return None
-    df = pd.read_csv(p)
-    if df.empty or "name" not in df.columns: return None
-    df = _normalize_rates(df)
-    boots = df[df["name"].apply(_is_boot_row)].copy()
-    if boots.empty: return None
+    hero = _guess_hero_from_path(sets_csv)
 
-    upg = boots[boots["name"].apply(_is_upgraded_boot)].copy()
-    cand = upg if not upg.empty else boots
+    # ---- 鞋子：優先信任 JSON ----
+    boots = (cfg.get("build") or {}).get("boots")
+    if not boots or boots == "鞋子":
+        boots = "（尚未決定）"
 
-    # 同名合併：pick_rate 加總、win_rate 平均，然後 pick desc / win desc
-    cand = cand.groupby("name", as_index=False).agg(
-        pick_rate=("pick_rate","sum"),
-        win_rate=("win_rate","mean")
-    ).sort_values(["pick_rate","win_rate"], ascending=[False, False])
+    # ---- 常見出裝（sets_csv） ----
+    sets_md = ""
+    if sets_csv.exists():
+        df = pd.read_csv(sets_csv, encoding="utf-8")
+        if not df.empty:
+            # 欄位對齊
+            if "items" not in df.columns:
+                # 兼容舊欄位（極少見）
+                raise SystemExit("[error] sets_csv 缺少 items 欄位")
 
-    return str(cand.iloc[0]["name"])
+            # 兼容欄位命名
+            if "set_pick_rate" not in df.columns and "pick_rate" in df.columns:
+                df["set_pick_rate"] = df["pick_rate"]
+            if "set_win_rate" not in df.columns and "win_rate" in df.columns:
+                df["set_win_rate"] = df["win_rate"]
 
-# ====== Markdown 渲染 ========================================================
+            # 數值正規化
+            for col in ("set_pick_rate", "set_win_rate"):
+                if col in df.columns:
+                    df[col] = _percentish_to_unit(df[col])
+                else:
+                    df[col] = 0.0
 
-def render_card(data: dict, sets_csv: str) -> str:
-    hero = data.get("hero") or data.get("spec", {}).get("hero") or "Hero"
-    spec = data.get("spec", {})
-    mode = spec.get("mode", "ARAM")
-    tier = spec.get("tier", "d2_plus")
-    window = spec.get("window", "7d")
-    build = data.get("build", {})
-    boots = build.get("boots") or "（未定）"
+            # 排序：選取率優先、勝率次之
+            df = df.sort_values(["set_pick_rate", "set_win_rate"], ascending=[False, False])
 
-    # 讀取 sets.csv，取前 10 組（依 set_pick_rate desc）
-    top_sets_md = ""
-    p = Path(sets_csv)
-    if p.exists():
-        df = pd.read_csv(p)
-        if not df.empty and {"items","set_pick_rate","set_win_rate"} <= set(df.columns):
-            df["set_pick_rate"] = pd.to_numeric(df["set_pick_rate"], errors="coerce").fillna(0)
-            df["set_win_rate"] = pd.to_numeric(df["set_win_rate"], errors="coerce").fillna(0)
-            df = df.sort_values(["set_pick_rate","set_win_rate"], ascending=[False, False]).head(10)
-            lines = []
-            for _, row in df.iterrows():
-                items = str(row["items"]).split("|")
-                pr = row["set_pick_rate"]
-                wr = row["set_win_rate"]
-                # 介面顯示成百分比
-                pr_show = f"{pr*100:.2f}%"
-                wr_show = f"{wr*100:.2f}%"
-                lines.append(f"- `{wr_show} / {pr_show}`  —  " + " > ".join(items))
-            top_sets_md = "\n".join(lines)
+            # 只顯示前 8 組
+            topn = df.head(8).copy()
+
+            # 渲染表格
+            rows = ["| # | 出裝 | 勝率 | 選取率 |",
+                    "|:-:|:-----|:----:|:------:|"]
+            for i, r in enumerate(topn.itertuples(index=False), start=1):
+                items_str = str(getattr(r, "items", ""))
+                # 用「 | 」或「 > 」較好讀；這裡用「 | 」
+                items_pretty = " | ".join(items_str.split("|")) if "|" in items_str else items_str
+                wr = _fmt_pct(getattr(r, "set_win_rate", 0))
+                pr = _fmt_pct(getattr(r, "set_pick_rate", 0))
+                rows.append(f"| {i} | {items_pretty} | {wr} | {pr} |")
+            sets_md = "\n".join(rows)
+        else:
+            sets_md = "_（無套裝資料）_"
+    else:
+        sets_md = "_（找不到套裝 CSV）_"
+
+    # ---- 組裝 Markdown ----
+    hdr = f"# {hero.title()} · {mode}\n"
+    meta = []
+    if tier:   meta.append(f"- **分段**：{tier}")
+    if window: meta.append(f"- **視窗**：{window}")
+    meta_s = "\n".join(meta)
 
     md = []
-    md.append(f"# {hero.title()} — {mode}（{tier}，{window}）")
-    md.append("")
-    md.append(f"**推薦鞋子：** {boots}")
-    md.append("")
-    if top_sets_md:
-        md.append("## Top Sets")
-        md.append(top_sets_md)
-        md.append("")
-
-    # 額外：把演算法輸出的 order（如果有）展示一下
-    order = build.get("order") or []
-    if order:
-        md.append("## Runes / Order（原始 JSON 中的順序資訊，僅供參考）")
-        md.append(" > " + " / ".join(map(str, order)))
-        md.append("")
-
-    return "\n".join(md).strip() + "\n"
+    md.append(hdr)
+    if meta_s: md.append(meta_s)
+    md.append("\n## 推薦鞋子\n")
+    md.append(f"- {boots}\n")
+    md.append("\n## 常見出裝（Actually Built Sets）\n")
+    md.append(sets_md)
+    md.append("")  # 結尾換行
+    return "\n".join(md)
 
 def main():
     ap = argparse.ArgumentParser()
@@ -108,25 +112,9 @@ def main():
     ap.add_argument("--out_md", required=True)
     args = ap.parse_args()
 
-    # 讀 JSON
-    data = json.loads(Path(args.in_json).read_text(encoding="utf-8"))
-
-    # 從 sets_csv 推回 winning.csv 路徑
-    sets_path = Path(args.sets_csv)
-    winning_csv = str(sets_path).replace("_sets.csv", "_winning.csv")
-
-    # 以 winning.csv 覆寫 JSON 內 boots
-    boot_choice = pick_boot_from_winning(winning_csv)
-    if boot_choice:
-        data.setdefault("build", {})["boots"] = boot_choice
-        print(f"[ok] boots -> {boot_choice}")
-    else:
-        # 沒抓到也不要中斷
-        print("[warn] boots -> 無法從 winning.csv 判定，沿用 JSON 內容")
-
-    # Render
-    card = render_card(data, args.sets_csv)
-    Path(args.out_md).write_text(card, encoding="utf-8")
+    out = render_markdown(Path(args.in_json), Path(args.sets_csv))
+    Path(args.out_md).parent.mkdir(parents=True, exist_ok=True)
+    Path(args.out_md).write_text(out, encoding="utf-8")
     print(f"[ok] wrote -> {args.out_md}")
 
 if __name__ == "__main__":
