@@ -7,10 +7,10 @@
   "build": {
     "boots": "狂戰士護脛",
     "order": [
-      "盧登之伴",
-      "黯影之炎",
       "死亡之帽",
       "雷霆風暴",
+      "盧登之伴",
+      "黯影之炎",
       "惡意"
     ]
   },
@@ -25,54 +25,51 @@
       "WinCut": 0.5061,
       "Tau": 0.5
     },
-    "supports": [],
-    "top_sets_used": 1,
+    "supports": [
+      1.0,
+      1.0
+    ],
+    "top_sets_used": 2,
     "note": "加入 explain 軌跡與參數可調。",
     "explain": {
       "decisions": [
         {
-          "item": "盧登之伴",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
-        },
-        {
           "item": "死亡之帽",
-          "sup": 0.0,
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         },
         {
           "item": "雷霆風暴",
-          "sup": 0.0,
+          "sup": 1.0,
+          "cut": 1.0,
+          "action": "accept"
+        },
+        {
+          "item": "盧登之伴",
+          "sup": 0.5,
           "cut": 1.0,
           "action": "reject"
         },
         {
           "item": "惡意",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "視界專注",
-          "sup": 0.0,
+          "sup": 0.5,
           "cut": 1.0,
           "action": "reject"
         }
       ],
       "selected_before_ordering": [
-        "盧登之伴",
-        "黯影之炎",
         "死亡之帽",
         "雷霆風暴",
+        "盧登之伴",
+        "黯影之炎",
         "惡意"
       ],
       "ordered_final": [
-        "盧登之伴",
-        "黯影之炎",
         "死亡之帽",
         "雷霆風暴",
+        "盧登之伴",
+        "黯影之炎",
         "惡意"
       ]
     }

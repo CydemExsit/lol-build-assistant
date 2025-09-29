@@ -4,7 +4,6 @@ from typing import Tuple
 import pandas as pd
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout, Page
 
-
 LANG = "zh_tw"
 DEF_MODE = "aram"
 DEF_TIER = "d2_plus"
@@ -125,77 +124,61 @@ def _parse_winning_items(page: Page) -> pd.DataFrame:
     # algo.load_winning_items 需要 sample_size 欄；這裡固定補 0
     return pd.DataFrame(data, columns=["img","name","win_rate","pick_rate"]).assign(sample_size=0)
 
-def _click_sets_five(page: Page):
-    """Actually Built Sets：點 a_5（不含靴）；回傳按鈕 locator 供後續 scroll。"""
-    a5 = None
+def _click_sets_five(page: Page) -> None:
+    """Actually Built Sets：只切到 a_5（不含靴的 5 件）。"""
     try:
         a5 = page.locator("[data-type='a_5']").first
         if a5 and a5.count() > 0:
             a5.click()
-            # 等到第 5 件（data-id^='4_'）渲染出來（任何地方的可見 4_）
-            page.wait_for_selector("css=img[data-id^='4_']:visible", timeout=8000)
-            time.sleep(0.2)
+            page.wait_for_selector("img[data-id^='4_']", timeout=5000)
+            time.sleep(0.15)
     except Exception:
         pass
-    return a5
-
 
 def _parse_sets_5(page: Page) -> pd.DataFrame:
     """
-    Actually Built Sets（a_5）：
-    - 點 a_5 並把它捲進視口，觸發懶載入
-    - 全頁只取「可見」的 data-id=0_ 圖片，往上找含 0..4_ 五張「可見」圖片的那層當一列
-    - 排除含藥水(2003/2031)的起手列
-    - 輸出 items 與 items_img 兩欄，數值不做百分比換算
+    抓 Actually Built Sets（a_5，不含靴）。
+    全頁尋找 data-id 前綴 0..4 的五件列，再過濾掉含藥水(2003/2031)的起手裝列。
+    直接使用頁面上的數值（Win / Pick / Games）。
+    另外固定輸出 items_img 供 MD 顯示圖片。
     """
-    a5 = _click_sets_five(page)
+    _click_sets_five(page)
+
+    # 永遠保留一份完整 DOM 方便除錯
     try:
-        if a5:
-            a5.scroll_into_view_if_needed()
-            page.wait_for_timeout(200)
+        _mkdir_for("data/raw/page_last.html")
+        with open("data/raw/page_last.html","w",encoding="utf-8") as f:
+            f.write(page.content())
     except Exception:
         pass
 
-    # 若還沒渲染，嘗試把頁面往下捲一段（Lux 常需要）
+    imgs0 = page.locator("css=img[data-id^='0_']")
     try:
-        if page.locator("css=img[data-id^='0_']:visible").count() == 0:
-            page.evaluate("() => window.scrollBy(0, window.innerHeight * 0.8)")
-            page.wait_for_timeout(250)
+        total = imgs0.count()
     except Exception:
-        pass
-
-    imgs0 = page.locator("css=img[data-id^='0_']:visible")
-    try:
-        n0 = imgs0.count()
-    except Exception:
-        n0 = 0
+        total = 0
 
     out, seen = [], set()
-    for i in range(n0):
+    for i in range(total):
         img0 = imgs0.nth(i)
+        # 往上找到同一列且同時含有 0..4 五張圖的容器
         row = img0.locator("xpath=ancestor::div[1]")
-
-        # 往上爬到同時含有 0..4_ 五張「可見」圖片的容器
         for _ in range(6):
-            ok_row = True
-            for k in range(5):
-                if row.locator(f"css=img[data-id^='{k}_']:visible").count() == 0:
-                    ok_row = False
-                    break
-            if ok_row:
+            if all(row.locator(f"css=img[data-id^='{k}_']").count() > 0 for k in range(5)):
                 break
             row = row.locator("xpath=ancestor::div[1]")
 
-        if any(row.locator(f"css=img[data-id^='{k}_']:visible").count() == 0 for k in range(5)):
+        if any(row.locator(f"css=img[data-id^='{k}_']").count() == 0 for k in range(5)):
             continue
 
-        # 5 件道具（依 0..4 序），同時蒐集圖片 URL；排除含藥水
+        # 5 件（名稱與圖片）
         names, imgs, skip = [], [], False
         for k in range(5):
-            q = row.locator(f"css=img[data-id^='{k}_']:visible").first
+            q = row.locator(f"css=img[data-id^='{k}_']").first
             n, src = _name_from_img(q)
             names.append(n)
             imgs.append(src)
+            # 排除 Starting Items 假陽性
             if src.endswith("/2003.webp") or src.endswith("/2031.webp"):
                 skip = True
         if skip:
@@ -206,27 +189,41 @@ def _parse_sets_5(page: Page) -> pd.DataFrame:
             continue
         seen.add(key)
 
-        # 抓該列數字（Win / Pick / Games），用網站原值
+        # 這一列的數字（直接沿用網站顯示，不做百分比縮放）
         texts = [t.strip() for t in row.locator("xpath=.//div[contains(@class,'my-1')]").all_inner_texts() if t.strip()]
         nums = []
         for t in texts:
             try:
-                nums.append(float(t.replace("%", "").replace(",", "")))
+                nums.append(float(t.replace("%","").replace(",","")))
             except:
                 pass
         if len(nums) < 3:
             continue
 
+        win, pick, sample = nums[0], nums[1], int(nums[2])
+
         out.append({
-            "items": key,
+            "items": "|".join(names),
             "items_img": "|".join(imgs),
-            "set_win_rate": nums[0],
-            "set_pick_rate": nums[1],
-            "set_sample_size": int(nums[2]),
+            "set_win_rate": win,
+            "set_pick_rate": pick,
+            "set_sample_size": sample,
         })
 
-    cols = ["items", "items_img", "set_win_rate", "set_pick_rate", "set_sample_size"]
-    return pd.DataFrame(out, columns=cols) if out else pd.DataFrame(columns=cols)
+    cols = ["items","items_img","set_win_rate","set_pick_rate","set_sample_size"]
+    df = pd.DataFrame(out, columns=cols) if out else pd.DataFrame(columns=cols)
+
+    # 若仍抓不到，dump a_5 區塊的 HTML 以便判斷
+    if df.empty:
+        try:
+            block = page.locator("xpath=//div[.//div[@data-type='a_5']]").first
+            _mkdir_for("data/raw/sets_block_dump.fail.html")
+            with open("data/raw/sets_block_dump.fail.html","w",encoding="utf-8") as f:
+                f.write(block.inner_html())
+        except Exception:
+            pass
+
+    return df
 
 def scrape(hero: str, mode: str, tier: str, patch: str, lang: str, no_headless: bool=False):
     with sync_playwright() as p:
