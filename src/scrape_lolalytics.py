@@ -58,33 +58,84 @@ def _goto_build_page(page, hero: str, mode: str, tier: str, patch: str, lang: st
 
 def _parse_winning_items(page):
     import pandas as pd
+    page.wait_for_selector("img[src*='/item64/']", timeout=30000)
 
-    # 精準鎖定：Winning -> Items -> 第一個 items 容器（你貼的那個 flex gap-[6px]）
-    container = page.locator(
-        "xpath=//div[contains(@class,'my-1') and normalize-space()='Winning']"
-        "/following-sibling::div[contains(@class,'my-1') and normalize-space()='Items']"
-        "/following-sibling::div[contains(@class,'flex') and contains(@class,'gap-[6px]')][1]"
-    )
-    container.wait_for(state="visible", timeout=30000)
+    def _looks_like_items_container(candidate) -> bool:
+        try:
+            rows = candidate.locator(":scope > div")
+            if rows.count() == 0:
+                rows = candidate.locator(":scope > *")
+            if rows.count() == 0:
+                return False
+            checks = 0
+            for idx in range(min(5, rows.count())):
+                row = rows.nth(idx)
+                if row.locator("img").count() == 0:
+                    continue
+                nums = [t.strip() for t in row.locator("div.my-1").all_inner_texts() if t.strip()]
+                pct_like = sum(1 for t in nums if "%" in t)
+                if pct_like >= 2:
+                    checks += 1
+            return checks >= 2
+        except Exception:
+            return False
+
+    container = None
+    # 優先嘗試 data-* 屬性，避免依賴翻譯文字
+    for selector in [
+        "[data-lolalytics-e2e='winning-items']",
+        "[data-e2e='winning-items']",
+        "[data-section='winning-items']",
+    ]:
+        q = page.locator(selector)
+        if q.count() == 0:
+            continue
+        cand = q.first
+        try:
+            cand.wait_for(state="visible", timeout=30000)
+        except Exception:
+            continue
+        if _looks_like_items_container(cand):
+            container = cand
+            break
+
+    if container is None:
+        # 退而求其次：從可能的樣式尋找第一個符合結構的容器
+        candidates = page.locator("css=div.flex.gap-\\[6px\\]")
+        if candidates.count() == 0:
+            candidates = page.locator("css=div.flex:has(img[src*='/item64/'])")
+        for idx in range(candidates.count()):
+            cand = candidates.nth(idx)
+            if not _looks_like_items_container(cand):
+                continue
+            container = cand
+            break
+
+    if container is None:
+        raise RuntimeError("winning items container not found")
 
     rows = container.locator(":scope > div")
-    n = rows.count()
+    if rows.count() == 0:
+        rows = container.locator(":scope > *")
+
     data = []
-    for i in range(n):
+    for i in range(rows.count()):
         row = rows.nth(i)
         img = row.locator("img").first()
+        if img.count() == 0:
+            continue
         src = img.get_attribute("src") or ""
         alt = img.get_attribute("alt") or ""   # 若沒名字也可，只用圖就行
 
-        # 此區塊的 4 個數字：win%, pick%, games, avgTime —— 我們只取前兩個
-        nums = [t.strip() for t in row.locator("div.my-1").all_inner_texts()]
-        if len(nums) >= 2:
-            try:
-                win_rate  = float(nums[0]) / 100.0
-                pick_rate = float(nums[1]) / 100.0
-            except ValueError:
-                continue
-            data.append({"img": src, "name": alt, "win_rate": win_rate, "pick_rate": pick_rate})
+        nums = [t.strip() for t in row.locator("div.my-1").all_inner_texts() if t.strip()]
+        if len(nums) < 2:
+            continue
+        try:
+            win_rate = float(nums[0].replace("%", "")) / 100.0
+            pick_rate = float(nums[1].replace("%", "")) / 100.0
+        except ValueError:
+            continue
+        data.append({"img": src, "name": alt, "win_rate": win_rate, "pick_rate": pick_rate})
 
     return pd.DataFrame(data, columns=["img", "name", "win_rate", "pick_rate"])
 
