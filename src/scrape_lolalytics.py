@@ -61,84 +61,130 @@ def _parse_winning_items(page):
     page.wait_for_selector("img[src*='/item64/']", timeout=30000)
 
     def _looks_like_items_container(candidate) -> bool:
+        """檢查容器是否包含多列道具圖示與百分比"""
         try:
-            rows = candidate.locator(":scope > div")
-            if rows.count() == 0:
-                rows = candidate.locator(":scope > *")
-            if rows.count() == 0:
-                return False
-            checks = 0
-            for idx in range(min(5, rows.count())):
-                row = rows.nth(idx)
-                if row.locator("img").count() == 0:
-                    continue
-                nums = [t.strip() for t in row.locator("div.my-1").all_inner_texts() if t.strip()]
-                pct_like = sum(1 for t in nums if "%" in t)
-                if pct_like >= 2:
-                    checks += 1
-            return checks >= 2
+            return candidate.evaluate(
+                """
+                (root) => {
+                    const rows = Array.from(root.querySelectorAll(':scope > *')).length
+                        ? Array.from(root.querySelectorAll(':scope > *'))
+                        : Array.from(root.children);
+                    if (!rows.length) return false;
+
+                    let ok = 0;
+                    for (const row of rows) {
+                        const imgs = row.querySelectorAll("img[src*='/item64/']");
+                        if (!imgs.length) continue;
+
+                        const texts = Array.from(row.querySelectorAll('*'))
+                          .map(el => (el.textContent || '').trim())
+                          .filter(Boolean);
+                        const percents = texts.filter(t => t.includes('%'));
+                        if (percents.length >= 2) {
+                            ok += 1;
+                            if (ok >= 2) return true;
+                        }
+                    }
+                    return false;
+                }
+                """
+            )
         except Exception:
             return False
 
+    def _find_items_block(scope):
+        # 嘗試在指定區塊內找到符合結構的容器
+        for selector in [
+            "css=:scope div.flex:has(img[src*='/item64/'])",
+            "css=:scope div.grid:has(img[src*='/item64/'])",
+            "css=:scope div:has(> div:has(img[src*='/item64/']))",
+        ]:
+            try:
+                loc = scope.locator(selector)
+            except Exception:
+                continue
+            try:
+                count = loc.count()
+            except Exception:
+                count = 0
+            for idx in range(count):
+                cand = loc.nth(idx)
+                if _looks_like_items_container(cand):
+                    return cand
+        if _looks_like_items_container(scope):
+            return scope
+        return None
+
+    def _locate_from_section(section_selector: str):
+        try:
+            handle = page.wait_for_selector(section_selector, timeout=3000)
+        except PWTimeout:
+            return None
+        except Exception:
+            return None
+        if not handle:
+            return None
+        section = page.locator(section_selector).first
+        try:
+            section.wait_for(state="visible", timeout=3000)
+        except Exception:
+            pass
+        return _find_items_block(section)
+
     container = None
-    # 優先嘗試 data-* 屬性，避免依賴翻譯文字
+    # 先用較穩定的 data-* 區段鎖定
     for selector in [
         "[data-lolalytics-e2e='winning-items']",
         "[data-e2e='winning-items']",
         "[data-section='winning-items']",
+        "[data-testid='winning-items']",
+        "section[data-lolalytics-e2e-section='winning-items']",
     ]:
-        q = page.locator(selector)
-        if q.count() == 0:
-            continue
-        cand = q.first
-        try:
-            cand.wait_for(state="visible", timeout=30000)
-        except Exception:
-            continue
-        if _looks_like_items_container(cand):
-            container = cand
+        container = _locate_from_section(selector)
+        if container:
             break
 
+    # 找不到就全頁掃描符合視覺結構的容器
     if container is None:
-        # 退而求其次：從可能的樣式尋找第一個符合結構的容器
-        candidates = page.locator("css=div.flex.gap-\\[6px\\]")
-        if candidates.count() == 0:
-            candidates = page.locator("css=div.flex:has(img[src*='/item64/'])")
-        for idx in range(candidates.count()):
+        candidates = page.locator("css=div:has(img[src*='/item64/'])")
+        try:
+            total = candidates.count()
+        except Exception:
+            total = 0
+        for idx in range(total):
             cand = candidates.nth(idx)
-            if not _looks_like_items_container(cand):
-                continue
-            container = cand
-            break
+            if _looks_like_items_container(cand):
+                container = cand
+                break
 
     if container is None:
         raise RuntimeError("winning items container not found")
 
-    rows = container.locator(":scope > div")
+    # 逐列解析
+    rows = container.locator("css=:scope > *:has(img[src*='/item64/'])")
     if rows.count() == 0:
-        rows = container.locator(":scope > *")
+        rows = container.locator("css=:scope *:has(> img[src*='/item64/'])")
 
     data = []
     for i in range(rows.count()):
         row = rows.nth(i)
-        img = row.locator("img").first()
+        img = row.locator("img[src*='/item64/']").first
         if img.count() == 0:
             continue
-        src = img.get_attribute("src") or ""
-        alt = img.get_attribute("alt") or ""   # 若沒名字也可，只用圖就行
+        name, src = _name_from_img(img)
 
-        nums = [t.strip() for t in row.locator("div.my-1").all_inner_texts() if t.strip()]
-        if len(nums) < 2:
+        texts = [t.strip() for t in row.locator("xpath=.//*[contains(text(), '%')]").all_inner_texts() if t.strip()]
+        rates = []
+        for t in texts:
+            v = _to_pct(t)
+            if v > 0:
+                rates.append(v)
+        if len(rates) < 2:
             continue
-        try:
-            win_rate = float(nums[0].replace("%", "")) / 100.0
-            pick_rate = float(nums[1].replace("%", "")) / 100.0
-        except ValueError:
-            continue
-        data.append({"img": src, "name": alt, "win_rate": win_rate, "pick_rate": pick_rate})
+        win_rate, pick_rate = rates[:2]
+        data.append({"img": src, "name": name, "win_rate": win_rate, "pick_rate": pick_rate})
 
     return pd.DataFrame(data, columns=["img", "name", "win_rate", "pick_rate"])
-
 
 def _click_sets_five(page) -> None:
     """
@@ -173,30 +219,19 @@ def _parse_sets_5(page) -> pd.DataFrame:
     for img0 in candidates:
         # 找到包含這張圖的最接近父層 div（列容器）
         row = img0.locator("xpath=ancestor::div[1]")
-        # 試著把列容器放大到含有五張 data-id 的那層
-        # （保守做法：往上找，直到同一層能找到 0_~4_）
+        # 放大到含有五張 data-id 的那層
         for _ in range(4):
-            want = True
-            for k in range(5):
-              # 逐列確認這一列是不是 5 件道具
-              if row.locator(f"img[data-id^='{k}_']").count() == 0:
-                  continue
-            if want:
+            ok_row = all(row.locator(f"img[data-id^='{k}_']").count() > 0 for k in range(5))
+            if ok_row:
                 break
             row = row.locator("xpath=ancestor::div[1]")
 
         # 最後確認一次
-        ok = True
-        imgs = []
-        for k in range(5):
-            q = row.locator(f"img[data-id^='{k}_']").first
-            if q.count() == 0:
-                ok = False
-                break
-            imgs.append(q)
+        ok = all(row.locator(f"img[data-id^='{k}_']").count() > 0 for k in range(5))
         if not ok:
             continue
 
+        imgs = [row.locator(f"img[data-id^='{k}_']").first for k in range(5)]
         names = []
         for q in imgs:
             n, _ = _name_from_img(q)
