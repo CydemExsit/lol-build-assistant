@@ -58,33 +58,129 @@ def _goto_build_page(page, hero: str, mode: str, tier: str, patch: str, lang: st
 
 def _parse_winning_items(page):
     import pandas as pd
+    page.wait_for_selector("img[src*='/item64/']", timeout=30000)
 
-    # 精準鎖定：Winning -> Items -> 第一個 items 容器（你貼的那個 flex gap-[6px]）
-    container = page.locator(
-        "xpath=//div[contains(@class,'my-1') and normalize-space()='Winning']"
-        "/following-sibling::div[contains(@class,'my-1') and normalize-space()='Items']"
-        "/following-sibling::div[contains(@class,'flex') and contains(@class,'gap-[6px]')][1]"
-    )
-    container.wait_for(state="visible", timeout=30000)
+    def _looks_like_items_container(candidate) -> bool:
+        """Check if the candidate contains several rows of item icons and percents."""
+        try:
+            return candidate.evaluate(
+                """
+                (root) => {
+                    const rows = Array.from(root.querySelectorAll(':scope > *')).length
+                        ? Array.from(root.querySelectorAll(':scope > *'))
+                        : Array.from(root.children);
+                    if (!rows.length) {
+                        return false;
+                    }
+                    let ok = 0;
+                    for (const row of rows) {
+                        const imgs = row.querySelectorAll("img[src*='/item64/']");
+                        if (!imgs.length) continue;
+                        const texts = Array.from(row.querySelectorAll('*'))
+                            .map((el) => (el.textContent || '').trim())
+                            .filter(Boolean);
+                        const percents = texts.filter((t) => t.includes('%'));
+                        if (percents.length >= 2) {
+                            ok += 1;
+                            if (ok >= 2) return true;
+                        }
+                    }
+                    return false;
+                }
+                """
+            )
+        except Exception:
+            return False
 
-    rows = container.locator(":scope > div")
-    n = rows.count()
-    data = []
-    for i in range(n):
-        row = rows.nth(i)
-        img = row.locator("img").first()
-        src = img.get_attribute("src") or ""
-        alt = img.get_attribute("alt") or ""   # 若沒名字也可，只用圖就行
-
-        # 此區塊的 4 個數字：win%, pick%, games, avgTime —— 我們只取前兩個
-        nums = [t.strip() for t in row.locator("div.my-1").all_inner_texts()]
-        if len(nums) >= 2:
+    def _find_items_block(scope):
+        for selector in [
+            "css=:scope div.flex:has(img[src*='/item64/'])",
+            "css=:scope div.grid:has(img[src*='/item64/'])",
+            "css=:scope div:has(> div:has(img[src*='/item64/']))",
+        ]:
             try:
-                win_rate  = float(nums[0]) / 100.0
-                pick_rate = float(nums[1]) / 100.0
-            except ValueError:
+                loc = scope.locator(selector)
+            except Exception:
                 continue
-            data.append({"img": src, "name": alt, "win_rate": win_rate, "pick_rate": pick_rate})
+            count = 0
+            try:
+                count = loc.count()
+            except Exception:
+                count = 0
+            for idx in range(count):
+                cand = loc.nth(idx)
+                if _looks_like_items_container(cand):
+                    return cand
+        if _looks_like_items_container(scope):
+            return scope
+        return None
+
+    def _locate_from_section(section_selector: str):
+        try:
+            handle = page.wait_for_selector(section_selector, timeout=3000)
+        except PWTimeout:
+            return None
+        except Exception:
+            return None
+        if not handle:
+            return None
+        section = page.locator(section_selector).first
+        try:
+            section.wait_for(state="visible", timeout=3000)
+        except Exception:
+            pass
+        return _find_items_block(section)
+
+    container = None
+    for selector in [
+        "[data-lolalytics-e2e='winning-items']",
+        "[data-e2e='winning-items']",
+        "[data-section='winning-items']",
+        "[data-testid='winning-items']",
+        "section[data-lolalytics-e2e-section='winning-items']",
+    ]:
+        container = _locate_from_section(selector)
+        if container:
+            break
+
+    if container is None:
+        # Fallback: scan for flex-like containers that visually match the rows.
+        candidates = page.locator("css=div:has(img[src*='/item64/'])")
+        try:
+            total = candidates.count()
+        except Exception:
+            total = 0
+        for idx in range(total):
+            cand = candidates.nth(idx)
+            if _looks_like_items_container(cand):
+                container = cand
+                break
+
+    if container is None:
+        raise RuntimeError("winning items container not found")
+
+    rows = container.locator("css=:scope > *:has(img[src*='/item64/'])")
+    if rows.count() == 0:
+        rows = container.locator("css=:scope *:has(> img[src*='/item64/'])")
+
+    data = []
+    for i in range(rows.count()):
+        row = rows.nth(i)
+        img = row.locator("img[src*='/item64/']").first
+        if img.count() == 0:
+            continue
+        name, src = _name_from_img(img)
+
+        texts = [t.strip() for t in row.locator("xpath=.//*[contains(text(), '%')]").all_inner_texts() if t.strip()]
+        rates = []
+        for t in texts:
+            v = _to_pct(t)
+            if v > 0:
+                rates.append(v)
+        if len(rates) < 2:
+            continue
+        win_rate, pick_rate = rates[:2]
+        data.append({"img": src, "name": name, "win_rate": win_rate, "pick_rate": pick_rate})
 
     return pd.DataFrame(data, columns=["img", "name", "win_rate", "pick_rate"])
 
