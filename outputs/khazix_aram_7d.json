@@ -1,0 +1,65 @@
+{
+  "spec": {
+    "mode": "ARAM",
+    "tier": "d2_plus",
+    "window": "7d"
+  },
+  "build": {
+    "boots": "狂戰士護脛",
+    "order": [
+      "席利妲咒怨",
+      "夜色緣界",
+      NaN,
+      "魔劍正宗",
+      "蒐集者"
+    ]
+  },
+  "rationale": {
+    "dynamic_thresholds": {
+      "P50": 0.0486,
+      "P75": 0.20024999999999998,
+      "W50": 0.4885,
+      "W75": 0.502075,
+      "GlobalAvgWin": 0.4777958333333334,
+      "PickCut": 0.1,
+      "WinCut": 0.4885,
+      "Tau": 0.5
+    },
+    "supports": [
+      1.0,
+      1.0
+    ],
+    "top_sets_used": 2,
+    "note": "加入 explain 軌跡與參數可調。",
+    "explain": {
+      "decisions": [
+        {
+          "item": "席利妲咒怨",
+          "sup": 1.0,
+          "cut": 1.0,
+          "action": "accept"
+        },
+        {
+          "item": "夜色緣界",
+          "sup": 1.0,
+          "cut": 1.0,
+          "action": "accept"
+        }
+      ],
+      "selected_before_ordering": [
+        "席利妲咒怨",
+        "夜色緣界",
+        NaN,
+        "魔劍正宗",
+        "蒐集者"
+      ],
+      "ordered_final": [
+        "席利妲咒怨",
+        "夜色緣界",
+        NaN,
+        "魔劍正宗",
+        "蒐集者"
+      ]
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "spec": {
+    "mode": "ARAM",
+    "tier": "d2_plus",
+    "window": "7d"
+  },
+  "build": {
+    "boots": "狂戰士護脛",
+    "order": [
+      "殞落王者之劍",
+      "鬼索的狂暴之刃",
+      "智慧末刃",
+      "千變萬化之賈克修",
+      "臨界點"
+    ]
+  },
+  "rationale": {
+    "dynamic_thresholds": {
+      "P50": 0.05575,
+      "P75": 0.14602500000000002,
+      "W50": 0.5847,
+      "W75": 0.604575,
+      "GlobalAvgWin": 0.5947125,
+      "PickCut": 0.1,
+      "WinCut": 0.5947125,
+      "Tau": 1.0
+    },
+    "supports": [
+      1.0,
+      1.0
+    ],
+    "top_sets_used": 2,
+    "note": "加入 explain 軌跡與參數可調。",
+    "explain": {
+      "decisions": [
+        {
+          "item": "臨界點",
+          "sup": 1.0,
+          "cut": 1.0,
+          "action": "accept"
+        },
+        {
+          "item": "千變萬化之賈克修",
+          "sup": 1.0,
+          "cut": 1.0,
+          "action": "accept"
+        }
+      ],
+      "selected_before_ordering": [
+        "臨界點",
+        "千變萬化之賈克修",
+        "殞落王者之劍",
+        "鬼索的狂暴之刃",
+        "智慧末刃"
+      ],
+      "ordered_final": [
+        "殞落王者之劍",
+        "鬼索的狂暴之刃",
+        "智慧末刃",
+        "千變萬化之賈克修",
+        "臨界點"
+      ]
+    }
+  }
+}

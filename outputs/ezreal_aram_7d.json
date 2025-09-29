@@ -7,73 +7,72 @@
   "build": {
     "boots": "狂戰士護脛",
     "order": [
-      "傳奇：敏捷",
-      "致命一擊",
-      "瞬疾步法",
-      "回春",
-      "淨化"
+      "三相之力",
+      "魔劍正宗",
+      "精進之矛",
+      "席利妲咒怨",
+      "殞落王者之劍"
     ]
   },
   "rationale": {
     "dynamic_thresholds": {
-      "P50": 0.13,
-      "P75": 0.2475,
-      "W50": 0.41664999999999996,
-      "W75": 0.8125,
-      "GlobalAvgWin": 0.4921810714285714,
-      "PickCut": 0.13,
-      "WinCut": 0.4921810714285714,
-      "Tau": 0.5
+      "P50": 0.019,
+      "P75": 0.072825,
+      "W50": 0.4897,
+      "W75": 0.510725,
+      "GlobalAvgWin": 0.4879833333333334,
+      "PickCut": 0.1,
+      "WinCut": 0.4897,
+      "Tau": 1.0
     },
-    "supports": [],
-    "top_sets_used": 2,
+    "supports": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "top_sets_used": 1,
     "note": "加入 explain 軌跡與參數可調。",
     "explain": {
       "decisions": [
         {
-          "item": "傳奇：敏捷",
-          "sup": 0.0,
+          "item": "三相之力",
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         },
         {
-          "item": "瞬疾步法",
-          "sup": 0.0,
+          "item": "魔劍正宗",
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         },
         {
-          "item": "致命一擊",
-          "sup": 0.0,
+          "item": "精進之矛",
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         },
         {
-          "item": "回春",
-          "sup": 0.0,
+          "item": "席利妲咒怨",
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "淨化",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         }
       ],
       "selected_before_ordering": [
-        "傳奇：敏捷",
-        "致命一擊",
-        "瞬疾步法",
-        "回春",
-        "淨化"
+        "三相之力",
+        "魔劍正宗",
+        "精進之矛",
+        "席利妲咒怨",
+        "殞落王者之劍"
       ],
       "ordered_final": [
-        "傳奇：敏捷",
-        "致命一擊",
-        "瞬疾步法",
-        "回春",
-        "淨化"
+        "三相之力",
+        "魔劍正宗",
+        "精進之矛",
+        "席利妲咒怨",
+        "殞落王者之劍"
       ]
     }
   }

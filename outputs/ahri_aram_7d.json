@@ -1,0 +1,65 @@
+{
+  "spec": {
+    "mode": "ARAM",
+    "tier": "d2_plus",
+    "window": "7d"
+  },
+  "build": {
+    "boots": "狂戰士護脛",
+    "order": [
+      "死亡之帽",
+      "雷霆風暴",
+      "黯影之炎",
+      "惡意",
+      "盧登之伴"
+    ]
+  },
+  "rationale": {
+    "dynamic_thresholds": {
+      "P50": 0.07239999999999999,
+      "P75": 0.221325,
+      "W50": 0.5,
+      "W75": 0.510775,
+      "GlobalAvgWin": 0.49694545454545463,
+      "PickCut": 0.1,
+      "WinCut": 0.5,
+      "Tau": 1.0
+    },
+    "supports": [
+      1.0,
+      1.0
+    ],
+    "top_sets_used": 3,
+    "note": "加入 explain 軌跡與參數可調。",
+    "explain": {
+      "decisions": [
+        {
+          "item": "死亡之帽",
+          "sup": 1.0,
+          "cut": 1.0,
+          "action": "accept"
+        },
+        {
+          "item": "雷霆風暴",
+          "sup": 1.0,
+          "cut": 1.0,
+          "action": "accept"
+        }
+      ],
+      "selected_before_ordering": [
+        "死亡之帽",
+        "雷霆風暴",
+        "黯影之炎",
+        "惡意",
+        "盧登之伴"
+      ],
+      "ordered_final": [
+        "死亡之帽",
+        "雷霆風暴",
+        "黯影之炎",
+        "惡意",
+        "盧登之伴"
+      ]
+    }
+  }
+}
