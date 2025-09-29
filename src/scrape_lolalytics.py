@@ -48,8 +48,22 @@ def _name_from_img(img) -> Tuple[str, str]:
 def _goto_build_page(page, hero: str, mode: str, tier: str, patch: str, lang: str) -> str:
     url = f"https://lolalytics.com/{lang}/lol/{hero}/{mode}/build/?tier={tier}&patch={patch}"
     page.goto(url, wait_until="domcontentloaded")
-    page.wait_for_selector("div.my-1", timeout=30000)
+
+    # 在桌面版一定會出現的穩定錨點：a_5 / ab_5 tab 或任意 item 圖片
+    stable = "css=[data-type='a_5'], [data-type='ab_5'], img[src*='/item64/']"
+    try:
+        page.wait_for_selector(stable, timeout=45000, state="visible")
+    except PWTimeout:
+        # 落網就丟一份 debug 方便檢
+        try:
+            os.makedirs("data/raw", exist_ok=True)
+            with open("data/raw/page_last.html", "w", encoding="utf-8") as f:
+                f.write(page.content())
+            page.screenshot(path="data/raw/snap_last.png", full_page=True)
+        finally:
+            raise
     return url
+
 
 def _parse_winning_items(page: Page) -> pd.DataFrame:
     """
@@ -228,7 +242,15 @@ def _parse_sets_5(page: Page) -> pd.DataFrame:
 def scrape(hero: str, mode: str, tier: str, patch: str, lang: str, no_headless: bool=False):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=not no_headless)
-        ctx = browser.new_context()
+        ctx = browser.new_context(
+            locale=lang.replace("_","-"),
+            user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                        "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        "Chrome/121.0.0.0 Safari/537.36"),
+            viewport={"width": 1440, "height": 2200}
+        )
+
+
         page = ctx.new_page()
         url = _goto_build_page(page, hero, mode, tier, patch, lang)
 
