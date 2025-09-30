@@ -16,23 +16,47 @@
   },
   "rationale": {
     "dynamic_thresholds": {
-      "P50": 0.028200000000000003,
-      "P75": 0.089225,
-      "W50": 0.5538000000000001,
-      "W75": 0.585825,
-      "GlobalAvgWin": 0.5440055555555555,
+      "P50": 0.0278,
+      "P75": 0.08987500000000001,
+      "W50": 0.55245,
+      "W75": 0.5847,
+      "GlobalAvgWin": 0.5469083333333332,
       "PickCut": 0.1,
-      "WinCut": 0.5538000000000001,
+      "WinCut": 0.55245,
       "Tau": 0.5
     },
     "supports": [],
-    "top_sets_used": 18,
+    "top_sets_used": 1,
     "note": "加入 explain 軌跡與參數可調。",
     "explain": {
       "decisions": [
         {
           "item": "殞落王者之劍",
-          "sup": 0.5,
+          "sup": 0.0,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "鬼索的狂暴之刃",
+          "sup": 0.0,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "智慧末刃",
+          "sup": 0.0,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "臨界點",
+          "sup": 0.0,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "千變萬化之賈克修",
+          "sup": 0.0,
           "cut": 1.0,
           "action": "reject"
         }

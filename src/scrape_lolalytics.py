@@ -207,110 +207,151 @@ def _parse_winning_items(page: Page) -> pd.DataFrame:
     return pd.DataFrame(data, columns=["img","name","win_rate","pick_rate","sample_size"])
 
 def _click_sets_five(page: Page) -> None:
-    """Actually Built Sets：切到 a_5（不含靴的 5 件）。"""
+    """在『Actually Built Sets』區塊內把 Exact Item Count 切到 5。"""
     try:
-        a5 = page.locator("[data-type='a_5']").first
-        if a5 and a5.count() > 0:
-            a5.click()
-            page.wait_for_selector("img[data-id^='4_']", timeout=5000)
-            time.sleep(0.15)
+        page.evaluate(r"""
+        (() => {
+          const find = (re) => Array.from(document.querySelectorAll('*'))
+            .find(n => re.test((n.textContent||'').trim()));
+          const blk = find(/(Actually\s*Built\s*Sets|實際出裝|出裝組合|裝備搭配|套裝)/i);
+          if (!blk) return false;
+          const root = blk.closest('section,div,article') || blk;
+          (root).scrollIntoView({behavior:'instant', block:'center'});
+          const btns = Array.from(root.querySelectorAll('button, a, span, div'));
+          const b5 = btns.find(el => (el.textContent||'').trim() === '5');
+          if (b5) { b5.dispatchEvent(new MouseEvent('click', {bubbles:true})); return true; }
+          return false;
+        })()
+        """)
+        page.wait_for_timeout(1200)  # 等重繪
     except Exception:
         pass
 
+
 def _parse_sets_5(page: Page) -> pd.DataFrame:
     """
-    Actually Built Sets（a_5，不含靴）。
-    直接在 a_5 區塊下把所有欄位一次抓回（不做水平滾動），
-    取每欄 0..4 的 item、以及 Win/Pick/Games 三個數字。
-    - 排除含 2003/2031（藥水）的列
-    - 過濾 sample_size <= 1
-    - 以 items 去重
+    Actually Built Sets（只取恰好 5 件、排除鞋、Games>1；不做橫向滑動）
     """
     _click_sets_five(page)
 
-    # a_5 所在的大區塊
-    block = page.locator("xpath=//div[.//div[@data-type='a_5']]").first
+    js = r"""
+    (() => {
+      const RE_SET = /(Actually\s*Built\s*Sets|實際出裝|出裝組合|裝備搭配|套裝)/i;
+      const PCT = /(\d+(?:\.\d+)?)\s*%/g;
+      const NUM = /\d[\d,\.]*/g;
+      const BOOT = /(靴|鞋|Boots|Greaves|Treads|Tabi|Berserker|Mercury|Plated|Sorcerer|Mobility|Ionia|Lucidity|Steelcaps|Tabi)/i;
 
-    # a_5 內真正承載所有欄位的橫向容器（包含大量 0_ 開頭的縮圖）
-    scroller = block.locator(
-        "xpath=.//div[contains(@class,'overflow-x-scroll')][.//img[starts-with(@data-id,'0_')]]"
-    ).first
+      const byText = (re) => {
+        const lab = Array.from(document.querySelectorAll('*'))
+          .find(n => re.test((n.textContent||'').trim()));
+        if (!lab) return null;
+        return lab.closest('section,div,article') || lab;
+      };
 
-    # 所有欄位的「第 1 張圖」（data-id 以 0_ 開頭），整頁都在 DOM，不需可見
-    img0s = scroller.locator("xpath=.//img[starts-with(@data-id,'0_')]")
+      const getItems = (el) => {
+        // 蒐集可見的 item 名稱（alt / aria-label / title）
+        const names = [];
+        el.querySelectorAll('img[alt], [aria-label], [title]').forEach(n => {
+          const v = n.getAttribute('alt') || n.getAttribute('aria-label') || n.getAttribute('title') || '';
+          const s = (v||'').trim();
+          if (!s || s.length > 40) return;
+          names.push(s);
+        });
+        return names;
+      };
+
+      const twoPercents = (el) => {
+        const txt = (el.textContent||'').replace(/\s+/g,' ');
+        const m = [...txt.matchAll(PCT)].map(x => parseFloat(x[1]));
+        if (m.length >= 2) return [m[0], m[1]];
+        return [NaN, NaN];
+      };
+
+      const gamesOf = (el) => {
+        // 取同列最像「場數」的數字（含千分位）
+        const txt = (el.textContent||'');
+        const nums = [...txt.matchAll(NUM)].map(x => x[0].replace(/,/g,''));
+        // 偏向較大的整數
+        const ints = nums.map(x => parseInt(x, 10)).filter(x => Number.isFinite(x));
+        if (!ints.length) return 0;
+        return Math.max(...ints);
+      };
+
+      const root = byText(RE_SET);
+      if (!root) return [];
+
+      const rows = Array.from(root.querySelectorAll('div,li,section,article'));
+      const out = [];
+      const seen = new Set();
+
+      for (const r of rows) {
+        const itemsAll = getItems(r);
+        if (itemsAll.length < 5) continue;
+
+        // 排除鞋，取前五個非鞋道具
+        const items = itemsAll.filter(x => !BOOT.test(x)).slice(0, 5);
+        if (items.length !== 5) continue;
+
+        // 防誤抓：這一列的 5 個 item 要彼此不同
+        if (new Set(items).size !== 5) continue;
+
+        const [win, pick] = twoPercents(r);
+        if (!Number.isFinite(win) || !Number.isFinite(pick)) continue;
+
+        const games = gamesOf(r);
+        if (!(games > 1)) continue; // 只要 sample_size > 1
+
+        const key = items.join('|');
+        if (seen.has(key)) continue;
+        seen.add(key);
+
+        out.push({ items, win, pick, games });
+      }
+
+      // 依場數降序，讓高樣本在前
+      out.sort((a,b) => b.games - a.games);
+      return out;
+    })()
+    """
+
     try:
-        n = img0s.count()
+        rows = page.evaluate(js) or []
     except Exception:
-        n = 0
+        rows = []
 
-    out, seen = [], set()
-    for i in range(n):
-        img0 = img0s.nth(i)
-
-        # 往上爬到「同一欄」的容器（必須同時有 0_..4_ 這五張）
-        col = img0.locator("xpath=ancestor::div[1]")
-        for _ in range(8):
-            if all(col.locator(f"xpath=.//img[starts-with(@data-id,'{k}_')]").count() > 0 for k in range(5)):
-                break
-            col = col.locator("xpath=ancestor::div[1]")
-
-        if any(col.locator(f"xpath=.//img[starts-with(@data-id,'{k}_')]").count() == 0 for k in range(5)):
-            continue
-
-        # 取 5 件 item（名稱 + 圖片）；若含藥水則跳過
-        names, imgs = [], []
-        skip = False
-        for k in range(5):
-            q = col.locator(f"xpath=.//img[starts-with(@data-id,'{k}_')]").first
-            name, src = _name_from_img(q)
-            if src.endswith("/2003.webp") or src.endswith("/2031.webp"):
-                skip = True
-            names.append(name)
-            imgs.append(src)
-        if skip:
-            continue
-
-        # 讀數字（網站顯示就是最終數值，不做百分比換算）
-        texts = [t.strip() for t in col.locator("xpath=.//div[contains(@class,'my-1')]").all_inner_texts() if t.strip()]
-        nums = []
-        for t in texts:
-            try:
-                nums.append(float(t.replace("%", "").replace(",", "")))
-            except:
-                pass
-        if len(nums) < 3:
-            continue
-
-        win, pick, sample = nums[0], nums[1], int(nums[2])
-        if sample <= 1:                 # 你要過濾掉 Games=1 的尾端雜訊
-            continue
-
-        key = "|".join(names)
-        if key in seen:
-            continue
-        seen.add(key)
-
-        out.append({
-            "items": "|".join(names),
-            "items_img": "|".join(imgs),
-            "set_win_rate": win,
-            "set_pick_rate": pick,
-            "set_sample_size": sample,
+    data = []
+    for r in rows:
+        data.append({
+            "items": "|".join(r.get("items", [])),
+            "items_img": "",  # 若要圖再補；目前只要名稱即可
+            "set_win_rate": float(r.get("win", 0)),
+            "set_pick_rate": float(r.get("pick", 0)),
+            "set_sample_size": int(r.get("games", 0)),
         })
 
-    cols = ["items", "items_img", "set_win_rate", "set_pick_rate", "set_sample_size"]
-    df = pd.DataFrame(out, columns=cols) if out else pd.DataFrame(columns=cols)
+    cols = ["items","items_img","set_win_rate","set_pick_rate","set_sample_size"]
+    df = pd.DataFrame(data, columns=cols)
 
-    # 仍抓不到就 dump 區塊 HTML 便於你貼回來
     if df.empty:
+        # 方便你抓錯誤：dump 該區塊 HTML
         try:
-            os.makedirs("data/raw", exist_ok=True)
-            with open("data/raw/sets_block_dump.fail.html", "w", encoding="utf-8") as f:
-                f.write(block.inner_html())
+            blk_html = page.evaluate(r"""
+            (() => {
+              const find = (re) => Array.from(document.querySelectorAll('*'))
+                .find(n => re.test((n.textContent||'').trim()));
+              const blk = find(/(Actually\s*Built\s*Sets|實際出裝|出裝組合|裝備搭配|套裝)/i);
+              const root = blk && (blk.closest('section,div,article') || blk);
+              return root ? root.innerHTML : '';
+            })()
+            """)
+            _mkdir_for("data/raw/sets_block_dump.fail.html")
+            with open("data/raw/sets_block_dump.fail.html","w",encoding="utf-8") as f:
+                f.write(blk_html or "")
         except Exception:
             pass
 
     return df
+
 
 # ---------- runner ----------
 
