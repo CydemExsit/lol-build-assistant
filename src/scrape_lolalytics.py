@@ -212,7 +212,10 @@ def _click_sets_five(page: Page) -> None:
         a5 = page.locator("[data-type='a_5']").first
         if a5 and a5.count() > 0:
             a5.click()
-            page.wait_for_selector("img[data-id^='4_']", timeout=5000)
+            page.wait_for_selector(
+                "css=.overflow-x-scroll > div.flex.gap-\\[6px\\]",
+                timeout=5000,
+            )
             time.sleep(0.15)
     except Exception:
         pass
@@ -234,65 +237,163 @@ def _parse_sets_5(page: Page) -> pd.DataFrame:
     except Exception:
         pass
 
-    imgs0 = page.locator("css=img[data-id^='0_']")
+    toggle = page.locator("css=div[data-type='a_5']").first
     try:
-        total = imgs0.count()
+        toggle.wait_for(state="visible", timeout=5000)
     except Exception:
-        total = 0
+        cols = ["items","items_img","set_win_rate","set_pick_rate","set_sample_size"]
+        return pd.DataFrame(columns=cols)
+
+    block = toggle.locator(
+        "xpath=ancestor::div[contains(concat(' ',normalize-space(@class),' '),' border-l ')][1]"
+    ).first
+    try:
+        block.wait_for(state="visible", timeout=5000)
+    except Exception:
+        cols = ["items","items_img","set_win_rate","set_pick_rate","set_sample_size"]
+        return pd.DataFrame(columns=cols)
+
+    scroller = toggle.locator(
+        "xpath=following::div[contains(@class,'overflow-x-scroll')][.//img[starts-with(@data-id,'0_')]][1]"
+    ).first
+    try:
+        scroller.wait_for(state="visible", timeout=5000)
+        if scroller.locator("css=img[src*='/item64/']").count() == 0:
+            raise Exception("no items")
+    except Exception:
+        cols = ["items","items_img","set_win_rate","set_pick_rate","set_sample_size"]
+        return pd.DataFrame(columns=cols)
+
+    wrapper = scroller.locator("css=div.flex.gap-\\[6px\\]").first
+    try:
+        wrapper.wait_for(state="visible", timeout=5000)
+    except Exception:
+        print("[debug] wrapper not visible")
+        cols = ["items","items_img","set_win_rate","set_pick_rate","set_sample_size"]
+        return pd.DataFrame(columns=cols)
 
     out, seen = [], set()
-    for i in range(total):
-        img0 = imgs0.nth(i)
-        # 往上找到同一列且同時含有 0..4 五張圖的容器
-        row = img0.locator("xpath=ancestor::div[1]")
-        for _ in range(6):
-            if all(row.locator(f"css=img[data-id^='{k}_']").count() > 0 for k in range(5)):
-                break
-            row = row.locator("xpath=ancestor::div[1]")
+    padding = 0
 
-        if any(row.locator(f"css=img[data-id^='{k}_']").count() == 0 for k in range(5)):
-            continue
+    # Reset padding-left to ensure we start from the first viewport.
+    try:
+        scroller.evaluate("(el) => { el.scrollLeft = 0; }")
+    except Exception:
+        pass
 
-        # 5 件（名稱與圖片）
-        names, imgs, skip = [], [], False
-        for k in range(5):
-            q = row.locator(f"css=img[data-id^='{k}_']").first
-            n, src = _name_from_img(q)
-            names.append(n)
-            imgs.append(src)
-            # 排除 Starting Items 假陽性
-            if src.endswith("/2003.webp") or src.endswith("/2031.webp"):
-                skip = True
-        if skip:
-            continue
-
-        key = "|".join(names)
-        if key in seen:
-            continue
-        seen.add(key)
-
-        # 這一列的數字（直接沿用網站顯示，不做百分比縮放）
-        texts = [t.strip() for t in row.locator("xpath=.//div[contains(@class,'my-1')]").all_inner_texts() if t.strip()]
-        nums = []
-        for t in texts:
-            try:
-                nums.append(float(t.replace("%","").replace(",","")))
-            except:
-                pass
-        if len(nums) < 3:
-            continue
-
-        win, pick, sample = nums[0], nums[1], int(nums[2])
-
-        out.append({
-            "items": "|".join(names),
-            "items_img": "|".join(imgs),
-            "set_win_rate": win,
-            "set_pick_rate": pick,
-            "set_sample_size": sample,
-        })
+    try:
+        wrapper.evaluate("(el) => { el.style.paddingLeft = '0px'; }")
+    except Exception:
+        pass
 
     cols = ["items","items_img","set_win_rate","set_pick_rate","set_sample_size"]
+
+    for idx in range(80):
+        result = wrapper.evaluate(
+            """
+            (el) => {
+              const viewport = el.parentElement;
+              const out = { rows: [], viewportWidth: 0 };
+              if (!viewport) return out;
+              out.viewportWidth = viewport.clientWidth || 0;
+              const children = Array.from(el.children || []);
+              for (const row of children) {
+                if (!row || typeof row.querySelector !== 'function') continue;
+                const imgs = Array.from(row.querySelectorAll("img[data-id]"));
+                if (!imgs.length) continue;
+                const entries = imgs.map(img => ({
+                  src: img.src || "",
+                  alt: img.alt || "",
+                  dataId: img.getAttribute('data-id') || "",
+                }));
+                const nums = Array.from(row.querySelectorAll("div.my-1"))
+                  .map(elm => (elm.textContent || "").trim())
+                  .filter(Boolean);
+                out.rows.push({ items: entries, numbers: nums });
+              }
+              return out;
+            }
+            """
+        )
+
+        if not result or not isinstance(result, dict):
+            break
+
+        rows = result.get("rows", []) or []
+        viewport_width = result.get("viewportWidth", 0) or 0
+        print("[debug] rows", len(rows), "viewport", viewport_width)
+
+        before = len(seen)
+        for row in rows:
+            entries = row.get("items", []) or []
+            slot_map = {}
+            for entry in entries:
+                data_id = entry.get("dataId", "") or ""
+                try:
+                    slot = int(str(data_id).split("_")[0])
+                except Exception:
+                    slot = -1
+                if slot < 0 or slot > 4:
+                    continue
+                if slot not in slot_map:
+                    slot_map[slot] = entry
+            ordered = [slot_map.get(i) for i in range(5)]
+            if any(o is None for o in ordered):
+                continue
+
+            names, imgs, skip = [], [], False
+            for entry in ordered:
+                src = entry.get("src", "")
+                alt = entry.get("alt", "")
+                name = alt or os.path.basename(src).split(".")[0]
+                names.append(name)
+                imgs.append(src)
+                if src.endswith("/2003.webp") or src.endswith("/2031.webp"):
+                    skip = True
+            if skip:
+                continue
+
+            key = "|".join(names)
+            if not key or key in seen:
+                continue
+
+            texts = row.get("numbers", []) or []
+            nums = []
+            for t in texts:
+                try:
+                    nums.append(float(t.replace("%", "").replace(",", "")))
+                except Exception:
+                    pass
+            if len(nums) < 3:
+                continue
+
+            win, pick, sample = nums[0], nums[1], int(nums[2])
+            if sample <= 1:
+                continue
+
+            seen.add(key)
+            out.append({
+                "items": key,
+                "items_img": "|".join(imgs),
+                "set_win_rate": win,
+                "set_pick_rate": pick,
+                "set_sample_size": sample,
+            })
+        added = len(seen) - before
+
+        if added == 0:
+            break
+
+        if viewport_width <= 0:
+            break
+
+        padding += viewport_width
+        try:
+            wrapper.evaluate("(el, padding) => { el.style.paddingLeft = padding + 'px'; }", padding)
+        except Exception:
+            break
+        page.wait_for_timeout(200)
+
     df = pd.DataFrame(out, columns=cols) if out else pd.DataFrame(columns=cols)
 
     # 若仍抓不到，dump a_5 區塊的 HTML 以便判斷
@@ -318,7 +419,8 @@ def scrape(hero: str, mode: str, tier: str, patch: str, lang: str, no_headless: 
             user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                         "AppleWebKit/537.36 (KHTML, like Gecko) "
                         "Chrome/121.0.0.0 Safari/537.36"),
-            viewport={"width": 1440, "height": 2200}
+            viewport={"width": 1440, "height": 2200},
+            ignore_https_errors=True,
         )
         page = ctx.new_page()
         url = _goto_build_page(page, hero, mode, tier, patch, lang)
