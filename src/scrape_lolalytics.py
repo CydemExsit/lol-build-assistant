@@ -49,19 +49,30 @@ def _goto_build_page(page, hero: str, mode: str, tier: str, patch: str, lang: st
     url = f"https://lolalytics.com/{lang}/lol/{hero}/{mode}/build/?tier={tier}&patch={patch}"
     page.goto(url, wait_until="domcontentloaded")
 
-    # 在桌面版一定會出現的穩定錨點：a_5 / ab_5 tab 或任意 item 圖片
-    stable = "css=[data-type='a_5'], [data-type='ab_5'], img[src*='/item64/']"
+    # 等網路靜止，避免還在載入 Qwik/lolx 區塊
     try:
-        page.wait_for_selector(stable, timeout=45000, state="visible")
-    except PWTimeout:
-        # 落網就丟一份 debug 方便檢
-        try:
-            os.makedirs("data/raw", exist_ok=True)
-            with open("data/raw/page_last.html", "w", encoding="utf-8") as f:
-                f.write(page.content())
-            page.screenshot(path="data/raw/snap_last.png", full_page=True)
-        finally:
-            raise
+        page.wait_for_load_state("networkidle", timeout=45000)
+    except Exception:
+        pass  # 某些時候 networkidle 不會觸發，讓下方 lazy 觸發補一手
+
+    # 觸發一次 lazy render / lazy image：捲到底再回到頂
+    try:
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        page.wait_for_timeout(500)
+        page.evaluate("window.scrollTo(0, 0)")
+        page.wait_for_timeout(200)
+    except Exception:
+        pass
+
+    # 立刻拍備份方便除錯
+    try:
+        os.makedirs("data/raw", exist_ok=True)
+        page.screenshot(path="data/raw/snap_last.png", full_page=True)
+        with open("data/raw/page_last.html", "w", encoding="utf-8") as f:
+            f.write(page.content())
+    except Exception:
+        pass
+
     return url
 
 
@@ -249,7 +260,6 @@ def scrape(hero: str, mode: str, tier: str, patch: str, lang: str, no_headless: 
                         "Chrome/121.0.0.0 Safari/537.36"),
             viewport={"width": 1440, "height": 2200}
         )
-
 
         page = ctx.new_page()
         url = _goto_build_page(page, hero, mode, tier, patch, lang)
