@@ -206,151 +206,92 @@ def _parse_winning_items(page: Page) -> pd.DataFrame:
 
     return pd.DataFrame(data, columns=["img","name","win_rate","pick_rate","sample_size"])
 
-def _click_sets_five(page: Page) -> None:
-    """在『Actually Built Sets』區塊內把 Exact Item Count 切到 5。"""
+def _click_sets_five(page: Page):
+    # 切到「5」
+    page.locator("xpath=//div[@data-type='a_5']").first.click()
+    page.wait_for_timeout(300)
+
+    # 找到「Actually Built Sets」的橫向 scroller
+    scroller = page.locator(
+        "xpath=//div[.//div[@data-type='a_5']]/following-sibling::div[contains(@class,'overflow-x-scroll')]"
+    ).first
+    if scroller.count() == 0:
+        scroller = page.locator("xpath=(//div[contains(@class,'overflow-x-scroll')])[2]").first
+
+    scroller.wait_for(state="visible", timeout=10000)
+
+    # 從最左邊開始（避免讀到尾端只剩 1 場的列）
     try:
-        page.evaluate(r"""
-        (() => {
-          const find = (re) => Array.from(document.querySelectorAll('*'))
-            .find(n => re.test((n.textContent||'').trim()));
-          const blk = find(/(Actually\s*Built\s*Sets|實際出裝|出裝組合|裝備搭配|套裝)/i);
-          if (!blk) return false;
-          const root = blk.closest('section,div,article') || blk;
-          (root).scrollIntoView({behavior:'instant', block:'center'});
-          const btns = Array.from(root.querySelectorAll('button, a, span, div'));
-          const b5 = btns.find(el => (el.textContent||'').trim() === '5');
-          if (b5) { b5.dispatchEvent(new MouseEvent('click', {bubbles:true})); return true; }
-          return false;
-        })()
-        """)
-        page.wait_for_timeout(1200)  # 等重繪
+        scroller.evaluate(
+            """(el) => {
+                el.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+                const inner = Array.from(el.children).find(n => (n.className||'').includes('flex'));
+                if (inner) inner.style.paddingLeft = '0px';
+            }"""
+        )
     except Exception:
         pass
+    return scroller
 
 
 def _parse_sets_5(page: Page) -> pd.DataFrame:
-    """
-    Actually Built Sets（只取恰好 5 件、排除鞋、Games>1；不做橫向滑動）
-    """
-    _click_sets_five(page)
+    scroller = _click_sets_five(page)
 
-    js = r"""
-    (() => {
-      const RE_SET = /(Actually\s*Built\s*Sets|實際出裝|出裝組合|裝備搭配|套裝)/i;
-      const PCT = /(\d+(?:\.\d+)?)\s*%/g;
-      const NUM = /\d[\d,\.]*/g;
-      const BOOT = /(靴|鞋|Boots|Greaves|Treads|Tabi|Berserker|Mercury|Plated|Sorcerer|Mobility|Ionia|Lucidity|Steelcaps|Tabi)/i;
+    # 把可見區塊的每一列（row）拉回來：前 5 個 img + 右側數字
+    rows = scroller.evaluate(
+        """(el) => {
+            const inner = Array.from(el.children).find(n => (n.className||'').includes('flex'));
+            if (!inner) return [];
+            return Array.from(inner.children).map(row => {
+                const imgs = Array.from(row.querySelectorAll('img')).slice(0, 5)
+                  .map(i => ({ alt: i.alt || '', src: i.src || '' }));
+                const texts = Array.from(row.querySelectorAll('div'))
+                  .map(d => (d.textContent || '').trim()).filter(Boolean);
 
-      const byText = (re) => {
-        const lab = Array.from(document.querySelectorAll('*'))
-          .find(n => re.test((n.textContent||'').trim()));
-        if (!lab) return null;
-        return lab.closest('section,div,article') || lab;
-      };
+                // 取出百分比與場數（最後一個整數）
+                const pcts  = texts.filter(t => t.includes('%'))
+                                   .map(t => parseFloat(t.replace('%','')));
+                const nums  = texts.map(t => t.replace(/[ ,]/g,''))
+                                   .map(t => parseFloat(t))
+                                   .filter(n => !Number.isNaN(n));
+                const games = (nums.slice().reverse().find(n => Number.isInteger(n)) || 0);
 
-      const getItems = (el) => {
-        // 蒐集可見的 item 名稱（alt / aria-label / title）
-        const names = [];
-        el.querySelectorAll('img[alt], [aria-label], [title]').forEach(n => {
-          const v = n.getAttribute('alt') || n.getAttribute('aria-label') || n.getAttribute('title') || '';
-          const s = (v||'').trim();
-          if (!s || s.length > 40) return;
-          names.push(s);
-        });
-        return names;
-      };
+                return { imgs, win: pcts[0] || 0, pick: pcts[1] || 0, games };
+            });
+        }"""
+    )
 
-      const twoPercents = (el) => {
-        const txt = (el.textContent||'').replace(/\s+/g,' ');
-        const m = [...txt.matchAll(PCT)].map(x => parseFloat(x[1]));
-        if (m.length >= 2) return [m[0], m[1]];
-        return [NaN, NaN];
-      };
+    out, seen = [], set()
+    for r in rows or []:
+        if not r or len(r["imgs"]) < 5:
+            continue
+        names    = [i["alt"] for i in r["imgs"]]
+        img_urls = [i["src"] for i in r["imgs"]]
 
-      const gamesOf = (el) => {
-        // 取同列最像「場數」的數字（含千分位）
-        const txt = (el.textContent||'');
-        const nums = [...txt.matchAll(NUM)].map(x => x[0].replace(/,/g,''));
-        // 偏向較大的整數
-        const ints = nums.map(x => parseInt(x, 10)).filter(x => Number.isFinite(x));
-        if (!ints.length) return 0;
-        return Math.max(...ints);
-      };
+        # 跳過藥水列
+        if any(u.endswith("/2003.webp") or u.endswith("/2031.webp") for u in img_urls):
+            continue
 
-      const root = byText(RE_SET);
-      if (!root) return [];
+        key = "|".join(names)
+        if key in seen:
+            continue
+        seen.add(key)
 
-      const rows = Array.from(root.querySelectorAll('div,li,section,article'));
-      const out = [];
-      const seen = new Set();
+        # 只要「場數 > 1」，且越後面若遇到 =1 就停
+        if int(r["games"]) <= 1:
+            break
 
-      for (const r of rows) {
-        const itemsAll = getItems(r);
-        if (itemsAll.length < 5) continue;
-
-        // 排除鞋，取前五個非鞋道具
-        const items = itemsAll.filter(x => !BOOT.test(x)).slice(0, 5);
-        if (items.length !== 5) continue;
-
-        // 防誤抓：這一列的 5 個 item 要彼此不同
-        if (new Set(items).size !== 5) continue;
-
-        const [win, pick] = twoPercents(r);
-        if (!Number.isFinite(win) || !Number.isFinite(pick)) continue;
-
-        const games = gamesOf(r);
-        if (!(games > 1)) continue; // 只要 sample_size > 1
-
-        const key = items.join('|');
-        if (seen.has(key)) continue;
-        seen.add(key);
-
-        out.push({ items, win, pick, games });
-      }
-
-      // 依場數降序，讓高樣本在前
-      out.sort((a,b) => b.games - a.games);
-      return out;
-    })()
-    """
-
-    try:
-        rows = page.evaluate(js) or []
-    except Exception:
-        rows = []
-
-    data = []
-    for r in rows:
-        data.append({
-            "items": "|".join(r.get("items", [])),
-            "items_img": "",  # 若要圖再補；目前只要名稱即可
-            "set_win_rate": float(r.get("win", 0)),
-            "set_pick_rate": float(r.get("pick", 0)),
-            "set_sample_size": int(r.get("games", 0)),
+        out.append({
+            "items": "|".join(names),
+            "items_img": "|".join(img_urls),
+            "set_win_rate": r["win"],
+            "set_pick_rate": r["pick"],
+            "set_sample_size": int(r["games"]),
         })
 
-    cols = ["items","items_img","set_win_rate","set_pick_rate","set_sample_size"]
-    df = pd.DataFrame(data, columns=cols)
+    cols = ["items", "items_img", "set_win_rate", "set_pick_rate", "set_sample_size"]
+    return pd.DataFrame(out, columns=cols)
 
-    if df.empty:
-        # 方便你抓錯誤：dump 該區塊 HTML
-        try:
-            blk_html = page.evaluate(r"""
-            (() => {
-              const find = (re) => Array.from(document.querySelectorAll('*'))
-                .find(n => re.test((n.textContent||'').trim()));
-              const blk = find(/(Actually\s*Built\s*Sets|實際出裝|出裝組合|裝備搭配|套裝)/i);
-              const root = blk && (blk.closest('section,div,article') || blk);
-              return root ? root.innerHTML : '';
-            })()
-            """)
-            _mkdir_for("data/raw/sets_block_dump.fail.html")
-            with open("data/raw/sets_block_dump.fail.html","w",encoding="utf-8") as f:
-                f.write(blk_html or "")
-        except Exception:
-            pass
-
-    return df
 
 
 # ---------- runner ----------
