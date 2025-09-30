@@ -9,13 +9,15 @@ DEF_MODE = "aram"
 DEF_TIER = "d2_plus"
 DEF_PATCH = "7"
 
+# ---------- utils ----------
+
 def _mkdir_for(path: str) -> None:
     d = os.path.dirname(os.path.abspath(path))
     if d and not os.path.exists(d):
         os.makedirs(d, exist_ok=True)
 
 def _to_pct(s: str) -> float:
-    """'67.03' or '67.03%' -> 0.6703；容錯處理（只給 Winning Items 用）"""
+    """'67.03' or '67.03%' -> 0.6703（僅 Winning Items 需要正規化成 0~1）。"""
     try:
         v = float(str(s).strip().replace("%","").replace(",",""))
         if v < 0: v = 0.0
@@ -45,26 +47,28 @@ def _name_from_img(img) -> Tuple[str, str]:
     base = os.path.basename(src).split(".")[0]
     return base, src
 
-def _goto_build_page(page, hero: str, mode: str, tier: str, patch: str, lang: str) -> str:
+# ---------- navigation / page-ready ----------
+
+def _goto_build_page(page: Page, hero: str, mode: str, tier: str, patch: str, lang: str) -> str:
     url = f"https://lolalytics.com/{lang}/lol/{hero}/{mode}/build/?tier={tier}&patch={patch}"
     page.goto(url, wait_until="domcontentloaded")
 
-    # 等網路靜止，避免還在載入 Qwik/lolx 區塊
+    # 儘量等到網路靜止（Qwik/lolx 有時仍會延遲載入）
     try:
         page.wait_for_load_state("networkidle", timeout=45000)
     except Exception:
-        pass  # 某些時候 networkidle 不會觸發，讓下方 lazy 觸發補一手
+        pass
 
-    # 觸發一次 lazy render / lazy image：捲到底再回到頂
+    # 觸發 lazy render（拉到底再回頂）
     try:
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-        page.wait_for_timeout(500)
+        page.wait_for_timeout(600)
         page.evaluate("window.scrollTo(0, 0)")
         page.wait_for_timeout(200)
     except Exception:
         pass
 
-    # 立刻拍備份方便除錯
+    # 永遠輸出除錯快照
     try:
         os.makedirs("data/raw", exist_ok=True)
         page.screenshot(path="data/raw/snap_last.png", full_page=True)
@@ -75,82 +79,135 @@ def _goto_build_page(page, hero: str, mode: str, tier: str, patch: str, lang: st
 
     return url
 
+# ---------- parsers ----------
 
 def _parse_winning_items(page: Page) -> pd.DataFrame:
     """
-    只解析「Winning Items」：
-      1) 鎖定整個區塊（含左側 'Winning' / 'Items' 標籤）
-      2) 右側橫向容器做一次 scroll 觸發
-      3) 直接 evaluate 把每列的 img / win / pick 拉回來
+    解析「Winning Items」：
+      1) 鎖定整個區塊（左側 'Winning' / 'Items' 標籤）
+      2) 在右側橫向容器「分段橫向捲動」，每段都收集一次，直到沒有新行
+      3) evaluate 把每列的 img / win / pick 拉回來
+      4) 輸出欄：img, name, win_rate(0~1), pick_rate(0~1), sample_size=0
     """
     block = page.locator(
         "xpath=//div[contains(@class,'flex') and contains(@class,'h-[128px]') and contains(@class,'mb-2') and contains(@class,'border')"
         " and .//div[@class='my-1' and normalize-space()='Winning']"
         " and .//div[@class='my-1' and normalize-space()='Items']]"
     ).first
-    block.wait_for(state="visible", timeout=10000)
+
+    try:
+        block.wait_for(state="visible", timeout=10000)
+    except Exception:
+        try:
+            with open("data/raw/winning_block_dump.pre.html","w",encoding="utf-8") as f:
+                f.write(page.content())
+        except Exception:
+            pass
+        return pd.DataFrame(columns=["img","name","win_rate","pick_rate","sample_size"])
+
     block.scroll_into_view_if_needed()
 
     scroller = block.locator("xpath=.//div[contains(@class,'overflow-x-scroll')]").first
-    scroller.wait_for(state="visible", timeout=10000)
+    try:
+        scroller.wait_for(state="visible", timeout=10000)
+    except Exception:
+        try:
+            with open("data/raw/winning_block_dump.norows.html","w",encoding="utf-8") as f:
+                f.write(block.inner_html())
+        except Exception:
+            pass
+        return pd.DataFrame(columns=["img","name","win_rate","pick_rate","sample_size"])
+
+    # 抽取目前畫面上的 rows
+    def _extract_rows():
+        return scroller.evaluate(
+            """
+            (el) => {
+              const out = [];
+              const candidates = Array.from(el.querySelectorAll('div'));
+              let container = null;
+              for (const c of candidates) {
+                const kids = Array.from(c.children || []);
+                const hasMany = kids.filter(r => r.querySelector("img[src*='/item64/']")).length;
+                if (hasMany >= 5) { container = c; break; }
+              }
+              if (!container) return out;
+              for (const row of Array.from(container.children)) {
+                const img = row.querySelector("img[src*='/item64/']");
+                if (!img) continue;
+                const nums = Array.from(row.querySelectorAll("div.my-1"))
+                  .map(e => (e.textContent || "").trim())
+                  .filter(Boolean);
+                const win  = nums[0] || "";
+                const pick = nums[1] || "";
+                out.push({ src: img.src || "", alt: img.alt || "", win, pick });
+              }
+              return out;
+            }
+            """
+        )
+
+    seen_src = set()
+    data = []
+
+    # 先觸發一次 scroll
     try:
         scroller.evaluate("(el) => { el.scrollLeft = 1; el.dispatchEvent(new Event('scroll', {bubbles:true})); }")
     except Exception:
         pass
     page.wait_for_timeout(200)
 
-    rows = scroller.evaluate(
-        """
-        (el) => {
-          const candidates = Array.from(el.querySelectorAll('div'));
-          let container = null;
-          for (const c of candidates) {
-            const kids = Array.from(c.children || []);
-            const hasMany = kids.filter(r => r.querySelector("img[src*='/item64/']")).length;
-            if (hasMany >= 5) { container = c; break; }
-          }
-          if (!container) return [];
-          return Array.from(container.children).map(row => {
-            const img = row.querySelector("img[src*='/item64/']");
-            if (!img) return null;
-            const nums = Array.from(row.querySelectorAll("div.my-1"))
-              .map(e => (e.textContent || "").trim())
-              .filter(Boolean);
-            const win  = nums[0] || "";
-            const pick = nums[1] || "";
-            return { src: img.src || "", alt: img.alt || "", win, pick };
-          }).filter(Boolean);
-        }
-        """
-    )
+    # 逐步往右捲動，直到不能再捲或沒有新資料
+    for _ in range(60):  # 最多 60 段
+        rows = _extract_rows()
+        new_added = 0
+        for r in rows:
+            key = r.get("src","")
+            if not key or key in seen_src:
+                continue
+            seen_src.add(key)
+            win_rate  = _to_pct(r.get("win",""))
+            pick_rate = _to_pct(r.get("pick",""))
+            if win_rate == 0.0 and pick_rate == 0.0:
+                continue
+            data.append({
+                "img": key,
+                "name": r.get("alt",""),
+                "win_rate": win_rate,
+                "pick_rate": pick_rate,
+                "sample_size": 0,
+            })
+            new_added += 1
 
-    data = []
-    for r in rows:
-        win_rate  = _to_pct(r.get("win",""))
-        pick_rate = _to_pct(r.get("pick",""))
-        if win_rate == 0.0 and pick_rate == 0.0:
-            continue
-        data.append({
-            "img": r.get("src",""),
-            "name": r.get("alt",""),
-            "win_rate": win_rate,
-            "pick_rate": pick_rate,
-        })
+        # 嘗試再往右捲一屏
+        moved = scroller.evaluate(
+            """
+            (el) => {
+              const before = el.scrollLeft;
+              const next = Math.min(el.scrollLeft + el.clientWidth, el.scrollWidth);
+              el.scrollLeft = next;
+              el.dispatchEvent(new Event('scroll', {bubbles:true}));
+              return [before, el.scrollLeft, el.scrollWidth];
+            }
+            """
+        )
+        page.wait_for_timeout(160)
+
+        before, after, _total = moved
+        if after == before and new_added == 0:
+            break  # 捲不動且沒有新資料，停止
 
     if not data:
         try:
-            html_dump = block.inner_html()
-            _mkdir_for("data/raw/winning_block_dump.fail.html")
             with open("data/raw/winning_block_dump.fail.html","w",encoding="utf-8") as f:
-                f.write(html_dump)
+                f.write(block.inner_html())
         except Exception:
             pass
 
-    # algo.load_winning_items 需要 sample_size 欄；這裡固定補 0
-    return pd.DataFrame(data, columns=["img","name","win_rate","pick_rate"]).assign(sample_size=0)
+    return pd.DataFrame(data, columns=["img","name","win_rate","pick_rate","sample_size"])
 
 def _click_sets_five(page: Page) -> None:
-    """Actually Built Sets：只切到 a_5（不含靴的 5 件）。"""
+    """Actually Built Sets：切到 a_5（不含靴的 5 件）。"""
     try:
         a5 = page.locator("[data-type='a_5']").first
         if a5 and a5.count() > 0:
@@ -162,70 +219,76 @@ def _click_sets_five(page: Page) -> None:
 
 def _parse_sets_5(page: Page) -> pd.DataFrame:
     """
-    抓 Actually Built Sets（a_5，不含靴）。
-    全頁尋找 data-id 前綴 0..4 的五件列，再過濾掉含藥水(2003/2031)的起手裝列。
-    直接使用頁面上的數值（Win / Pick / Games）。
-    另外固定輸出 items_img 供 MD 顯示圖片。
+    Actually Built Sets（a_5，不含靴）。
+    直接在 a_5 區塊下把所有欄位一次抓回（不做水平滾動），
+    取每欄 0..4 的 item、以及 Win/Pick/Games 三個數字。
+    - 排除含 2003/2031（藥水）的列
+    - 過濾 sample_size <= 1
+    - 以 items 去重
     """
     _click_sets_five(page)
 
-    # 永遠保留一份完整 DOM 方便除錯
-    try:
-        _mkdir_for("data/raw/page_last.html")
-        with open("data/raw/page_last.html","w",encoding="utf-8") as f:
-            f.write(page.content())
-    except Exception:
-        pass
+    # a_5 所在的大區塊
+    block = page.locator("xpath=//div[.//div[@data-type='a_5']]").first
 
-    imgs0 = page.locator("css=img[data-id^='0_']")
+    # a_5 內真正承載所有欄位的橫向容器（包含大量 0_ 開頭的縮圖）
+    scroller = block.locator(
+        "xpath=.//div[contains(@class,'overflow-x-scroll')][.//img[starts-with(@data-id,'0_')]]"
+    ).first
+
+    # 所有欄位的「第 1 張圖」（data-id 以 0_ 開頭），整頁都在 DOM，不需可見
+    img0s = scroller.locator("xpath=.//img[starts-with(@data-id,'0_')]")
     try:
-        total = imgs0.count()
+        n = img0s.count()
     except Exception:
-        total = 0
+        n = 0
 
     out, seen = [], set()
-    for i in range(total):
-        img0 = imgs0.nth(i)
-        # 往上找到同一列且同時含有 0..4 五張圖的容器
-        row = img0.locator("xpath=ancestor::div[1]")
-        for _ in range(6):
-            if all(row.locator(f"css=img[data-id^='{k}_']").count() > 0 for k in range(5)):
-                break
-            row = row.locator("xpath=ancestor::div[1]")
+    for i in range(n):
+        img0 = img0s.nth(i)
 
-        if any(row.locator(f"css=img[data-id^='{k}_']").count() == 0 for k in range(5)):
+        # 往上爬到「同一欄」的容器（必須同時有 0_..4_ 這五張）
+        col = img0.locator("xpath=ancestor::div[1]")
+        for _ in range(8):
+            if all(col.locator(f"xpath=.//img[starts-with(@data-id,'{k}_')]").count() > 0 for k in range(5)):
+                break
+            col = col.locator("xpath=ancestor::div[1]")
+
+        if any(col.locator(f"xpath=.//img[starts-with(@data-id,'{k}_')]").count() == 0 for k in range(5)):
             continue
 
-        # 5 件（名稱與圖片）
-        names, imgs, skip = [], [], False
+        # 取 5 件 item（名稱 + 圖片）；若含藥水則跳過
+        names, imgs = [], []
+        skip = False
         for k in range(5):
-            q = row.locator(f"css=img[data-id^='{k}_']").first
-            n, src = _name_from_img(q)
-            names.append(n)
-            imgs.append(src)
-            # 排除 Starting Items 假陽性
+            q = col.locator(f"xpath=.//img[starts-with(@data-id,'{k}_')]").first
+            name, src = _name_from_img(q)
             if src.endswith("/2003.webp") or src.endswith("/2031.webp"):
                 skip = True
+            names.append(name)
+            imgs.append(src)
         if skip:
             continue
 
-        key = "|".join(names)
-        if key in seen:
-            continue
-        seen.add(key)
-
-        # 這一列的數字（直接沿用網站顯示，不做百分比縮放）
-        texts = [t.strip() for t in row.locator("xpath=.//div[contains(@class,'my-1')]").all_inner_texts() if t.strip()]
+        # 讀數字（網站顯示就是最終數值，不做百分比換算）
+        texts = [t.strip() for t in col.locator("xpath=.//div[contains(@class,'my-1')]").all_inner_texts() if t.strip()]
         nums = []
         for t in texts:
             try:
-                nums.append(float(t.replace("%","").replace(",","")))
+                nums.append(float(t.replace("%", "").replace(",", "")))
             except:
                 pass
         if len(nums) < 3:
             continue
 
         win, pick, sample = nums[0], nums[1], int(nums[2])
+        if sample <= 1:                 # 你要過濾掉 Games=1 的尾端雜訊
+            continue
+
+        key = "|".join(names)
+        if key in seen:
+            continue
+        seen.add(key)
 
         out.append({
             "items": "|".join(names),
@@ -235,20 +298,21 @@ def _parse_sets_5(page: Page) -> pd.DataFrame:
             "set_sample_size": sample,
         })
 
-    cols = ["items","items_img","set_win_rate","set_pick_rate","set_sample_size"]
+    cols = ["items", "items_img", "set_win_rate", "set_pick_rate", "set_sample_size"]
     df = pd.DataFrame(out, columns=cols) if out else pd.DataFrame(columns=cols)
 
-    # 若仍抓不到，dump a_5 區塊的 HTML 以便判斷
+    # 仍抓不到就 dump 區塊 HTML 便於你貼回來
     if df.empty:
         try:
-            block = page.locator("xpath=//div[.//div[@data-type='a_5']]").first
-            _mkdir_for("data/raw/sets_block_dump.fail.html")
-            with open("data/raw/sets_block_dump.fail.html","w",encoding="utf-8") as f:
+            os.makedirs("data/raw", exist_ok=True)
+            with open("data/raw/sets_block_dump.fail.html", "w", encoding="utf-8") as f:
                 f.write(block.inner_html())
         except Exception:
             pass
 
     return df
+
+# ---------- runner ----------
 
 def scrape(hero: str, mode: str, tier: str, patch: str, lang: str, no_headless: bool=False):
     with sync_playwright() as p:
@@ -260,7 +324,6 @@ def scrape(hero: str, mode: str, tier: str, patch: str, lang: str, no_headless: 
                         "Chrome/121.0.0.0 Safari/537.36"),
             viewport={"width": 1440, "height": 2200}
         )
-
         page = ctx.new_page()
         url = _goto_build_page(page, hero, mode, tier, patch, lang)
 
