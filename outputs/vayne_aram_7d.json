@@ -10,8 +10,8 @@
       "殞落王者之劍",
       "鬼索的狂暴之刃",
       "智慧末刃",
-      "臨界點",
-      "海妖殺手"
+      "千變萬化之賈克修",
+      "臨界點"
     ]
   },
   "rationale": {
@@ -23,42 +23,41 @@
       "GlobalAvgWin": 0.5469083333333332,
       "PickCut": 0.1,
       "WinCut": 0.55245,
-      "Tau": 0.5
+      "Tau": 1.0
     },
-    "supports": [],
+    "supports": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
     "top_sets_used": 1,
     "note": "加入 explain 軌跡與參數可調。",
     "explain": {
       "decisions": [
         {
           "item": "殞落王者之劍",
-          "sup": 0.0,
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         },
         {
           "item": "鬼索的狂暴之刃",
-          "sup": 0.0,
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         },
         {
           "item": "智慧末刃",
-          "sup": 0.0,
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         },
         {
           "item": "臨界點",
-          "sup": 0.0,
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
-        },
-        {
-          "item": "千變萬化之賈克修",
-          "sup": 0.0,
-          "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         }
       ],
       "selected_before_ordering": [
@@ -66,14 +65,14 @@
         "鬼索的狂暴之刃",
         "智慧末刃",
         "臨界點",
-        "海妖殺手"
+        "千變萬化之賈克修"
       ],
       "ordered_final": [
         "殞落王者之劍",
         "鬼索的狂暴之刃",
         "智慧末刃",
-        "臨界點",
-        "海妖殺手"
+        "千變萬化之賈克修",
+        "臨界點"
       ]
     }
   }
