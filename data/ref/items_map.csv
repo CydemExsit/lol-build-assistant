@@ -1,0 +1,636 @@
+item_id,en_name,zh_tw_name,tags
+1001,Boots,鞋子,Boots
+1004,Faerie Charm,仙女護符,ManaRegen
+1006,Rejuvenation Bead,治療寶珠,HealthRegen
+1011,Giant's Belt,巨人腰帶,Health
+1018,Cloak of Agility,靈巧披風,CriticalStrike
+1026,Blasting Wand,爆裂魔杖,SpellDamage
+1027,Sapphire Crystal,藍水晶,Mana
+1028,Ruby Crystal,紅水晶,Health
+1029,Cloth Armor,布甲,Armor
+1031,Chain Vest,鎖子甲,Armor
+1033,Null-Magic Mantle,抗魔斗篷,SpellBlock
+1035,Emberknife,餘燼之刃,"LifeSteal,SpellVamp,Jungle"
+1036,Long Sword,長劍,"Damage,Lane"
+1037,Pickaxe,十字鎬,Damage
+1038,B. F. Sword,暴風之劍,Damage
+1039,Hailblade,雹刃,"LifeSteal,SpellVamp,Jungle"
+1040,Obsidian Edge,黑曜鋒刃,"LifeSteal,SpellVamp,Jungle"
+1042,Dagger,短劍,AttackSpeed
+1043,Recurve Bow,反曲弓,"AttackSpeed,OnHit"
+1052,Amplifying Tome,增幅典籍,SpellDamage
+1053,Vampiric Scepter,吸血鬼權杖,"Damage,LifeSteal"
+1054,Doran's Shield,多蘭之盾,"Health,HealthRegen,Lane"
+1055,Doran's Blade,多蘭之劍,"Health,Damage,SpellVamp,Lane"
+1056,Doran's Ring,多蘭之戒,"Health,Lane,ManaRegen,SpellDamage"
+1057,Negatron Cloak,負極斗篷,SpellBlock
+1058,Needlessly Large Rod,巨型魔棒,SpellDamage
+1082,Dark Seal,黑暗玉璽,"Health,SpellDamage,Lane"
+1083,Cull,汰除品,"Damage,OnHit,Lane"
+1101,Scorchclaw Pup,熾爪幼犬,Jungle
+1102,Gustwalker Hatchling,馭風幼狐,Jungle
+1103,Mosstomper Seedling,重踏幼螈,Jungle
+1104,Eye of the Herald,預示者之眼,"Trinket,Active"
+1105,Mosstomper Seedling,重踏幼螈,Jungle
+1106,Gustwalker Hatchling,馭風幼狐,Jungle
+1107,Scorchclaw Pup,熾爪幼犬,Jungle
+1500,Penetrating Bullets,穿甲彈,"HealthRegen,ManaRegen,OnHit"
+1501,Fortification,強化堡壘,
+1502,Reinforced Armor,武裝強化,"Armor,ManaRegen,OnHit"
+1503,Warden's Eye,守護之眼,"HealthRegen,ManaRegen,OnHit"
+1504,Vanguard,先鋒者,"Armor,ManaRegen,OnHit"
+1506,Reinforced Armor,強化護甲,"Armor,ManaRegen,OnHit"
+1507,Overcharged,超載,"Armor,ManaRegen,OnHit"
+1508,Anti-tower Socks,扛塔之襪,"Armor,ManaRegen,OnHit"
+1509,Gusto,熱血情懷,"Armor,ManaRegen,OnHit"
+1510,Phreakish Gusto,弗瑞克式的熱血情懷,"Armor,ManaRegen,OnHit"
+1511,Super Mech Armor,超級士兵裝甲,"Armor,ManaRegen,OnHit"
+1512,Super Mech Power Field,超級士兵能量力場,"Armor,ManaRegen,OnHit"
+1515,Turret Plating,防禦塔護甲,Armor
+1516,Structure Bounty,建築物賞金,"HealthRegen,ManaRegen,OnHit"
+1517,Structure Bounty,建築物賞金,"HealthRegen,ManaRegen,OnHit"
+1518,Structure Bounty,建築物賞金,"HealthRegen,ManaRegen,OnHit"
+1519,Structure Bounty,建築物賞金,"HealthRegen,ManaRegen,OnHit"
+1520,OvererchargedHA,咆嘯深淵超載,"Armor,ManaRegen,OnHit"
+1521,Fortification,強化堡壘,OnHit
+1522,Tower Power-Up,強化防禦塔,"Armor,Damage"
+1523,Overcharged,超載,"Armor,ManaRegen,OnHit"
+2003,Health Potion,生命藥水,"HealthRegen,Consumable,Lane,Jungle"
+2010,Total Biscuit of Everlasting Will,活力乾糧,
+2015,Kircheis Shard,科奇碎片,"Damage,OnHit"
+2019,Steel Sigil,鋼鐵紋章,"Armor,Damage"
+2020,The Brutalizer,兇殘之柄,"Damage,CooldownReduction,ArmorPenetration"
+2021,Tunneler,鑽掘機,"Health,Damage"
+2022,Glowing Mote,發光結晶,CooldownReduction
+2031,Refillable Potion,回復藥水,"HealthRegen,Consumable,Active,Lane,Jungle"
+2033,Corrupting Potion,污濁藥劑,"Active,Consumable,HealthRegen,Lane,ManaRegen"
+2049,Guardian's Amulet,守護者護符,"SpellDamage,ManaRegen,CooldownReduction,Lane,AbilityHaste"
+2050,Guardian's Shroud,守護者法衣,"Health,SpellDamage,CooldownReduction,Lane,AbilityHaste"
+2051,Guardian's Horn,保衛者號角,"Health,HealthRegen,Lane"
+2052,Poro-Snax,普羅的飼料,
+2055,Control Ward,控域守衛,"Consumable,Lane,Stealth,Vision"
+2056,Stealth Ward,潛行守衛,"Consumable,Lane,Stealth,Vision"
+2065,Shurelya's Battlesong,蘇瑞亞的戰歌,"SpellDamage,ManaRegen,Active,CooldownReduction,NonbootsMovement,AbilityHaste"
+2138,Elixir of Iron,抗擊藥劑,"Health,Consumable,NonbootsMovement,Tenacity"
+2139,Elixir of Sorcery,巫魔藥劑,"Consumable,ManaRegen,SpellDamage"
+2140,Elixir of Wrath,憤怒藥劑,"Consumable,Damage,LifeSteal,SpellVamp"
+2141,Cappa Juice,帽帽果汁,"Damage,Consumable"
+2142,Juice of Power,力量果汁,"SpellDamage,Consumable"
+2143,Juice of Vitality,活力果汁,"Health,Consumable"
+2144,Juice of Haste,疾速果汁,"Consumable,CooldownReduction"
+2145,Lucky Dice,幸運骰子,Consumable
+2146,Enhanced Lucky Dice,強化幸運骰子,Consumable
+2150,Elixir of Skill,精通藥劑,Consumable
+2151,Elixir of Avarice,貪婪藥劑,"Health,Consumable,Tenacity"
+2152,Elixir of Force,力量藥劑,"Consumable,Tenacity"
+2161,Bandle Juice of Power,班德爾力量果汁,"SpellDamage,Consumable"
+2162,Bandle Juice of Vitality,班德爾活力果汁,"Health,Consumable"
+2163,Bandle Juice of Haste,班德爾疾速果汁,"Consumable,CooldownReduction"
+2403,Minion Dematerializer,士兵去質器,
+2420,Seeker's Armguard,探索者護腕,"Armor,SpellDamage,Active"
+2421,Shattered Armguard,破碎的護腕,
+2422,Slightly Magical Footwear,輕魔之靴,Boots
+2501,Overlord's Bloodmail,狂霸血甲,"Health,Damage"
+2502,Unending Despair,無盡絕望,"Health,SpellBlock,Armor,CooldownReduction,AbilityHaste"
+2503,Blackfire Torch,黑焰火炬,"SpellDamage,Mana,CooldownReduction,AbilityHaste"
+2504,Kaenic Rookern,凱尼克欺瞞者,"Health,SpellBlock,HealthRegen"
+2508,Fated Ashes,命定灰燼,SpellDamage
+3001,Evenshroud,均等法衣,"Health,SpellBlock,Armor,AbilityHaste"
+3002,Trailblazer,開拓者,"Health,Armor,NonbootsMovement"
+3003,Archangel's Staff,大天使之杖,"SpellDamage,Mana,AbilityHaste"
+3004,Manamune,魔劍正宗,"Damage,Mana,CooldownReduction,OnHit,AbilityHaste"
+3005,Ghostcrawlers,鬼蟹,Boots
+3006,Berserker's Greaves,狂戰士護脛,"AttackSpeed,Boots"
+3009,Boots of Swiftness,輕靈之靴,Boots
+3010,Symbiotic Soles,共生之足,Boots
+3011,Chemtech Putrifier,生化科技腐化器,"SpellDamage,ManaRegen,AbilityHaste"
+3012,Chalice of Blessing,祝福聖杯,"Health,ManaRegen"
+3013,Synchronized Souls,靈魂同步,Boots
+3020,Sorcerer's Shoes,法師之靴,"Boots,MagicPenetration"
+3023,Lifewell Pendant,命源墜飾,"Health,Armor,AbilityHaste"
+3024,Glacial Buckler,冰川圓盾,"Armor,Mana,CooldownReduction,AbilityHaste"
+3026,Guardian Angel,守護天使,"Armor,Damage"
+3031,Infinity Edge,無盡之刃,"CriticalStrike,Damage"
+3032,Yun Tal Wildarrows,雲陶狂箭,"Damage,CriticalStrike,AttackSpeed"
+3033,Mortal Reminder,致死宣告,"Damage,CriticalStrike,ArmorPenetration"
+3035,Last Whisper,最後耳語,"ArmorPenetration,Damage"
+3036,Lord Dominik's Regards,多明尼克的問候,"Damage,CriticalStrike,ArmorPenetration"
+3039,Atma's Reckoning,終末戰戟,"SpellBlock,Armor,Damage,Lane"
+3040,Seraph's Embrace,熾天使的擁抱,"SpellDamage,Mana,AbilityHaste"
+3041,Mejai's Soulstealer,靈魂竊取者,"Health,SpellDamage,NonbootsMovement"
+3042,Muramana,終極魔劍,"Damage,Mana,CooldownReduction,OnHit,ArmorPenetration"
+3044,Phage,淨蝕之槌,"Health,Damage,NonbootsMovement"
+3046,Phantom Dancer,幻影之舞,"CriticalStrike,AttackSpeed,NonbootsMovement"
+3047,Plated Steelcaps,鍍板鋼蓋,"Armor,Boots"
+3050,Zeke's Convergence,錫柯的聚合之力,"Health,SpellBlock,Armor,AbilityHaste"
+3051,Hearthbound Axe,爐縛之斧,"Damage,AttackSpeed"
+3053,Sterak's Gage,史特拉克手套,"Health,Damage,Tenacity"
+3057,Sheen,閃耀劍,"OnHit,AbilityHaste"
+3065,Spirit Visage,振奮盔甲,"Health,SpellBlock,HealthRegen,CooldownReduction,AbilityHaste"
+3066,Winged Moonplate,飛翼月甲,"Health,NonbootsMovement"
+3067,Kindlegem,燃燒寶石,"Health,CooldownReduction,AbilityHaste"
+3068,Sunfire Aegis,日炎聖盾,"Health,Armor,Aura,AbilityHaste"
+3070,Tear of the Goddess,女神之淚,"Mana,ManaRegen"
+3071,Black Cleaver,黑色切割者,"Health,Damage,CooldownReduction,OnHit,NonbootsMovement,ArmorPenetration,AbilityHaste"
+3072,Bloodthirster,嗜血者,"Damage,LifeSteal"
+3073,Experimental Hexplate,實驗型海克斯板甲,"Health,Damage,AttackSpeed,CooldownReduction,NonbootsMovement,AbilityHaste"
+3074,Ravenous Hydra,狂怒九頭蛇,"Damage,LifeSteal,CooldownReduction,OnHit,AbilityHaste"
+3075,Thornmail,荊棘之甲,"Health,Armor"
+3076,Bramble Vest,刺藤胸甲,Armor
+3077,Tiamat,海神之斧,"Damage,OnHit"
+3078,Trinity Force,三相之力,"Health,Damage,AttackSpeed,CooldownReduction,OnHit,NonbootsMovement,AbilityHaste"
+3082,Warden's Mail,守望者鎧甲,Armor
+3083,Warmog's Armor,好戰者鎧甲,"Health,HealthRegen"
+3084,Heartsteel,雄心之鋼,"Health,HealthRegen"
+3085,Runaan's Hurricane,芮蘭颶風箭,"CriticalStrike,AttackSpeed,OnHit,NonbootsMovement"
+3086,Zeal,狂熱雙刀,"CriticalStrike,AttackSpeed,NonbootsMovement"
+3087,Statikk Shiv,史提克彈簧刀,"Damage,AttackSpeed,OnHit,NonbootsMovement"
+3089,Rabadon's Deathcap,死亡之帽,SpellDamage
+3091,Wit's End,智慧末刃,"SpellBlock,AttackSpeed,OnHit,Tenacity"
+3094,Rapid Firecannon,衝擊火炮,"CriticalStrike,AttackSpeed,NonbootsMovement"
+3095,Stormrazor,狂暴利刃,"Damage,CriticalStrike"
+3100,Lich Bane,巫妖之禍,"SpellDamage,OnHit,NonbootsMovement,AbilityHaste"
+3102,Banshee's Veil,女妖面紗,"SpellBlock,SpellDamage"
+3105,Aegis of the Legion,軍團聖盾,"SpellBlock,Armor,CooldownReduction,AbilityHaste"
+3107,Redemption,贖罪神石,"Health,ManaRegen,CooldownReduction,AbilityHaste"
+3108,Fiendish Codex,惡魔法典,"SpellDamage,CooldownReduction,AbilityHaste"
+3109,Knight's Vow,騎士誓願,"Health,HealthRegen,Armor,Aura,Active,CooldownReduction,AbilityHaste"
+3110,Frozen Heart,冰霜之心,"Armor,Mana,Aura,CooldownReduction,AbilityHaste"
+3111,Mercury's Treads,水星之靴,"Boots,SpellBlock,Tenacity"
+3112,Guardian's Orb,保衛者冰玉,"Health,SpellDamage,ManaRegen,Lane"
+3113,Aether Wisp,蒼穹神火,"NonbootsMovement,SpellDamage"
+3114,Forbidden Idol,禁忌之像,ManaRegen
+3115,Nashor's Tooth,納什之牙,"AttackSpeed,SpellDamage,OnHit,AbilityHaste"
+3116,Rylai's Crystal Scepter,瑞萊的冰晶節杖,"Health,SpellDamage,Slow"
+3117,Mobility Boots,疾行之靴,Boots
+3118,Malignance,惡意,"SpellDamage,Mana,AbilityHaste"
+3119,Winter's Approach,凜冬將至,"Health,Mana,AbilityHaste"
+3121,Fimbulwinter,芬布爾之冬,"Health,Mana,AbilityHaste"
+3123,Executioner's Calling,死刑宣告,Damage
+3124,Guinsoo's Rageblade,鬼索的狂暴之刃,"Damage,AttackSpeed,SpellDamage,OnHit"
+3128,Deathfire Grasp,冥火之擁,"SpellDamage,CooldownReduction"
+3131,Sword of the Divine,神聖之劍,"Damage,CriticalStrike,AttackSpeed"
+3133,Caulfield's Warhammer,考菲爾德的戰槌,"Damage,CooldownReduction,AbilityHaste"
+3134,Serrated Dirk,殘暴之力,"Damage,ArmorPenetration"
+3135,Void Staff,虛空之杖,"MagicPenetration,SpellDamage"
+3137,Cryptbloom,死墓之花,"SpellDamage,MagicPenetration,AbilityHaste"
+3139,Mercurial Scimitar,水星彎刀,"SpellBlock,Damage,LifeSteal,Active,NonbootsMovement,Tenacity"
+3140,Quicksilver Sash,水銀飾帶,"Active,SpellBlock"
+3142,Youmuu's Ghostblade,妖夢鬼刀,"Damage,Active,NonbootsMovement,ArmorPenetration"
+3143,Randuin's Omen,蘭頓之兆,"Health,Armor,Active,Slow"
+3144,Scout's Slingshot,斥候彈弓,AttackSpeed
+3145,Hextech Alternator,海克斯科技發電機,SpellDamage
+3146,Hextech Gunblade,海克斯科技槍刃,"Damage,LifeSteal,SpellDamage,Active,SpellVamp"
+3147,Haunting Guise,幽魂面具,"Health,SpellDamage"
+3152,Hextech Rocketbelt,海克斯科技火箭腰帶,"Health,SpellDamage,Active,CooldownReduction,NonbootsMovement,AbilityHaste"
+3153,Blade of The Ruined King,殞落王者之劍,"Damage,AttackSpeed,LifeSteal,Slow,OnHit"
+3155,Hexdrinker,吸魔劍,"Damage,SpellBlock"
+3156,Maw of Malmortius,魔提斯深淵,"SpellBlock,Damage,LifeSteal,SpellVamp,AbilityHaste"
+3157,Zhonya's Hourglass,中婭沙漏,"Armor,SpellDamage,Active"
+3158,Ionian Boots of Lucidity,愛歐尼亞之靴,"Boots,CooldownReduction"
+3161,Spear of Shojin,精進之矛,"Health,Damage,AbilityHaste"
+3165,Morellonomicon,黑魔禁書,"Health,SpellDamage,CooldownReduction,AbilityHaste"
+3170,Swiftmarch,快速行軍,Boots
+3171,Crimson Lucidity,血色法靴,"CooldownReduction,Boots"
+3172,Gunmetal Greaves,槍銅護脛,"AttackSpeed,NonbootsMovement"
+3173,Chainlaced Crushers,鎖鍊軍靴,"SpellBlock,Boots,Tenacity,MagicResist"
+3174,Armored Advance,裝甲戰靴,"Armor,Boots"
+3175,Spellslinger's Shoes,魔法使之鞋,"Boots,MagicPenetration"
+3176,Forever Forward,勇進靈靴,Boots
+3177,Guardian's Blade,保衛者之刃,"Health,Damage,Lane,AbilityHaste"
+3179,Umbral Glaive,闇影戰戟,"Damage,Vision,CooldownReduction,ArmorPenetration,AbilityHaste"
+3181,Hullbreaker,破船戰斧,"Health,Damage,NonbootsMovement"
+3184,Guardian's Hammer,保衛者戰鎚,"Health,Damage,LifeSteal,Lane"
+3190,Locket of the Iron Solari,日輪的加冕,"Health,SpellBlock,Armor,Aura,Active,MagicResist,AbilityHaste"
+3193,Gargoyle Stoneplate,石像鬼磐核,"SpellBlock,Armor,Active,CooldownReduction,AbilityHaste"
+3211,Spectre's Cowl,亡靈斗篷,"Health,HealthRegen,SpellBlock"
+3222,Mikael's Blessing,米凱的祝福,"Health,ManaRegen,Active,CooldownReduction,Tenacity,AbilityHaste"
+3302,Terminus,臨界點,"Damage,AttackSpeed,OnHit,MagicPenetration,ArmorPenetration"
+3330,Scarecrow Effigy,稻草人,"Active,Jungle,Lane,Trinket,Vision"
+3340,Stealth Ward,潛行守衛,"Active,Jungle,Lane,Trinket,Vision"
+3348,Arcane Sweeper,奧術清除者,"Active,Jungle,Lane,Trinket,Vision"
+3349,Lucent Singularity,光明異點,"Active,Jungle,Lane,Trinket,Vision"
+3363,Farsight Alteration,鷹眼晶球,"Active,Trinket,Vision"
+3364,Oracle Lens,先知透視鏡,"Active,Trinket,Vision"
+3398,Small Party Favor,小型派對禮物,"Consumable,GoldPer"
+3399,Party Favor,派對禮物,"Consumable,GoldPer"
+3400,Your Cut,你也有份,"Consumable,GoldPer"
+3430,Rite Of Ruin,殞落之祭,"CriticalStrike,SpellDamage,CooldownReduction"
+3504,Ardent Censer,熾灼魔器,"AttackSpeed,SpellDamage,ManaRegen,NonbootsMovement"
+3508,Essence Reaver,奪魄之鐮,"Damage,CriticalStrike,ManaRegen,CooldownReduction,OnHit,AbilityHaste"
+3513,Eye of the Herald,預示者之眼,"Trinket,Active"
+3599,Kalista's Black Spear,克黎思妲的靈魂黑矛,Consumable
+3600,Kalista's Black Spear,克黎思妲的靈魂黑矛,Consumable
+3742,Dead Man's Plate,死者肩甲,"Health,Armor,Slow,NonbootsMovement"
+3748,Titanic Hydra,泰坦九頭蛇,"Health,HealthRegen,Damage,OnHit"
+3801,Crystalline Bracer,水晶護腕,"Health,HealthRegen"
+3802,Lost Chapter,失落之章,"SpellDamage,Mana,ManaRegen,CooldownReduction,AbilityHaste"
+3803,Catalyst of Aeons,催化魔方,"Health,HealthRegen,Mana,ManaRegen"
+3814,Edge of Night,夜色緣界,"Health,Damage,ArmorPenetration"
+3850,Spellthief's Edge,盜竊之刃,"Health,SpellDamage,ManaRegen,Vision,GoldPer,Lane"
+3851,Frostfang,霜牙,"GoldPer,Lane,ManaRegen,SpellDamage"
+3853,Shard of True Ice,真霜碎片,"GoldPer,Lane,ManaRegen,SpellDamage"
+3854,Steel Shoulderguards,鋼鐵護肩,"Health,HealthRegen,Damage,Vision,GoldPer,Lane"
+3855,Runesteel Spaulders,符文鋼肩,"Health,HealthRegen,GoldPer,Lane"
+3857,Pauldrons of Whiterock,白石韌肩,"Health,HealthRegen,GoldPer,Lane"
+3858,Relic Shield,遺跡之盾,"Health,HealthRegen,SpellDamage,Vision,GoldPer,Lane"
+3859,Targon's Buckler,巨石峰圓盾,"Health,HealthRegen,GoldPer,Lane"
+3860,Bulwark of the Mountain,群山堡壘,"Health,HealthRegen,GoldPer,Lane"
+3862,Spectral Sickle,幽魂之鐮,"Health,Damage,ManaRegen,Vision,GoldPer,Lane"
+3863,Harrowing Crescent,駭懼之鐮,"Health,ManaRegen,GoldPer,Lane"
+3864,Black Mist Scythe,黯霧之鐮,"Health,ManaRegen,GoldPer,Lane"
+3865,World Atlas,世界地圖,"Health,ManaRegen,Vision,GoldPer,Lane"
+3866,Runic Compass,符文指針,"SpellDamage,ManaRegen,Vision,GoldPer,Lane"
+3867,Bounty of Worlds,跨界獎賞,"SpellDamage,ManaRegen,Vision,GoldPer,Lane"
+3869,Celestial Opposition,星體抗力,"Health,HealthRegen,ManaRegen,Vision,GoldPer,Lane"
+3870,Dream Maker,夢寐以求,"Health,HealthRegen,ManaRegen,Vision,GoldPer,Lane"
+3871,Zaz'Zak's Realmspike,薩茲薩克的領域之刺,"Health,HealthRegen,ManaRegen,Vision,GoldPer,Lane"
+3876,Solstice Sleigh,冬至雪橇,"Health,HealthRegen,ManaRegen,Vision,GoldPer,Lane"
+3877,Bloodsong,血歌,"Health,HealthRegen,ManaRegen,Vision,GoldPer,Lane"
+3901,<rarityLegendary>Fire at Will</rarityLegendary><br><subtitleLeft><silver>500 Silver Serpents</silver></subtitleLeft>,<rarityLegendary>恣意開火</rarityLegendary><br><subtitleLeft><silver>500 毒蛇銀幣</silver></subtitleLeft>,
+3902,<rarityLegendary>Death's Daughter</rarityLegendary><br><subtitleLeft><silver>500 Silver Serpents</silver></subtitleLeft>,<rarityLegendary>死亡之女</rarityLegendary><br><subtitleLeft><silver>500 毒蛇銀幣</silver></subtitleLeft>,
+3903,<rarityLegendary>Raise Morale</rarityLegendary><br><subtitleLeft><silver>500 Silver Serpents</silver></subtitleLeft>,<rarityLegendary>士氣高昂</rarityLegendary><br><subtitleLeft><silver>500 毒蛇銀幣</silver></subtitleLeft>,
+3916,Oblivion Orb,遺忘寶珠,SpellDamage
+4003,Lifeline,生命之索,"Damage,NonbootsMovement,ArmorPenetration"
+4004,Spectral Cutlass,鬼使彎刀,"Damage,NonbootsMovement,ArmorPenetration"
+4005,Imperial Mandate,帝王命令,"SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+4010,Bloodletter's Curse,血書詛咒,"SpellBlock,SpellDamage,CooldownReduction,MagicPenetration"
+4011,Sword of Blossoming Dawn,破曉綻放之劍,"Health,SpellDamage,CooldownReduction,OnHit,AbilityHaste"
+4012,Sin Eater,食罪者,"Health,SpellBlock,Armor,Tenacity"
+4013,Lightning Braid,雷霆之辮,"SpellBlock,Armor,SpellDamage,Tenacity"
+4014,Frozen Mallet,冰霜之錘,"Health,Damage,AttackSpeed,Slow"
+4015,Perplexity,困惑,"SpellDamage,CooldownReduction,NonbootsMovement,MagicPenetration,ArmorPenetration,AbilityHaste"
+4016,Wordless Promise,無言之約,"SpellDamage,CooldownReduction,AbilityHaste"
+4017,Hellfire Hatchet,獄火手斧,"Damage,ArmorPenetration"
+4401,Force of Nature,自然之力,"Health,SpellBlock,NonbootsMovement"
+4402,Innervating Locket,支配寶匣,"Health,Damage,Mana,CooldownReduction,AbilityHaste"
+4403,The Golden Spatula,黃金鍋鏟,"Health,SpellBlock,HealthRegen,Armor,Damage,CriticalStrike,AttackSpeed,LifeSteal,SpellDamage,Mana,ManaRegen,CooldownReduction,NonbootsMovement"
+4628,Horizon Focus,視界專注,"SpellDamage,AbilityHaste"
+4629,Cosmic Drive,星河馳騁,"Health,SpellDamage,NonbootsMovement,AbilityHaste"
+4630,Blighting Jewel,枯萎寶石,"MagicPenetration,SpellDamage"
+4632,Verdant Barrier,蒼翠屏障,"SpellBlock,SpellDamage"
+4633,Riftmaker,峽谷製造者,"Health,SpellDamage,CooldownReduction,SpellVamp"
+4635,Leeching Leer,榨血睥睨,"Health,SpellDamage,SpellVamp"
+4636,Night Harvester,闇夜收割者,"Health,SpellDamage,CooldownReduction,NonbootsMovement,AbilityHaste"
+4637,Demonic Embrace,惡魔之擁,"Health,SpellDamage"
+4638,Watchful Wardstone,警戒視石,"Health,SpellBlock,Armor,Vision,Active,CooldownReduction,AbilityHaste"
+4641,Stirring Wardstone,活耀視石,"Health,Damage,SpellDamage,ManaRegen,Vision,Active,CooldownReduction,AbilityHaste"
+4642,Bandleglass Mirror,班德爾玻璃之鏡,"SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+4643,Vigilant Wardstone,警覺視石,"Health,SpellBlock,Armor,Vision,Active,CooldownReduction,AbilityHaste"
+4644,Crown of the Shattered Queen,殘破王后之冠,"Health,SpellDamage,Mana,NonbootsMovement,AbilityHaste"
+4645,Shadowflame,黯影之炎,"SpellDamage,MagicPenetration"
+4646,Stormsurge,雷霆風暴,"SpellDamage,GoldPer,NonbootsMovement,MagicPenetration"
+6029,Ironspike Whip,鐵刺之鞭,"Damage,Active"
+6035,Silvermere Dawn,銀織黎明,"Health,SpellBlock,Damage,Active,Tenacity"
+6333,Death's Dance,死亡之舞,"Armor,Damage,AbilityHaste"
+6609,Chempunk Chainsword,生化龐克鏈鋸之劍,"Health,Damage,CooldownReduction,AbilityHaste"
+6610,Sundered Sky,突破天際,"Health,Damage,CooldownReduction,AbilityHaste"
+6616,Staff of Flowing Water,流水之杖,"SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+6617,Moonstone Renewer,月之石再生裝置,"Health,SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+6620,Echoes of Helia,希利亞的迴響,"Health,SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+6621,Dawncore,破曉之核,"SpellDamage,ManaRegen"
+6630,Goredrinker,飲血戰錘,"Health,Damage,LifeSteal,Active,CooldownReduction,SpellVamp,AbilityHaste"
+6631,Stridebreaker,步履破壞者,"Health,Damage,AttackSpeed,Slow"
+6632,Divine Sunderer,聖裂之杖,"Health,Damage,CooldownReduction,OnHit,MagicPenetration,ArmorPenetration,AbilityHaste"
+6653,Liandry's Torment,黎安卓的折磨,"Health,SpellDamage"
+6655,Luden's Companion,盧登之伴,"SpellDamage,Mana,CooldownReduction,AbilityHaste"
+6656,Everfrost,永寒之霜,"Health,SpellDamage,Mana,Active,CooldownReduction,Slow,AbilityHaste"
+6657,Rod of Ages,時光之杖,"Health,HealthRegen,SpellDamage,Mana,ManaRegen"
+6660,Bami's Cinder,巴米灰燼,"Health,AbilityHaste"
+6662,Iceborn Gauntlet,寒冰霸拳,"Health,Armor,CooldownReduction,Slow,OnHit,AbilityHaste"
+6664,Hollow Radiance,虛偽光彩,"Health,SpellBlock,HealthRegen,Aura,MagicResist,AbilityHaste"
+6665,"Jak'Sho, The Protean",千變萬化之賈克修,"Health,SpellBlock,Armor,MagicResist"
+6667,Radiant Virtue,聖光美德,"Health,SpellBlock,Armor,Aura,CooldownReduction,AbilityHaste"
+6670,Noonquiver,正午箭筒,"Damage,CriticalStrike"
+6671,Galeforce,狂風之力,"Damage,CriticalStrike,AttackSpeed,Active,NonbootsMovement"
+6672,Kraken Slayer,海妖殺手,"Damage,AttackSpeed,OnHit,NonbootsMovement"
+6673,Immortal Shieldbow,不朽盾弓,"Damage,CriticalStrike"
+6675,Navori Flickerblade,那歐閃刃,"CriticalStrike,AttackSpeed,NonbootsMovement"
+6676,The Collector,蒐集者,"Damage,CriticalStrike,ArmorPenetration"
+6677,Rageknife,狂怒匕首,"AttackSpeed,OnHit"
+6690,Rectrix,導翔之羽,"Damage,NonbootsMovement"
+6691,Duskblade of Draktharr,暮色黑刃,"Damage,Stealth,CooldownReduction,Slow,NonbootsMovement,ArmorPenetration,AbilityHaste"
+6692,Eclipse,星蝕,"Damage,CooldownReduction,AbilityHaste"
+6693,Prowler's Claw,潛行者之爪,"Damage,CooldownReduction,ArmorPenetration,AbilityHaste"
+6694,Serylda's Grudge,席利妲咒怨,"Damage,CooldownReduction,ArmorPenetration,AbilityHaste"
+6695,Serpent's Fang,巨蛇鋒牙,"Damage,ArmorPenetration"
+6696,Axiom Arc,公理弧刃,"Damage,ArmorPenetration,AbilityHaste"
+6697,Hubris,傲慢,"Damage,Active,CooldownReduction,ArmorPenetration,AbilityHaste"
+6698,Profane Hydra,瀆神九頭蛇,"Damage,Active,CooldownReduction,ArmorPenetration,AbilityHaste"
+6699,Voltaic Cyclosword,電流旋風劍,"Damage,Active,CooldownReduction,ArmorPenetration,AbilityHaste"
+6700,Shield of the Rakkor,拉克爾之盾,"Armor,Damage,Active,CooldownReduction,ArmorPenetration,AbilityHaste"
+6701,Opportunity,機會,"Damage,Active,NonbootsMovement,ArmorPenetration"
+6702,Scouting Ahead,偵察前路,"Active,Jungle,Lane,Trinket,Vision"
+7050,Gangplank Placeholder,剛普朗克 版面,
+8001,Anathema's Chains,咒恨縛鎖,"Health,Active,CooldownReduction,AbilityHaste"
+8010,Bloodletter's Curse,血書詛咒,"Health,SpellDamage,CooldownReduction,MagicPenetration"
+8020,Abyssal Mask,深淵面具,"Health,SpellBlock,CooldownReduction,MagicResist,AbilityHaste"
+9168,Locked Weapon Slot,鎖定的武器欄位,
+9171,Cyclonic Slicers,旋風迴旋刀,
+9172,YuumiBot,悠咪機器人,
+9173,Radiant Field,聖光氣場,
+9174,Statikk Sword,史提克之劍,
+9175,Lioness's Lament,母獅之哀嘆,
+9176,Gatling Bunny-Guns,兔女郎格林槍,
+9177,Searing Shortbow,熔岩短弓,
+9178,The Annihilator,滅絕者,
+9179,Battle Bunny Crossbow,戰鬥兔女郎十字弓,
+9180,UwU Blaster,UwU砲,
+9181,Vortex Glove,漩渦手套,
+9183,Blade-o-rang,迴力刃,
+9184,Bunny Mega-Blast,兔女郎轟擊砲,
+9185,Anti-Shark Sea Mine,反鯊魚雷,
+9187,T.I.B.B.E.R.S,泰.貝.爾,
+9188,Ani-Mines,百獸地雷,
+9189,Final City Transit,終城快車,
+9190,Echoing Batblades,反彈蝙蝠鏢,
+9192,Paw Print Poisoner,掌印毒藥,
+9193,Iceblast Armor,冰爆盔甲,
+9271,Unceasing Cyclone,無盡風暴,
+9272,YuumiBot_Final_FINAL,悠咪機器人_最終_最終版,
+9273,Explosive Embrace,爆炸性擁抱,
+9274,Prumbis's Electrocarver,普朗比斯的電動切割器,
+9275,Enveloping Light,籠罩之光,
+9276,Double Bun-Bun Barrage,戰鬥兔兔彈幕,
+9277,Evolved Embershot,進化餘燼擊,
+9278,Animapocalypse,百獸末日,
+9279,Bunny Prime Ballista,究極兔女郎弩砲,
+9280,OwO Blaster,OwO砲,
+9281,Tempest's Gauntlet,風暴手套,
+9283,Quad-o-rang,四重迴力鏢,
+9284,Rapid Rabbit Raindown,疾速兔兔彈幕,
+9285,Neverending Mobstomper,無盡小兵踐踏機,
+9287,T.I.B.B.E.R.S (B.E.E.G Edition),超.大.泰.貝.爾,
+9288,Jinx's Tri-Namite,吉茵珂絲的三重炸藥,
+9289,FC Limited Express,終城特快車,
+9290,Vayne's Chromablades,汎的炫彩箭刃,
+9292,Bearfoot Chem-Dispenser,熊掌化學藥劑釋放器,
+9293,Deep Freeze,深層凍結,
+9300,Meow Meow,喵喵,
+9301,Shield Slam,大盾衝擊,
+9302,Sound Wave,音波,
+9303,Pillory Swipe,頸手枷揮擊,
+9304,Steel Tempest,鋼鐵暴雪,
+9305,Tentacle Slam,觸手猛擊,
+9306,Winged Dagger,飛翼匕首,
+9307,Guiding Hex,引導靈咒,
+9308,Bunny Hop,兔子跳,
+9400,Battle Cat Barrage,戰鬥貓女彈幕,
+9401,Light of the Lion,聖獅之光,
+9402,Anima Echo,百獸回音,
+9403,Savage Slice,凶蠻切斬,
+9404,Wandering Storms,流浪狂風,
+9405,Grizzly Smash,巨熊砸擊,
+9406,Lover's Ricochet,愛人彈射,
+9407,Hopped-Up Hex,振奮靈咒,
+9408,Carrot Crash,紅蘿蔔衝擊,
+126697,Hubris,傲慢,"Damage,Active,CooldownReduction,ArmorPenetration,AbilityHaste"
+220000,Stat Bonus,能力值加成,"Health,SpellBlock,Armor,Damage,CriticalStrike,AttackSpeed,SpellDamage,Mana,Consumable,CooldownReduction,SpellVamp,NonbootsMovement,Tenacity,MagicPenetration,ArmorPenetration,MagicResist,AbilityHaste"
+220001,Legendary Fighter Item,傳奇鬥士道具,"Health,SpellBlock,Armor,Damage,AttackSpeed,LifeSteal,Mana,Consumable,CooldownReduction,SpellVamp,OnHit,NonbootsMovement,Tenacity,ArmorPenetration,MagicResist,AbilityHaste"
+220002,Legendary Marksman Item,傳奇射手道具,"Health,Armor,Damage,CriticalStrike,AttackSpeed,LifeSteal,Mana,Consumable,CooldownReduction,OnHit,NonbootsMovement,ArmorPenetration,AbilityHaste"
+220003,Legendary Assassin Item,傳奇刺客道具,"Health,SpellBlock,Armor,Damage,AttackSpeed,Consumable,Active,CooldownReduction,NonbootsMovement,ArmorPenetration,AbilityHaste"
+220004,Legendary Mage Item,傳奇法師道具,"Health,SpellBlock,Armor,CriticalStrike,AttackSpeed,SpellDamage,Mana,Consumable,Active,CooldownReduction,Slow,SpellVamp,OnHit,NonbootsMovement,MagicPenetration,ArmorPenetration,MagicResist,AbilityHaste"
+220005,Legendary Tank Item,傳奇坦克道具,"Health,SpellBlock,Armor,CriticalStrike,SpellDamage,Consumable,Active,CooldownReduction,Slow,NonbootsMovement,MagicPenetration,MagicResist,AbilityHaste"
+220006,Legendary Support Item,傳奇輔助道具,"Health,SpellBlock,Armor,AttackSpeed,SpellDamage,ManaRegen,Consumable,Active,CooldownReduction,Slow,OnHit,NonbootsMovement,MagicResist,AbilityHaste"
+220007,Prismatic Item,稜鏡道具,"Health,SpellBlock,HealthRegen,Armor,Damage,CriticalStrike,AttackSpeed,LifeSteal,SpellDamage,Mana,ManaRegen,Consumable,Active,CooldownReduction,Slow,SpellVamp,OnHit,NonbootsMovement,Tenacity,MagicPenetration,ArmorPenetration,MagicResist,AbilityHaste"
+220008,Anvil Voucher,鐵砧券,
+220009,Gold Stat Anvil Voucher,金色能力值鐵砧券,
+220010,Prismatic Stat Voucher,稜鏡能力值券,
+220011,Bravery Voucher,勇氣禮券,
+221011,Giant's Belt,巨人腰帶,Health
+221026,Blasting Wand,爆裂魔杖,SpellDamage
+221031,Chain Vest,鎖子甲,Armor
+221038,B. F. Sword,暴風之劍,Damage
+221043,Recurve Bow,反曲弓,"AttackSpeed,OnHit"
+221053,Vampiric Scepter,吸血鬼權杖,"Damage,LifeSteal"
+221057,Negatron Cloak,負極斗篷,SpellBlock
+221058,Needlessly Large Rod,巨型魔棒,SpellDamage
+222022,Glowing Mote,發光結晶,CooldownReduction
+222051,Guardian's Horn,保衛者號角,"Health,HealthRegen,Lane"
+222065,Shurelya's Battlesong,蘇瑞亞的戰歌,"SpellDamage,ManaRegen,Active,CooldownReduction,NonbootsMovement,AbilityHaste"
+222141,Cappa Juice,帽帽果汁,"Damage,Consumable"
+222502,Unending Despair,無盡絕望,"Health,Armor,CooldownReduction,MagicResist,AbilityHaste"
+222503,Blackfire Torch,黑焰火炬,"SpellDamage,Mana,CooldownReduction,AbilityHaste"
+222504,Kaenic Rookern,凱尼克欺瞞者,"Health,SpellBlock,HealthRegen"
+223001,Evenshroud,均等法衣,"Health,SpellBlock,Armor,AbilityHaste"
+223002,Trailblazer,開拓者,"Health,Armor,NonbootsMovement"
+223003,Archangel's Staff,大天使之杖,"SpellDamage,Mana,AbilityHaste"
+223004,Manamune,魔劍正宗,"Damage,Mana,CooldownReduction,OnHit,AbilityHaste"
+223005,Ghostcrawlers,鬼蟹,Boots
+223006,Berserker's Greaves,狂戰士護脛,"AttackSpeed,Boots"
+223009,Boots of Swiftness,輕靈之靴,Boots
+223011,Chemtech Putrifier,生化科技腐化器,"SpellDamage,ManaRegen,AbilityHaste"
+223020,Sorcerer's Shoes,法師之靴,"Boots,MagicPenetration"
+223026,Guardian Angel,守護天使,"Armor,Damage"
+223031,Infinity Edge,無盡之刃,"CriticalStrike,Damage"
+223032,Yun Tal Wildarrows,雲陶狂箭,"Damage,CriticalStrike"
+223033,Mortal Reminder,致死宣告,"Damage,CriticalStrike,ArmorPenetration"
+223036,Lord Dominik's Regards,多明尼克的問候,"Damage,CriticalStrike,ArmorPenetration"
+223039,Atma's Reckoning,終末戰戟,"Health,CriticalStrike,Lane"
+223040,Seraph's Embrace,熾天使的擁抱,"SpellDamage,Mana,AbilityHaste"
+223042,Muramana,終極魔劍,"Damage,Mana,CooldownReduction,OnHit,ArmorPenetration"
+223046,Phantom Dancer,幻影之舞,"CriticalStrike,AttackSpeed,NonbootsMovement"
+223047,Plated Steelcaps,鍍板鋼蓋,"Armor,Boots"
+223050,Zeke's Convergence,錫柯的聚合之力,"Health,SpellBlock,Armor,AbilityHaste"
+223053,Sterak's Gage,史特拉克手套,"Health,Damage,Tenacity"
+223057,Sheen,閃耀劍,"OnHit,AbilityHaste"
+223065,Spirit Visage,振奮盔甲,"Health,SpellBlock,HealthRegen,CooldownReduction,AbilityHaste"
+223067,Kindlegem,燃燒寶石,"Health,CooldownReduction,AbilityHaste"
+223068,Sunfire Aegis,日炎聖盾,"Health,Armor,Aura,AbilityHaste"
+223071,Black Cleaver,黑色切割者,"Health,Damage,CooldownReduction,OnHit,NonbootsMovement,ArmorPenetration,AbilityHaste"
+223072,Bloodthirster,嗜血者,"Damage,LifeSteal"
+223073,Experimental Hexplate,實驗型海克斯板甲,"Health,Damage,AttackSpeed,CooldownReduction,NonbootsMovement,AbilityHaste"
+223074,Ravenous Hydra,狂怒九頭蛇,"Damage,LifeSteal,CooldownReduction,OnHit,AbilityHaste"
+223075,Thornmail,荊棘之甲,"Health,Armor"
+223078,Trinity Force,三相之力,"Health,Damage,AttackSpeed,CooldownReduction,OnHit,NonbootsMovement,AbilityHaste"
+223084,Heartsteel,雄心之鋼,Health
+223085,Runaan's Hurricane,芮蘭颶風箭,"CriticalStrike,AttackSpeed,OnHit,NonbootsMovement"
+223087,Statikk Shiv,史提克彈簧刀,"Damage,AttackSpeed,OnHit,NonbootsMovement"
+223089,Rabadon's Deathcap,死亡之帽,SpellDamage
+223091,Wit's End,智慧末刃,"SpellBlock,AttackSpeed,OnHit,Tenacity"
+223094,Rapid Firecannon,衝擊火炮,"CriticalStrike,AttackSpeed,NonbootsMovement"
+223095,Stormrazor,狂暴利刃,"Damage,CriticalStrike"
+223100,Lich Bane,巫妖之禍,"SpellDamage,OnHit,NonbootsMovement,AbilityHaste"
+223102,Banshee's Veil,女妖面紗,"SpellBlock,SpellDamage"
+223105,Aegis of the Legion,軍團聖盾,"SpellBlock,Armor,CooldownReduction,AbilityHaste"
+223107,Redemption,魂之救贖,"Health,ManaRegen,CooldownReduction,AbilityHaste"
+223109,Knight's Vow,騎士誓願,"Health,Armor,Aura,Active,CooldownReduction,AbilityHaste"
+223110,Frozen Heart,冰霜之心,"Armor,Mana,Aura,CooldownReduction,AbilityHaste"
+223111,Mercury's Treads,水星之靴,"Boots,SpellBlock,Tenacity"
+223112,Guardian's Orb,保衛者冰玉,"SpellDamage,ManaRegen,CooldownReduction,Lane"
+223115,Nashor's Tooth,納什之牙,"AttackSpeed,SpellDamage,OnHit,AbilityHaste"
+223116,Rylai's Crystal Scepter,瑞萊的冰晶節杖,"Health,SpellDamage,Slow"
+223118,Malignance,惡意,"SpellDamage,Mana,AbilityHaste"
+223119,Winter's Approach,凜冬將至,"Health,Mana,AbilityHaste"
+223121,Fimbulwinter,芬布爾之冬,"Health,Mana,AbilityHaste"
+223124,Guinsoo's Rageblade,鬼索的狂暴之刃,"Damage,AttackSpeed,SpellDamage,OnHit"
+223135,Void Staff,虛空之杖,"MagicPenetration,SpellDamage"
+223137,Cryptbloom,死墓之花,"SpellDamage,MagicPenetration,AbilityHaste"
+223139,Mercurial Scimitar,水星彎刀,"SpellBlock,Damage,LifeSteal,Active,NonbootsMovement,Tenacity"
+223142,Youmuu's Ghostblade,妖夢鬼刀,"Damage,Active,NonbootsMovement,ArmorPenetration"
+223143,Randuin's Omen,蘭頓之兆,"Health,Armor,Active,Slow"
+223146,Hextech Gunblade,海克斯科技槍刃,"Damage,LifeSteal,SpellDamage,Active,SpellVamp"
+223152,Hextech Rocketbelt,海克斯科技火箭腰帶,"Health,SpellDamage,Active,CooldownReduction,NonbootsMovement,AbilityHaste"
+223153,Blade of The Ruined King,殞落王者之劍,"Damage,AttackSpeed,LifeSteal,Slow,OnHit"
+223156,Maw of Malmortius,魔提斯深淵,"SpellBlock,Damage,LifeSteal,SpellVamp,AbilityHaste"
+223157,Zhonya's Hourglass,中婭沙漏,"Armor,SpellDamage,Active"
+223158,Ionian Boots of Lucidity,愛歐尼亞之靴,"Boots,CooldownReduction"
+223161,Spear of Shojin,精進之矛,"Health,Damage,AbilityHaste"
+223165,Morellonomicon,黑魔禁書,"Health,SpellDamage,CooldownReduction,AbilityHaste"
+223172,Zephyr,和風守護,"AttackSpeed,CooldownReduction,OnHit,NonbootsMovement,Tenacity"
+223177,Guardian's Blade,保衛者之刃,"Health,Damage,Lane,AbilityHaste"
+223181,Hullbreaker,破船戰斧,"Health,Damage,NonbootsMovement"
+223184,Guardian's Hammer,保衛者戰鎚,"Health,Damage,LifeSteal,Lane"
+223185,Guardian's Dirk,保衛者利刃,"Damage,ArmorPenetration,Lane"
+223190,Locket of the Iron Solari,日輪的加冕,"Health,SpellBlock,Armor,Aura,Active,MagicResist,AbilityHaste"
+223193,Gargoyle Stoneplate,石像鬼磐核,"SpellBlock,Armor,Active,CooldownReduction,AbilityHaste"
+223222,Mikael's Blessing,米凱的祝福,"Health,ManaRegen,Active,CooldownReduction,Tenacity,AbilityHaste"
+223302,Terminus,臨界點,"Damage,AttackSpeed,OnHit,MagicPenetration,ArmorPenetration"
+223504,Ardent Censer,熾灼魔器,"AttackSpeed,SpellDamage,ManaRegen,NonbootsMovement"
+223508,Essence Reaver,奪魄之鐮,"Damage,CriticalStrike,ManaRegen,CooldownReduction,OnHit,AbilityHaste"
+223742,Dead Man's Plate,死者肩甲,"Health,Armor,Slow,NonbootsMovement"
+223748,Titanic Hydra,泰坦九頭蛇,"Health,HealthRegen,Damage,OnHit"
+223814,Edge of Night,夜色緣界,"Health,Damage,ArmorPenetration"
+224004,Spectral Cutlass,鬼使彎刀,"Damage,ArmorPenetration"
+224005,Imperial Mandate,帝王命令,"SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+224401,Force of Nature,自然之力,"Health,SpellBlock,NonbootsMovement"
+224403,The Golden Spatula,黃金鍋鏟,"Health,SpellBlock,HealthRegen,Armor,Damage,CriticalStrike,AttackSpeed,LifeSteal,SpellDamage,Mana,ManaRegen,CooldownReduction,NonbootsMovement"
+224628,Horizon Focus,視界專注,"SpellDamage,AbilityHaste"
+224629,Cosmic Drive,星河馳騁,"Health,SpellDamage,NonbootsMovement,AbilityHaste"
+224633,Riftmaker,峽谷製造者,"Health,SpellDamage,CooldownReduction,SpellVamp"
+224636,Night Harvester,闇夜收割者,"Health,SpellDamage,CooldownReduction,NonbootsMovement,AbilityHaste"
+224637,Demonic Embrace,惡魔之擁,"Health,SpellDamage"
+224644,Crown of the Shattered Queen,殘破王后之冠,"Health,SpellDamage,Mana,AbilityHaste"
+224645,Shadowflame,黯影之炎,"SpellDamage,MagicPenetration"
+224646,Stormsurge,雷霆風暴,"SpellDamage,GoldPer,NonbootsMovement,MagicPenetration"
+226035,Silvermere Dawn,銀織黎明,"Health,SpellBlock,Damage,Active,Tenacity"
+226333,Death's Dance,死亡之舞,"Armor,Damage,AbilityHaste"
+226609,Chempunk Chainsword,生化龐克鏈鋸之劍,"Health,Damage,CooldownReduction,AbilityHaste"
+226610,Sundered Sky,突破天際,"Health,Damage,CooldownReduction,AbilityHaste"
+226616,Staff of Flowing Water,流水之杖,"SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+226617,Moonstone Renewer,月之石再生裝置,"Health,SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+226620,Echoes of Helia,希利亞的迴響,"Health,SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+226621,Dawncore,破曉之核,"SpellDamage,ManaRegen"
+226630,Goredrinker,飲血戰錘,"Health,Damage,Active,CooldownReduction,AbilityHaste"
+226631,Stridebreaker,步履破壞者,"Health,Damage,AttackSpeed,Slow,NonbootsMovement"
+226632,Divine Sunderer,聖裂之杖,"Health,Damage,CooldownReduction,OnHit,MagicPenetration,ArmorPenetration,AbilityHaste"
+226653,Liandry's Anguish,黎安卓的苦楚,"Health,SpellDamage"
+226655,Luden's Companion,盧登之伴,"SpellDamage,Mana,CooldownReduction,AbilityHaste"
+226656,Everfrost,永寒之霜,"Health,SpellDamage,Mana,Active,CooldownReduction,Slow,AbilityHaste"
+226657,Rod of Ages,時光之杖,"Health,HealthRegen,SpellDamage,Mana,ManaRegen"
+226662,Iceborn Gauntlet,寒冰霸拳,"Health,Armor,CooldownReduction,Slow,OnHit,AbilityHaste"
+226664,Hollow Radiance,虛偽光彩,"Health,SpellBlock,Aura,MagicResist,AbilityHaste"
+226665,"Jak'Sho, The Protean",千變萬化之賈克修,"Health,SpellBlock,Armor,MagicResist"
+226667,Radiant Virtue,聖光美德,"Health,SpellBlock,Armor,Aura,CooldownReduction,AbilityHaste"
+226671,Galeforce,狂風之力,"Damage,CriticalStrike,AttackSpeed,Active,NonbootsMovement"
+226672,Kraken Slayer,海妖殺手,"Damage,AttackSpeed,OnHit,NonbootsMovement"
+226673,Immortal Shieldbow,不朽盾弓,"Damage,CriticalStrike"
+226675,Navori Flickerblades,那歐閃刃,"CriticalStrike,AttackSpeed,NonbootsMovement"
+226676,The Collector,蒐集者,"Damage,CriticalStrike,ArmorPenetration"
+226691,Duskblade of Draktharr,暮色黑刃,"Damage,Stealth,CooldownReduction,Slow,ArmorPenetration,AbilityHaste"
+226692,Eclipse,星蝕,"Damage,CooldownReduction,AbilityHaste"
+226693,Prowler's Claw,潛行者之爪,"Damage,CooldownReduction,ArmorPenetration,AbilityHaste"
+226694,Serylda's Grudge,席利妲咒怨,"Damage,CooldownReduction,ArmorPenetration,AbilityHaste"
+226695,Serpent's Fang,巨蛇鋒牙,"Damage,ArmorPenetration"
+226696,Axiom Arc,公理弧刃,"Damage,ArmorPenetration,AbilityHaste"
+226697,Hubris,傲慢,"Damage,Active,CooldownReduction,ArmorPenetration,AbilityHaste"
+226698,Profane Hydra,瀆神九頭蛇,"Damage,Active,CooldownReduction,ArmorPenetration,AbilityHaste"
+226699,Voltaic Cyclosword,電流旋風劍,"Damage,Active,CooldownReduction,ArmorPenetration,AbilityHaste"
+226701,Opportunity,機會,"Damage,Active,NonbootsMovement,ArmorPenetration"
+228001,Anathema's Chains,咒恨縛鎖,"Health,Active,CooldownReduction,AbilityHaste"
+228002,Wooglet's Witchcap,烏莉特的法帽,"Armor,SpellDamage,Active"
+228003,Deathblade,死神之刃,"Damage,CriticalStrike,ArmorPenetration"
+228004,Adaptive Helm,適性神盔,"Health,SpellBlock,Armor,MagicResist"
+228005,Obsidian Cleaver,黑曜切割者,"Health,Damage,CooldownReduction,OnHit,NonbootsMovement,ArmorPenetration,AbilityHaste"
+228006,Sanguine Blade,愉悅刀刃,"Damage,LifeSteal,CooldownReduction,OnHit,AbilityHaste"
+228008,Runeglaive,偃月,"Health,Damage,AttackSpeed,CooldownReduction,OnHit,NonbootsMovement,AbilityHaste"
+228020,Abyssal Mask,深淵面具,"Health,SpellBlock,SpellDamage,CooldownReduction,MagicResist,AbilityHaste"
+322065,Shurelya's Battlesong,蘇瑞亞的戰歌,"SpellDamage,ManaRegen,Active,CooldownReduction,NonbootsMovement,AbilityHaste"
+323002,Trailblazer,開拓者,"Health,Armor,NonbootsMovement"
+323003,Archangel's Staff,大天使之杖,"SpellDamage,Mana,AbilityHaste"
+323004,Manamune,魔劍正宗,"Damage,Mana,CooldownReduction,OnHit,AbilityHaste"
+323040,Seraph's Embrace,熾天使的擁抱,"SpellDamage,Mana,AbilityHaste"
+323042,Muramana,終極魔劍,"Damage,Mana,CooldownReduction,OnHit,ArmorPenetration"
+323050,Zeke's Convergence,錫柯的聚合之力,"Health,SpellBlock,Armor,AbilityHaste"
+323070,Tear of the Goddess,女神之淚,"Mana,ManaRegen"
+323075,Thornmail,荊棘之甲,"Health,Armor"
+323107,Redemption,贖罪神石,"Health,ManaRegen,CooldownReduction,AbilityHaste"
+323109,Knight's Vow,騎士誓願,"Health,HealthRegen,Armor,Aura,Active,CooldownReduction,AbilityHaste"
+323110,Frozen Heart,冰霜之心,"Armor,Mana,Aura,CooldownReduction,AbilityHaste"
+323119,Winter's Approach,凜冬將至,"Health,Mana,AbilityHaste"
+323121,Fimbulwinter,芬布爾之冬,"Health,Mana,AbilityHaste"
+323190,Locket of the Iron Solari,日輪的加冕,"Health,SpellBlock,Armor,Aura,Active,MagicResist,AbilityHaste"
+323222,Mikael's Blessing,米凱的祝福,"Health,ManaRegen,Active,CooldownReduction,Tenacity,AbilityHaste"
+323504,Ardent Censer,熾灼魔器,"AttackSpeed,SpellDamage,ManaRegen,NonbootsMovement"
+324005,Imperial Mandate,帝王命令,"SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+326616,Staff of Flowing Water,流水之杖,"SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+326617,Moonstone Renewer,月之石再生裝置,"Health,SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+326620,Echoes of Helia,希利亞的迴響,"Health,SpellDamage,ManaRegen,CooldownReduction,AbilityHaste"
+326621,Dawncore,破曉之核,"SpellDamage,ManaRegen"
+326657,Rod of Ages,時光之杖,"Health,HealthRegen,SpellDamage,Mana,ManaRegen"
+328020,Abyssal Mask,深淵面具,"Health,SpellBlock,CooldownReduction,MagicResist,AbilityHaste"
+443054,Darksteel Talons,暗鋼利爪,"Armor,AttackSpeed,NonbootsMovement"
+443055,Fulmination,轟鳴,"Damage,AttackSpeed,NonbootsMovement"
+443056,Demon King's Crown,魔王的王冠,"Health,Armor,Damage,AttackSpeed,SpellDamage,MagicResist,AbilityHaste"
+443058,Shield of Molten Stone,熔岩護盾,"Health,Armor"
+443059,Cloak of Starry Night,星夜斗篷,"Health,SpellBlock"
+443060,Sword of the Divine,神聖之劍,"Damage,CriticalStrike,SpellDamage"
+443061,Force Of Entropy,熵力,"Health,SpellBlock,Armor,CriticalStrike"
+443062,Sanguine Gift,血紅贈禮,"SpellDamage,SpellVamp,AbilityHaste"
+443063,Eleisa's Miracle,奇蹟之石,"SpellBlock,Armor,AbilityHaste"
+443064,Talisman Of Ascension,昇華護符,"Health,SpellBlock,HealthRegen,Armor,Damage,CriticalStrike,AttackSpeed,LifeSteal,SpellDamage,Mana,ManaRegen,Active,CooldownReduction,SpellVamp,NonbootsMovement,MagicPenetration,ArmorPenetration,MagicResist,AbilityHaste"
+443069,Hamstringer,斷筋,"Damage,CriticalStrike,AttackSpeed"
+443079,Turbo Chemtank,渦輪煉金罐,"Health,Active,NonbootsMovement"
+443080,Twin Mask,雙生面具,"Health,Armor,Damage,AttackSpeed,SpellDamage,MagicResist,AbilityHaste"
+443081,Hexbolt Companion,海克斯閃電夥伴,"Health,AttackSpeed"
+443083,Warmog's Armor,好戰者鎧甲,"Health,HealthRegen,NonbootsMovement"
+443090,Reaper's Toll,收割者的報應,"Damage,AttackSpeed,SpellDamage,OnHit,NonbootsMovement"
+443193,Gargoyle Stoneplate,石像鬼磐核,"SpellBlock,Armor,Active,CooldownReduction,AbilityHaste"
+444636,Night Harvester,闇夜收割者,"Health,SpellDamage,CooldownReduction,NonbootsMovement,AbilityHaste"
+444637,Demonic Embrace,惡魔之擁,"Health,SpellDamage"
+444644,Crown of the Shattered Queen,殘破王后之冠,"Health,SpellDamage,Mana,AbilityHaste"
+446632,Divine Sunderer,聖裂之杖,"Health,Damage,CooldownReduction,OnHit,MagicPenetration,ArmorPenetration,AbilityHaste"
+446656,Everfrost,永寒之霜,"Health,SpellDamage,Mana,Active,CooldownReduction,Slow,AbilityHaste"
+446667,Radiant Virtue,聖光美德,"Health,SpellBlock,Armor,Aura,CooldownReduction,AbilityHaste"
+446671,Galeforce,狂風之力,"Damage,CriticalStrike,AttackSpeed,Active,NonbootsMovement"
+446691,Duskblade of Draktharr,暮色黑刃,"Damage,Stealth,CooldownReduction,Slow,ArmorPenetration,AbilityHaste"
+446693,Prowler's Claw,潛行者之爪,"Damage,CooldownReduction,ArmorPenetration,AbilityHaste"
+447100,Mirage Blade,幻象之刃,"Damage,AttackSpeed,SpellDamage,NonbootsMovement,AbilityHaste"
+447101,Gambler's Blade,賭徒之刀,"AttackSpeed,NonbootsMovement,AbilityHaste"
+447102,Reality Fracture,現實裂痕,"Health,AttackSpeed,SpellDamage"
+447103,Hemomancer's Helm,御血之盔,"Damage,SpellVamp,AbilityHaste"
+447104,Innervating Locket,支配寶匣,"Health,SpellDamage,AbilityHaste"
+447105,Empyrean Promise,幻焰之誓,"SpellDamage,ManaRegen,AbilityHaste"
+447106,Dragonheart,龍族之心,"Health,HealthRegen,Armor,Damage,AttackSpeed,MagicResist,AbilityHaste"
+447107,Decapitator,斷頭者,"Damage,AttackSpeed,SpellDamage,NonbootsMovement"
+447108,Runecarver,符文雕刻者,"SpellDamage,NonbootsMovement"
+447109,Cruelty,殘忍,"Armor,SpellDamage,MagicResist"
+447110,Moonflair Spellblade,月光魔劍,"Health,SpellDamage,Tenacity"
+447111,Overlord's Bloodmail,狂霸血甲,"Health,Damage"
+447112,Flesheater,食肉者,"Damage,SpellDamage,MagicPenetration,ArmorPenetration"
+447113,Detonation Orb,爆發晶球,"SpellDamage,Mana,MagicPenetration"
+447114,Reverberation,震盪迴響,"Health,Armor,AttackSpeed,OnHit,MagicResist"
+447115,Regicide,弒君,"Damage,NonbootsMovement,ArmorPenetration"
+447116,Kinkou Jitte,均衡十手,"Health,Damage,SpellDamage,AbilityHaste"
+447118,Pyromancer's Cloak,火炎術士之袍,"Health,Damage,SpellDamage,SpellVamp"
+447119,Lightning Rod,避雷針,"Damage,AttackSpeed"
+447120,Diamond-Tipped Spear,鑽石尖矛,"Damage,AttackSpeed"
+447121,Twilight's Edge,暮光之刃,"Health,Armor,Damage,AttackSpeed,SpellDamage,MagicResist,AbilityHaste"
+447122,Black Hole Gauntlet,黑洞手套,"SpellBlock,AttackSpeed,OnHit,AbilityHaste"
+447123,Puppeteer,傀儡手套,"SpellDamage,ManaRegen,AbilityHaste"
+663039,Atma's Reckoning,終末戰戟,"Health,CriticalStrike,Lane"
+663056,Demon King's Crown,魔王的王冠,"Health,Armor,Damage,AttackSpeed,SpellDamage,MagicResist,AbilityHaste"
+663058,Shield of Molten Stone,熔岩護盾,"Health,Armor"
+663059,Cloak of Starry Night,星夜斗篷,"Health,SpellBlock"
+663060,Sword of the Divine,神聖之劍,"Damage,CriticalStrike,SpellDamage"
+663064,Veigar's Talisman of Ascension,維迦的昇華護符,
+663146,Hextech Gunblade,海克斯科技槍刃,"Damage,LifeSteal,SpellDamage,Active,SpellVamp"
+663172,Zephyr,和風守護,"AttackSpeed,CooldownReduction,OnHit,NonbootsMovement,Tenacity"
+663193,Gargoyle Stoneplate,石像鬼磐核,"SpellBlock,Armor,Active,CooldownReduction,AbilityHaste"
+664011,Sword of Blossoming Dawn,破曉綻放之劍,"Health,SpellDamage,CooldownReduction,OnHit,AbilityHaste"
+664403,The Golden Spatula,黃金鍋鏟,"Health,SpellBlock,HealthRegen,Armor,Damage,CriticalStrike,AttackSpeed,LifeSteal,SpellDamage,Mana,ManaRegen,CooldownReduction,NonbootsMovement"
+664644,Crown of the Shattered Queen,殘破王后之冠,"Health,SpellDamage,Mana,AbilityHaste"
+667101,Gambler's Blade,賭徒之刀,"Damage,NonbootsMovement,MagicPenetration,ArmorPenetration,AbilityHaste"
+667109,Cruelty,殘忍,"Armor,SpellDamage,MagicResist"
+667112,Flesheater,食肉者,"Damage,SpellDamage,MagicPenetration,ArmorPenetration"
+667666,The Collector,蒐集者,"Damage,CriticalStrike,ArmorPenetration"
