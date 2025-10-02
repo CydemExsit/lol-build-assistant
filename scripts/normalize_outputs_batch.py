@@ -175,8 +175,9 @@ def normalize_sets(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, dict
         if c not in out.columns: out[c] = None
     out = out[cols]
     flags = {"has_winrate": win_col is not None, "has_pickrate": pick_col is not None}
+    for c in ["games", "item_id1", "item_id2", "item_id3", "item_id4", "item_id5"]:
+        out[c] = pd.to_numeric(out[c], errors="coerce").astype("Int64")
     return out, flags
-
 
 def normalize_winning(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, dict]:
     item_col = _col(df, ITEM_KEYS); games_col = _col(df, GAMES_KEYS)
@@ -199,6 +200,8 @@ def normalize_winning(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, d
         if c not in out.columns: out[c] = None
     out = out[cols]
     flags = {"has_winrate": win_col is not None, "has_pickrate": pick_col is not None}
+    for c in ["games", "item_id"]:
+        out[c] = pd.to_numeric(out[c], errors="coerce").astype("Int64")
     return out, flags
 
 
@@ -270,7 +273,12 @@ def main():
             if norm["champion"].isna().all() or (norm["champion"].astype(str).str.strip()=="").all(): norm["champion"] = champ
             if norm["champion_slug"].isna().all() or (norm["champion_slug"].astype(str).str.strip()=="").all(): norm["champion_slug"] = _slug(champ)
             front = ["source_file","window","source_tag","source_mode","source_tier","source_champion"]; norm = norm[front + [c for c in norm.columns if c not in front]]
-            miss_mask = norm[[f"item_id{i}" for i in range(1,6)]].isna().any(axis=1)
+            mm = []
+            for i in range(1,6):
+                mm.append(
+                    norm[f"item_id{i}"].isna() & (norm[f"item_en{i}"].notna() | norm[f"item_zh{i}"].notna())
+                )
+            miss_mask = pd.concat(mm, axis=1).any(axis=1)
             for _, r in norm[miss_mask].iterrows():
                 audit_missing_rows.append({"kind": "sets","source_file": r["source_file"],"source_champion": champ,"window": r["window"],"source_tag": r["source_tag"]})
             fields = [c for c, ok in (("winrate", flags["has_winrate"]),("pickrate", flags["has_pickrate"])) if ok]
@@ -292,7 +300,7 @@ def main():
                 norm["window"] = norm["source_tag"] = norm["source_mode"] = norm["source_tier"] = None
             norm["source_champion"] = champ
             front = ["source_file","window","source_tag","source_mode","source_tier","source_champion"]; norm = norm[front + [c for c in norm.columns if c not in front]]
-            miss_mask = norm["item_id"].isna()
+            miss_mask = norm["item_id"].isna() & (norm["item_en"].notna() | norm["item_zh"].notna())
             for _, r in norm[miss_mask].iterrows():
                 audit_missing_rows.append({"kind": "winning","source_file": r["source_file"],"source_champion": champ,"window": r["window"],"source_tag": r["source_tag"]})
             fields = [c for c, ok in (("winrate", flags["has_winrate"]),("pickrate", flags["has_pickrate"])) if ok]
