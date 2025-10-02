@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-最終版 v6：
-1) 支援 Lolalytics 欄位（set_win_rate/set_pick_rate/sample_size）。
-2) set_pick_rate=0.81 表示 0.81% → 0.0081（僅此欄位特別縮放）。
-3) winning 缺名稱時用 img URL 解析 item_id 回填。
-4) 物品查找 O(1) 索引＋別名表；整數欄輸出為 nullable Int64。
+normalize_outputs_batch.py — v6.1
+- 支援 Lolalytics 欄位（set_win_rate / set_pick_rate / sample_size）。
+- set_pick_rate=0.81 代表 0.81% → 0.0081（僅限此欄縮放）。
+- winning 名稱缺失時以 img URL 萃取數字嘗試回填（若 DDragon 無相同 id 則保持缺失）。
+- 物品查找：O(1) 索引 + 別名（data/ref/item_aliases.csv）。
+- 輸出整數欄為 nullable Int64。稽核只記錄「原始有名稱卻對不到 id」的列。
 """
 import argparse, os, re, glob, json, datetime, csv
 import pandas as pd
@@ -106,7 +107,6 @@ def _id_from_img(url):
     return int(m.group(1)) if m else None
 
 
-# 物品索引（O(1) 查詢）＋別名
 class ItemIndex:
     def __init__(self, df: pd.DataFrame, alias_csv: str | None):
         self.by_id: dict[int, tuple] = {}
@@ -177,7 +177,6 @@ def normalize_sets(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, dict
         games = _to_int(r.get(games_col)) if games_col else None
         winrt = _norm_rate(r.get(win_col)) if win_col else None
         pickr = _norm_rate(r.get(pick_col)) if pick_col else None
-        # Lolalytics 的 set_pick_rate 是百分數字串，例如 0.81 代表 0.81%
         if pick_col and str(pick_col).lower() == "set_pick_rate" and pickr is not None:
             pickr = pickr / 100.0
         raw_items = [r.get(ic) for ic in sorted(item_cols, key=_item_index)] if item_cols else (split_set(r.get(set_col)) if set_col else [])
@@ -218,7 +217,6 @@ def normalize_sets(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, dict
         if c not in out.columns:
             out[c] = None
     out = out[cols]
-    # dtype 修正
     for c in ["games","item_id1","item_id2","item_id3","item_id4","item_id5"]:
         out[c] = pd.to_numeric(out[c], errors="coerce").astype("Int64")
     flags = {"has_winrate": win_col is not None, "has_pickrate": pick_col is not None}
