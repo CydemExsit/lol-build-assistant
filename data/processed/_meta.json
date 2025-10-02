@@ -9,13 +9,13 @@
   "windows": [
     "7d"
   ],
-  "run_at": "2025-10-02T10:39:11.936261+08:00",
+  "run_at": "2025-10-02T11:06:13.142821+08:00",
   "inputs": {
     "in_dir": "data\\raw"
   },
   "counts": {
-    "set_files": 1,
-    "winning_files": 1,
-    "champions": 1
+    "set_files": 2,
+    "winning_files": 2,
+    "champions": 2
   }
 }

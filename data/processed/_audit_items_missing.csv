@@ -1,0 +1,3 @@
+kind,source_file,source_champion,window,source_tag
+sets,ezreal_aram_d2_plus_7d_sets.csv,ezreal,7d,aram_d2_plus
+winning,ezreal_aram_d2_plus_7d_winning.csv,ezreal,7d,aram_d2_plus
