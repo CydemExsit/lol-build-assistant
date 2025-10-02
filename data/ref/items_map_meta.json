@@ -1,0 +1,10 @@
+{
+  "ddragon_version": "15.19.1",
+  "generated_at": "2025-10-01T23:42:44.260454+08:00",
+  "row_count": 635,
+  "source": {
+    "versions": "https://ddragon.leagueoflegends.com/api/versions.json",
+    "item_zh": "https://ddragon.leagueoflegends.com/cdn/15.19.1/data/zh_TW/item.json",
+    "item_en": "https://ddragon.leagueoflegends.com/cdn/15.19.1/data/en_US/item.json"
+  }
+}

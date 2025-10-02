@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
-import argparse, os, csv, requests
-
+import argparse, os, csv, json, datetime, requests
 VERSIONS_URL = "https://ddragon.leagueoflegends.com/api/versions.json"
 DATA_URL = "https://ddragon.leagueoflegends.com/cdn/{ver}/data/{lang}/item.json"
+
 
 def fetch_json(url):
     r = requests.get(url, timeout=30)
     r.raise_for_status()
     return r.json()
 
+
 def ensure_dir(p):
-    os.makedirs(p, exist_ok=True)
+    if p:
+        os.makedirs(p, exist_ok=True)
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -29,24 +32,49 @@ def main():
 
     rows = []
     for item_id, meta_zh in items_zh.items():
-        name_zh = meta_zh.get("name", "")
         meta_en = items_en.get(item_id, {})
-        name_en = meta_en.get("name", "")
-        tags = ",".join(meta_en.get("tags", []))
-        row = {
+        rows.append({
             "item_id": int(item_id),
-            "en_name": name_en,
-            "zh_tw_name": name_zh,
-            "tags": tags
-        }
-        rows.append(row)
+            "en_name": meta_en.get("name", ""),
+            "zh_tw_name": meta_zh.get("name", ""),
+            "tags": ",".join(meta_en.get("tags", [])),
+            "ddragon_version": ver,
+        })
 
-    ensure_dir(os.path.dirname(args.out) or ".")
-    with open(args.out, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["item_id","en_name","zh_tw_name","tags"])
+    out_dir = os.path.dirname(os.path.abspath(args.out))
+    ensure_dir(out_dir)
+
+    # 版本化輸出：items_map_{ver}.csv + 最新副本 items_map.csv
+    versioned = os.path.join(out_dir, f"items_map_{ver}.csv")
+    with open(versioned, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["item_id","en_name","zh_tw_name","tags","ddragon_version"])
         w.writeheader()
         for r in sorted(rows, key=lambda x: x["item_id"]):
             w.writerow(r)
+
+    # 複製一份為 items_map.csv（避免 Windows 權限問題不用 symlink）
+    with open(versioned, "r", encoding="utf-8") as src, open(args.out, "w", encoding="utf-8") as dst:
+        dst.write(src.read())
+
+    # 寫入中繼資料
+    meta_path = os.path.join(out_dir, "items_map_meta.json")
+    meta = {
+        "ddragon_version": ver,
+        "generated_at": datetime.datetime.now().astimezone().isoformat(),
+        "row_count": len(rows),
+        "source": {
+            "versions": VERSIONS_URL,
+            "item_zh": DATA_URL.format(ver=ver, lang=args.lang),
+            "item_en": DATA_URL.format(ver=ver, lang="en_US"),
+        },
+    }
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+
+    print(f"Wrote: {versioned}")
+    print(f"Wrote: {args.out}")
+    print(f"Wrote: {meta_path}")
+
 
 if __name__ == "__main__":
     main()
