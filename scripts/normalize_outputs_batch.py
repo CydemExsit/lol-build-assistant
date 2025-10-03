@@ -1,15 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-normalize_outputs_batch.py — v6.1
-- 支援 Lolalytics 欄位（set_win_rate / set_pick_rate / sample_size）。
-- set_pick_rate=0.81 代表 0.81% → 0.0081（僅限此欄縮放）。
-- winning 名稱缺失時以 img URL 萃取數字嘗試回填（若 DDragon 無相同 id 則保持缺失）。
-- 物品查找：O(1) 索引 + 別名（data/ref/item_aliases.csv）。
-- 輸出整數欄為 nullable Int64。稽核只記錄「原始有名稱卻對不到 id」的列。
-"""
+from __future__ import annotations
 import argparse, os, re, glob, json, datetime, csv
+from typing import Optional, Tuple
 import pandas as pd
 from pathlib import Path
+
+ItemT = Tuple[int, str, str | None]
 
 ITEM_COL_RE = re.compile(r"item[1-5]$", re.IGNORECASE)
 FNAME_RE = re.compile(r"^(?P<champ>[^_]+)_(?P<middle>.+?)_(?P<window>\d+d)_(?P<kind>sets|winning)\.csv$", re.IGNORECASE)
@@ -107,27 +102,36 @@ def _id_from_img(url):
     return int(m.group(1)) if m else None
 
 
+def _safe_get_by_id(idx: "ItemIndex", iid) -> Optional[ItemT]:
+    try:
+        iv = int(iid)
+    except (TypeError, ValueError):
+        return None
+    return idx.by_id.get(iv)
+
+
+# 物品索引（O(1) 查詢）＋別名
 class ItemIndex:
     def __init__(self, df: pd.DataFrame, alias_csv: str | None):
-        self.by_id: dict[int, tuple] = {}
-        self.key_en: dict[str, tuple] = {}
-        self.key_zh: dict[str, tuple] = {}
-        self.norm_en: dict[str, tuple] = {}
-        self.norm_zh: dict[str, tuple] = {}
+        self.by_id: dict[int, ItemT] = {}
+        self.key_en: dict[str, ItemT] = {}
+        self.key_zh: dict[str, ItemT] = {}
+        self.norm_en: dict[str, ItemT] = {}
+        self.norm_zh: dict[str, ItemT] = {}
         for _, r in df.iterrows():
-            tup = (int(r["item_id"]), r["en_name"], r.get("zh_tw_name"))
+            tup: ItemT = (int(r["item_id"]), r["en_name"], r.get("zh_tw_name"))
             self.by_id[int(r["item_id"])] = tup
             if isinstance(r["en_name"], str):
                 k = r["en_name"].lower(); self.key_en[k] = tup; self.norm_en[_norm_key(k)] = tup
             if isinstance(r.get("zh_tw_name"), str):
                 z = r["zh_tw_name"].lower(); self.key_zh[z] = tup; self.norm_zh[_norm_key(z)] = tup
-        self.alias: dict[str, tuple | None] = {}
+        self.alias: dict[str, ItemT | None] = {}
         if alias_csv and os.path.exists(alias_csv):
             with open(alias_csv, newline='', encoding='utf-8') as f:
                 for row in csv.DictReader(f):
                     zh = (row.get('alias_zh') or '').strip(); en = (row.get('alias_en') or '').strip().lower(); iid = (row.get('item_id') or '').strip()
                     key = _norm_key(zh) if zh else None
-                    tgt = None
+                    tgt: Optional[ItemT] = None
                     if iid.isdigit():
                         tgt = self.by_id.get(int(iid))
                     if tgt is None and en:
@@ -135,7 +139,7 @@ class ItemIndex:
                     if key:
                         self.alias[key] = tgt
 
-    def find(self, token):
+    def find(self, token) -> Optional[ItemT]:
         s = _norm_str(token)
         if s is None:
             return None
@@ -171,15 +175,19 @@ def normalize_sets(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, dict
     champ_col = _col(df, CHAMP_KEYS); games_col = _col(df, GAMES_KEYS)
     win_col = _col(df, WIN_KEYS); pick_col = _col(df, PICK_KEYS)
     item_cols = [c for c in df.columns if ITEM_COL_RE.fullmatch(c)]; set_col = _col(df, SET_KEYS)
+
     rows = []
     for _, r in df.iterrows():
         champ = _norm_str(r.get(champ_col, "")) if champ_col else ""
         games = _to_int(r.get(games_col)) if games_col else None
         winrt = _norm_rate(r.get(win_col)) if win_col else None
         pickr = _norm_rate(r.get(pick_col)) if pick_col else None
+        # Lolalytics set_pick_rate=0.81 代表 0.81% → 0.0081
         if pick_col and str(pick_col).lower() == "set_pick_rate" and pickr is not None:
             pickr = pickr / 100.0
+
         raw_items = [r.get(ic) for ic in sorted(item_cols, key=_item_index)] if item_cols else (split_set(r.get(set_col)) if set_col else [])
+
         item_ids, item_en, item_zh = [], [], []
         for it in raw_items[:5]:
             hit = idx.find(it)
@@ -187,24 +195,17 @@ def normalize_sets(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, dict
                 item_ids.append(None); item_en.append(_norm_str(it)); item_zh.append(None)
             else:
                 item_ids.append(hit[0]); item_en.append(hit[1]); item_zh.append(hit[2])
+        # 補滿 5 欄
+        while len(item_ids) < 5:
+            item_ids.append(None); item_en.append(None); item_zh.append(None)
+
         rows.append({
             "champion": champ, "champion_slug": _slug(champ), "games": games, "winrate": winrt, "pickrate": pickr,
-            "item_id1": item_ids[0] if len(item_ids)>0 else None,
-            "item_id2": item_ids[1] if len(item_ids)>1 else None,
-            "item_id3": item_ids[2] if len(item_ids)>2 else None,
-            "item_id4": item_ids[3] if len(item_ids)>3 else None,
-            "item_id5": item_ids[4] if len(item_ids)>4 else None,
-            "item_en1": item_en[0] if len(item_en)>0 else None,
-            "item_en2": item_en[1] if len(item_en)>1 else None,
-            "item_en3": item_en[2] if len(item_en)>2 else None,
-            "item_en4": item_en[3] if len(item_en)>3 else None,
-            "item_en5": item_en[4] if len(item_en)>4 else None,
-            "item_zh1": item_zh[0] if len(item_zh)>0 else None,
-            "item_zh2": item_zh[1] if len(item_zh)>1 else None,
-            "item_zh3": item_zh[2] if len(item_zh)>2 else None,
-            "item_zh4": item_zh[3] if len(item_zh)>3 else None,
-            "item_zh5": item_zh[4] if len(item_zh)>4 else None,
+            "item_id1": item_ids[0], "item_id2": item_ids[1], "item_id3": item_ids[2], "item_id4": item_ids[3], "item_id5": item_ids[4],
+            "item_en1": item_en[0],  "item_en2": item_en[1],  "item_en3": item_en[2],  "item_en4": item_en[3],  "item_en5": item_en[4],
+            "item_zh1": item_zh[0],  "item_zh2": item_zh[1],  "item_zh3": item_zh[2],  "item_zh4": item_zh[3],  "item_zh5": item_zh[4],
         })
+
     out = pd.DataFrame(rows)
     cols = [
         "source_file","window","source_tag","source_mode","source_tier","source_champion",
@@ -235,7 +236,7 @@ def normalize_winning(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, d
         if not hit and img_col:
             iid = _id_from_img(r.get(img_col))
             if iid is not None:
-                hit = idx.by_id.get(iid)
+                hit = _safe_get_by_id(idx, iid)
         rows.append({
             "item_id": hit[0] if hit else None,
             "item_en": hit[1] if hit else _norm_str(item_raw),
@@ -301,6 +302,7 @@ def main():
 
     all_sets_frames, all_win_frames = [], []
     audit_missing_rows, audit_rate_rows = [], []
+    audit_win_not_in_sets_rows = []  # 追加覆蓋稽核
 
     def audit_rates(row: pd.Series, fields: list[str], ctx: dict):
         for c in fields:
@@ -329,11 +331,10 @@ def main():
                 norm["champion_slug"] = _slug(champ)
             front = ["source_file","window","source_tag","source_mode","source_tier","source_champion"]
             norm = norm[front + [c for c in norm.columns if c not in front]]
+            # 稽核：該格有名稱卻無 id
             mm = []
             for i in range(1,6):
-                mm.append(
-                    norm[f"item_id{i}"].isna() & (norm[f"item_en{i}"].notna() | norm[f"item_zh{i}"].notna())
-                )
+                mm.append(norm[f"item_id{i}"].isna() & (norm[f"item_en{i}"].notna() | norm[f"item_zh{i}"].notna()))
             miss_mask = pd.concat(mm, axis=1).any(axis=1)
             for _, r in norm[miss_mask].iterrows():
                 audit_missing_rows.append({"kind": "sets","source_file": r["source_file"],"source_champion": champ,"window": r["window"],"source_tag": r["source_tag"]})
@@ -345,6 +346,8 @@ def main():
             df_sets_all = pd.concat(merged_sets, ignore_index=True).sort_values(["champion_slug","games"], ascending=[True, False], kind="mergesort")
             df_sets_all.to_csv(os.path.join(out_dir_champ, "sets_normalized.csv"), index=False, encoding="utf-8")
             all_sets_frames.append(df_sets_all)
+        else:
+            df_sets_all = pd.DataFrame(columns=["item_id1","item_id2","item_id3","item_id4","item_id5"])  # 空佔位
 
         # winning
         merged_win = []
@@ -370,21 +373,49 @@ def main():
             df_win_all = pd.concat(merged_win, ignore_index=True).sort_values(["item_id","games"], ascending=[True, False], kind="mergesort")
             df_win_all.to_csv(os.path.join(out_dir_champ, "winning_normalized.csv"), index=False, encoding="utf-8")
             all_win_frames.append(df_win_all)
+        else:
+            df_win_all = pd.DataFrame(columns=["item_id","item_en","item_zh"])  # 空佔位
 
+        # 覆蓋稽核：winning 中出現但 sets 完全未出現的 item（逐英雄）
+        if not df_win_all.empty:
+            set_item_ids = set()
+            for i in range(1,6):
+                if f"item_id{i}" in df_sets_all.columns:
+                    set_item_ids.update(df_sets_all[f"item_id{i}"].dropna().astype(int).tolist())
+            for _, r in df_win_all.dropna(subset=["item_id"]).iterrows():
+                iid = int(r["item_id"])
+                if iid not in set_item_ids:
+                    audit_win_not_in_sets_rows.append({
+                        "source_champion": champ,
+                        "item_id": iid,
+                        "item_en": r.get("item_en"),
+                        "item_zh": r.get("item_zh"),
+                        "window": r.get("window"),
+                        "source_tag": r.get("source_tag"),
+                        "source_file": r.get("source_file"),
+                    })
+
+    # 彙整輸出
     if all_sets_frames:
         pd.concat(all_sets_frames, ignore_index=True).to_csv(os.path.join(args.out_dir, "all_sets_normalized.csv"), index=False, encoding="utf-8")
     if all_win_frames:
         pd.concat(all_win_frames, ignore_index=True).to_csv(os.path.join(args.out_dir, "all_winning_normalized.csv"), index=False, encoding="utf-8")
 
+    # 稽核輸出
     if audit_missing_rows:
         pd.DataFrame(audit_missing_rows).to_csv(os.path.join(args.out_dir, "_audit_items_missing.csv"), index=False, encoding="utf-8")
     else:
         open(os.path.join(args.out_dir, "_audit_items_missing.csv"), "w", encoding="utf-8").write("")
+
     if audit_rate_rows:
         pd.DataFrame(audit_rate_rows).to_csv(os.path.join(args.out_dir, "_audit_rates.csv"), index=False, encoding="utf-8")
     else:
         open(os.path.join(args.out_dir, "_audit_rates.csv"), "w", encoding="utf-8").write("")
 
+    if audit_win_not_in_sets_rows:
+        pd.DataFrame(audit_win_not_in_sets_rows).to_csv(os.path.join(args.out_dir, "_audit_winning_not_in_sets.csv"), index=False, encoding="utf-8")
+
+    # 中繼資料 _meta.json
     meta = {"ddragon_version": ddragon_ver, "modes": sorted(modes), "tiers": sorted(tiers), "windows": sorted(windows),
             "run_at": datetime.datetime.now().astimezone().isoformat(), "inputs": {"in_dir": str(in_dir)},
             "counts": {"set_files": len(set_files), "winning_files": len(winning_files), "champions": len(set(by_hero_sets.keys()) | set(by_hero_win.keys()))}}
