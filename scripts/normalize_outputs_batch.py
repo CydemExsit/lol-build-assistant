@@ -1,17 +1,24 @@
+# -*- coding: utf-8 -*-
+"""
+normalize_outputs_batch.py — v6.6
+變更：
+- 移除所有 winrate/pickrate 的 0~1 縮放。字串去掉 % 後，直接轉成浮點數，允許 >1。
+- 保留 v6.5 的稽核與欄位輸出；_audit_winning_not_in_sets.csv 維持輸出。
+"""
 from __future__ import annotations
 import argparse, os, re, glob, json, datetime, csv
 from typing import Optional, Tuple
 import pandas as pd
 from pathlib import Path
 
-ItemT = Tuple[int, str, str | None]
+ItemT = tuple[int, str, str | None]
 
 ITEM_COL_RE = re.compile(r"item[1-5]$", re.IGNORECASE)
 FNAME_RE = re.compile(r"^(?P<champ>[^_]+)_(?P<middle>.+?)_(?P<window>\d+d)_(?P<kind>sets|winning)\.csv$", re.IGNORECASE)
 
 # 欄位鍵集合
 GAMES_KEYS = {"games","matches","count","對局數","場次","對局","比賽數","sample_size","set_sample_size"}
-WIN_KEYS   = {"winrate","win%","win_rate","wr","勝率","set_win_rate"}
+WIN_KEYS   = {"winrate","win%","win_rate","wr","勝率","set_win_rate","win_rate"}
 PICK_KEYS  = {"pickrate","pick%","pick_rate","pr","選用率","出場率","選取率","登場率","set_pick_rate"}
 ITEM_KEYS  = {"item","item_name","name","物品","道具","裝備"}
 SET_KEYS   = {"set","items","build","combo","組合","套裝","出裝"}
@@ -24,18 +31,17 @@ def ensure_dir(p: str):
         os.makedirs(p, exist_ok=True)
 
 
-def _norm_rate(v):
-    if pd.isna(v):
+def _to_float(v):
+    """去除 % 與逗號，保留原始數值（不除以 100）。"""
+    if v is None or (isinstance(v, float) and pd.isna(v)):
         return None
-    if isinstance(v, str):
-        s = v.strip().replace('%','').replace(',','')
-        if not s:
-            return None
-        try:
-            v = float(s)
-        except ValueError:
-            return None
-    return float(v)/100.0 if v > 1 else float(v)
+    if isinstance(v, (int, float)):
+        return float(v)
+    try:
+        s = str(v).strip().replace('%','').replace(',','')
+        return float(s) if s != '' else None
+    except Exception:
+        return None
 
 
 def _to_int(v):
@@ -91,23 +97,8 @@ def parse_meta_from_name(name: str):
     if not m:
         return None
     d = m.groupdict(); tag = d["middle"]
-    parts = tag.split("_")
-    mode = parts[0] if len(parts) >= 1 else None
-    tier = "_".join(parts[1:]) if len(parts) >= 2 else None
+    parts = tag.split("_"); mode = parts[0] if len(parts)>=1 else None; tier = "_".join(parts[1:]) if len(parts)>=2 else None
     return {"champion": d["champ"], "window": d["window"], "kind": d["kind"].lower(), "tag": tag, "mode": mode, "tier": tier}
-
-
-def _id_from_img(url):
-    m = re.search(r"/(\d+)\.webp", str(url))
-    return int(m.group(1)) if m else None
-
-
-def _safe_get_by_id(idx: "ItemIndex", iid) -> Optional[ItemT]:
-    try:
-        iv = int(iid)
-    except (TypeError, ValueError):
-        return None
-    return idx.by_id.get(iv)
 
 
 # 物品索引（O(1) 查詢）＋別名
@@ -175,19 +166,13 @@ def normalize_sets(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, dict
     champ_col = _col(df, CHAMP_KEYS); games_col = _col(df, GAMES_KEYS)
     win_col = _col(df, WIN_KEYS); pick_col = _col(df, PICK_KEYS)
     item_cols = [c for c in df.columns if ITEM_COL_RE.fullmatch(c)]; set_col = _col(df, SET_KEYS)
-
     rows = []
     for _, r in df.iterrows():
         champ = _norm_str(r.get(champ_col, "")) if champ_col else ""
         games = _to_int(r.get(games_col)) if games_col else None
-        winrt = _norm_rate(r.get(win_col)) if win_col else None
-        pickr = _norm_rate(r.get(pick_col)) if pick_col else None
-        # Lolalytics set_pick_rate=0.81 代表 0.81% → 0.0081
-        if pick_col and str(pick_col).lower() == "set_pick_rate" and pickr is not None:
-            pickr = pickr / 100.0
-
+        winrt = _to_float(r.get(win_col)) if win_col else None
+        pickr = _to_float(r.get(pick_col)) if pick_col else None
         raw_items = [r.get(ic) for ic in sorted(item_cols, key=_item_index)] if item_cols else (split_set(r.get(set_col)) if set_col else [])
-
         item_ids, item_en, item_zh = [], [], []
         for it in raw_items[:5]:
             hit = idx.find(it)
@@ -195,17 +180,14 @@ def normalize_sets(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, dict
                 item_ids.append(None); item_en.append(_norm_str(it)); item_zh.append(None)
             else:
                 item_ids.append(hit[0]); item_en.append(hit[1]); item_zh.append(hit[2])
-        # 補滿 5 欄
         while len(item_ids) < 5:
             item_ids.append(None); item_en.append(None); item_zh.append(None)
-
         rows.append({
             "champion": champ, "champion_slug": _slug(champ), "games": games, "winrate": winrt, "pickrate": pickr,
             "item_id1": item_ids[0], "item_id2": item_ids[1], "item_id3": item_ids[2], "item_id4": item_ids[3], "item_id5": item_ids[4],
             "item_en1": item_en[0],  "item_en2": item_en[1],  "item_en3": item_en[2],  "item_en4": item_en[3],  "item_en5": item_en[4],
             "item_zh1": item_zh[0],  "item_zh2": item_zh[1],  "item_zh3": item_zh[2],  "item_zh4": item_zh[3],  "item_zh5": item_zh[4],
         })
-
     out = pd.DataFrame(rows)
     cols = [
         "source_file","window","source_tag","source_mode","source_tier","source_champion",
@@ -230,13 +212,18 @@ def normalize_winning(df: pd.DataFrame, idx: ItemIndex) -> tuple[pd.DataFrame, d
     rows = []
     for _, r in df.iterrows():
         item_raw = r.get(item_col); games = _to_int(r.get(games_col)) if games_col else None
-        winrt = _norm_rate(r.get(win_col)) if win_col else None
-        pickr = _norm_rate(r.get(pick_col)) if pick_col else None
+        winrt = _to_float(r.get(win_col)) if win_col else None
+        pickr = _to_float(r.get(pick_col)) if pick_col else None
         hit = idx.find(item_raw)
         if not hit and img_col:
-            iid = _id_from_img(r.get(img_col))
+            tok = r.get(img_col)
+            try:
+                m = re.search(r"/(\d+)\\.webp$", str(tok))
+                iid = int(m.group(1)) if m else None
+            except Exception:
+                iid = None
             if iid is not None:
-                hit = _safe_get_by_id(idx, iid)
+                hit = idx.by_id.get(iid)
         rows.append({
             "item_id": hit[0] if hit else None,
             "item_en": hit[1] if hit else _norm_str(item_raw),
@@ -302,12 +289,12 @@ def main():
 
     all_sets_frames, all_win_frames = [], []
     audit_missing_rows, audit_rate_rows = [], []
-    audit_win_not_in_sets_rows = []  # 追加覆蓋稽核
+    audit_win_not_in_sets_rows = []
 
     def audit_rates(row: pd.Series, fields: list[str], ctx: dict):
         for c in fields:
             v = row.get(c)
-            bad = v is None or pd.isna(v) or (isinstance(v, float) and (v < 0 or v > 1))
+            bad = v is None or pd.isna(v)  # 不再檢查 0~1 範圍
             if bad:
                 audit_rate_rows.append({**ctx, "field": c, "value": v})
 
@@ -331,7 +318,6 @@ def main():
                 norm["champion_slug"] = _slug(champ)
             front = ["source_file","window","source_tag","source_mode","source_tier","source_champion"]
             norm = norm[front + [c for c in norm.columns if c not in front]]
-            # 稽核：該格有名稱卻無 id
             mm = []
             for i in range(1,6):
                 mm.append(norm[f"item_id{i}"].isna() & (norm[f"item_en{i}"].notna() | norm[f"item_zh{i}"].notna()))

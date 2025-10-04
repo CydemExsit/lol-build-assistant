@@ -1,7 +1,5 @@
 source_file,window,source_tag,source_mode,source_tier,source_champion,item_id,item_en,item_zh,games,winrate,pickrate
-lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,2503,Blackfire Torch,黑焰火炬,0,0.4924,0.0512
 lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,6653,Liandry's Torment,黎安卓的折磨,0,0.4417,0.076
-lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,8010,Bloodletter's Curse,血書詛咒,0,0.4359,0.0061
 lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,223089,Rabadon's Deathcap,死亡之帽,0,0.5218,0.5066
 lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,223102,Banshee's Veil,女妖面紗,0,0.5031,0.0253
 lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,223118,Malignance,惡意,0,0.5151,0.464
@@ -22,3 +20,5 @@ lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,326616,Staff of
 lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,326617,Moonstone Renewer,月之石再生裝置,0,0.6154,0.0061
 lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,326620,Echoes of Helia,希利亞的迴響,0,0.6154,0.004
 lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,326621,Dawncore,破曉之核,0,0.625,0.0037
+lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,,,,0,0.4924,0.0512
+lux_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,lux,,,,0,0.4359,0.0061

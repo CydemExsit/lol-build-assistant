@@ -1,10 +1,9 @@
 source_champion,item_id,item_en,item_zh,window,source_tag,source_file
-ezreal,126697,Hubris,傲慢,7d,aram_d2_plus,ezreal_aram_d2_plus_7d_winning.csv
 ezreal,223508,Essence Reaver,奪魄之鐮,7d,aram_d2_plus,ezreal_aram_d2_plus_7d_winning.csv
+ezreal,224646,Stormsurge,雷霆風暴,7d,aram_d2_plus,ezreal_aram_d2_plus_7d_winning.csv
+ezreal,226672,Kraken Slayer,海妖殺手,7d,aram_d2_plus,ezreal_aram_d2_plus_7d_winning.csv
 ezreal,226696,Axiom Arc,公理弧刃,7d,aram_d2_plus,ezreal_aram_d2_plus_7d_winning.csv
 ezreal,323003,Archangel's Staff,大天使之杖,7d,aram_d2_plus,ezreal_aram_d2_plus_7d_winning.csv
-lux,2503,Blackfire Torch,黑焰火炬,7d,aram_d2_plus,lux_aram_d2_plus_7d_winning.csv
-lux,8010,Bloodletter's Curse,血書詛咒,7d,aram_d2_plus,lux_aram_d2_plus_7d_winning.csv
 lux,224629,Cosmic Drive,星河馳騁,7d,aram_d2_plus,lux_aram_d2_plus_7d_winning.csv
 lux,323107,Redemption,贖罪神石,7d,aram_d2_plus,lux_aram_d2_plus_7d_winning.csv
 lux,323504,Ardent Censer,熾灼魔器,7d,aram_d2_plus,lux_aram_d2_plus_7d_winning.csv
@@ -13,8 +12,6 @@ lux,326616,Staff of Flowing Water,流水之杖,7d,aram_d2_plus,lux_aram_d2_plus_
 lux,326617,Moonstone Renewer,月之石再生裝置,7d,aram_d2_plus,lux_aram_d2_plus_7d_winning.csv
 lux,326620,Echoes of Helia,希利亞的迴響,7d,aram_d2_plus,lux_aram_d2_plus_7d_winning.csv
 lux,326621,Dawncore,破曉之核,7d,aram_d2_plus,lux_aram_d2_plus_7d_winning.csv
-vayne,3032,Yun Tal Wildarrows,雲陶狂箭,7d,aram_d2_plus,vayne_aram_d2_plus_7d_winning.csv
-vayne,126697,Hubris,傲慢,7d,aram_d2_plus,vayne_aram_d2_plus_7d_winning.csv
 vayne,223033,Mortal Reminder,致死宣告,7d,aram_d2_plus,vayne_aram_d2_plus_7d_winning.csv
 vayne,223065,Spirit Visage,振奮盔甲,7d,aram_d2_plus,vayne_aram_d2_plus_7d_winning.csv
 vayne,223085,Runaan's Hurricane,芮蘭颶風箭,7d,aram_d2_plus,vayne_aram_d2_plus_7d_winning.csv

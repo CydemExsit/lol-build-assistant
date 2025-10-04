@@ -1,6 +1,4 @@
 source_file,window,source_tag,source_mode,source_tier,source_champion,item_id,item_en,item_zh,games,winrate,pickrate
-vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,3032,Yun Tal Wildarrows,雲陶狂箭,0,0.4812,0.0378
-vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,126697,Hubris,傲慢,0,0.4146,0.0058
 vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,222504,Kaenic Rookern,凱尼克欺瞞者,0,0.5789,0.0162
 vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,223031,Infinity Edge,無盡之刃,0,0.4983,0.0843
 vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,223033,Mortal Reminder,致死宣告,0,0.6591,0.0062
@@ -33,3 +31,5 @@ vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,226695,Serp
 vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,226699,Voltaic Cyclosword,電流旋風劍,0,0.4978,0.0328
 vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,443083,Warmog's Armor,好戰者鎧甲,0,0.5556,0.0038
 vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,667666,The Collector,蒐集者,0,0.4881,0.0535
+vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,,,,0,0.4812,0.0378
+vayne_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,vayne,,,,0,0.4146,0.0058
