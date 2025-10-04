@@ -7,67 +7,72 @@
   "build": {
     "boots": "狂戰士護脛",
     "order": [
-      "殞落王者之劍",
       "魔劍正宗",
-      NaN,
       "席利妲咒怨",
-      "夜色緣界"
+      "蒐集者",
+      "夜色緣界",
+      NaN
     ]
   },
   "rationale": {
     "dynamic_thresholds": {
-      "P50": 0.0659,
-      "P75": 0.26135,
-      "W50": 0.545,
-      "W75": 0.57395,
-      "GlobalAvgWin": 0.5523157894736842,
+      "P50": 0.0241,
+      "P75": 0.1005,
+      "W50": 0.4964,
+      "W75": 0.5263500000000001,
+      "GlobalAvgWin": 0.4905,
       "PickCut": 0.1,
-      "WinCut": 0.5523157894736842,
+      "WinCut": 0.4964,
       "Tau": 0.5
     },
-    "supports": [],
+    "supports": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
     "top_sets_used": 1,
     "note": "加入 explain 軌跡與參數可調。",
     "explain": {
       "decisions": [
         {
-          "item": "殞落王者之劍",
-          "sup": 0.0,
+          "item": "魔劍正宗",
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         },
         {
-          "item": "鬼索的狂暴之刃",
-          "sup": 0.0,
+          "item": "席利妲咒怨",
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         },
         {
-          "item": "臨界點",
-          "sup": 0.0,
+          "item": "蒐集者",
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         },
         {
-          "item": "智慧末刃",
-          "sup": 0.0,
+          "item": "夜色緣界",
+          "sup": 1.0,
           "cut": 1.0,
-          "action": "reject"
+          "action": "accept"
         }
       ],
       "selected_before_ordering": [
-        "殞落王者之劍",
         "魔劍正宗",
-        NaN,
         "席利妲咒怨",
-        "夜色緣界"
+        "蒐集者",
+        "夜色緣界",
+        NaN
       ],
       "ordered_final": [
-        "殞落王者之劍",
         "魔劍正宗",
-        NaN,
         "席利妲咒怨",
-        "夜色緣界"
+        "蒐集者",
+        "夜色緣界",
+        NaN
       ]
     }
   }

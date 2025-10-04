@@ -7,51 +7,73 @@
   "build": {
     "boots": "狂戰士護脛",
     "order": [
+      "126697",
       "蒐集者",
       "無盡之刃",
       "衝擊火炮",
-      "多明尼克的問候",
-      "嗜血者"
+      "多明尼克的問候"
     ]
   },
   "rationale": {
     "dynamic_thresholds": {
-      "P50": 0.0384,
-      "P75": 0.18974999999999997,
-      "W50": 0.5431,
-      "W75": 0.56655,
-      "GlobalAvgWin": 0.549191304347826,
-      "PickCut": 0.1,
-      "WinCut": 0.549191304347826,
+      "P50": 5.234999999999999,
+      "P75": 20.225,
+      "W50": 55.71,
+      "W75": 58.235,
+      "GlobalAvgWin": 55.64909090909091,
+      "PickCut": 5.234999999999999,
+      "WinCut": 55.71,
       "Tau": 0.5
     },
-    "supports": [
-      1.0
-    ],
+    "supports": [],
     "top_sets_used": 1,
     "note": "加入 explain 軌跡與參數可調。",
     "explain": {
       "decisions": [
         {
-          "item": "嗜血者",
-          "sup": 1.0,
+          "item": "126697",
+          "sup": 0.0,
           "cut": 1.0,
-          "action": "accept"
+          "action": "reject"
+        },
+        {
+          "item": "公理弧刃",
+          "sup": 0.0,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "妖夢鬼刀",
+          "sup": 0.0,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "夜色緣界",
+          "sup": 0.0,
+          "cut": 1.0,
+          "action": "reject"
+        },
+        {
+          "item": "幻影之舞",
+          "sup": 0.0,
+          "cut": 1.0,
+          "action": "reject"
         }
       ],
       "selected_before_ordering": [
-        "嗜血者",
+        "126697",
         "蒐集者",
         "無盡之刃",
         "衝擊火炮",
         "多明尼克的問候"
       ],
       "ordered_final": [
+        "126697",
         "蒐集者",
         "無盡之刃",
         "衝擊火炮",
-        "多明尼克的問候",
-        "嗜血者"
+        "多明尼克的問候"
       ]
     }
   }
