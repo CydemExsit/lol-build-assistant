@@ -1,0 +1,21 @@
+{
+  "ddragon_version": "15.19.1",
+  "modes": [
+    "aram"
+  ],
+  "tiers": [
+    "d2_plus"
+  ],
+  "windows": [
+    "7d"
+  ],
+  "run_at": "2025-10-06T21:50:43.069940+08:00",
+  "inputs": {
+    "in_dir": "data\\raw"
+  },
+  "counts": {
+    "set_files": 3,
+    "winning_files": 3,
+    "champions": 3
+  }
+}
