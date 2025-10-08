@@ -5,7 +5,6 @@ __pycache__/
 *.so
 *.egg-info/
 .eggs/
-*.log
 *.tmp
 *.cache/
 .pytest_cache/
@@ -17,3 +16,9 @@ data/raw/
 data/processed/
 data/debug/
 data/cf_state.json
+.venv/
+.env
+*.log
+data/*state*.json
+demo/*.csv
+!demo/*.sample.csv

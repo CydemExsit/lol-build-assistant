@@ -1,0 +1,6 @@
+source_file,window,source_tag,source_mode,source_tier,source_champion,item_id,item_en,item_zh,games,winrate,pickrate
+ezreal_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,6675,Navori Flickerblade,那歐閃刃,0,53.49,0.42
+ezreal_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,126697,Hubris,傲慢,0,47.78,1.77
+ezreal_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,222504,Kaenic Rookern,凱尼克欺瞞者,0,57.58,0.32
+ezreal_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,223031,Infinity Edge,無盡之刃,0,43.48,0.45
+ezreal_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,223033,Mortal Reminder,致死宣告,0,41.09,2.7
