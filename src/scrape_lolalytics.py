@@ -1,7 +1,27 @@
+# -*- coding: utf-8 -*-
+"""
+Lolalytics 抓取器：Winning Items 與 Actually Built Sets（a_5）。
+重點修正：
+1) 針對少數英雄（如 Lux）a_5 區塊不回應 scrollLeft 的情況，新增第二種翻頁機制：
+   直接調整內層 list 的 style.paddingLeft，每次 +378px，並觸發 scroll/resize 事件。
+2) 兩種機制並用：先嘗試 scroller.scrollLeft，失敗再改 padding-left；都失敗連續多次則停止。
+3) 避免使用無效 CSS 選擇器（如 .gap-[6px]），改以 XPath/通用 traversing 尋找容器。
+4) 若 <img> 無 alt，回退以 /item64/{id}.webp 中的 {id} 當名稱，避免 sets 第一欄空白。
+5) 比例欄位只去掉 % 與逗號，不做 0~1 縮放（保持原頁面數值，例如 0.81 而非 0.0081）。
+
+執行示例：
+  powershell -File .\scripts\build_batch.ps1 -Heroes lux
+  powershell -File .\scripts\build_batch.ps1 -Heroes ezreal
+  # 除錯觀察：
+  python src/scrape_lolalytics.py --hero lux --winning_out data/raw/lux_aram_d2_plus_7d_winning.csv \
+      --sets_out data/raw/lux_aram_d2_plus_7d_sets.csv --no-headless
+"""
+
+from __future__ import annotations
 import argparse, os, time, re
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 import pandas as pd
-from playwright.sync_api import sync_playwright, Page
+from playwright.sync_api import sync_playwright, Page, Locator
 
 LANG = "zh_tw"
 DEF_MODE = "aram"
@@ -105,13 +125,14 @@ def _parse_winning_items(page: Page) -> pd.DataFrame:
               for (const row of Array.from(container.children)) {
                 const img = row.querySelector("img[src*='/item64/']");
                 if (!img) continue;
-                const name = (img.alt && img.alt.trim()) ? img.alt.trim() : idFromSrc(img.src||"");
+                const alt = (img.getAttribute('alt')||'').trim();
+                const name = alt ? alt : idFromSrc(img.getAttribute('src')||'');
                 const nums = Array.from(row.querySelectorAll("div.my-1"))
                   .map(e => (e.textContent || "").trim())
                   .filter(Boolean);
                 const win  = nums[0] || "";
                 const pick = nums[1] || "";
-                out.push({ src: img.src || "", name, win, pick });
+                out.push({ src: img.getAttribute('src') || "", name, win, pick });
               }
               return out;
             }
@@ -138,7 +159,7 @@ def _parse_winning_items(page: Page) -> pd.DataFrame:
             data.append({"img": key, "name": name, "win_rate": win_rate, "pick_rate": pick_rate, "sample_size": 0})
             new_added += 1
         consts = scroller.evaluate(
-            """
+            r"""
             (el) => {
               const before = el.scrollLeft;
               const next = Math.min(el.scrollLeft + el.clientWidth, el.scrollWidth);
@@ -169,19 +190,20 @@ def _click_sets_five(page: Page) -> None:
         pass
 
 
-def _find_sets_scroller(page: Page):
+def _find_sets_scroller(page: Page) -> Tuple[Locator|None, Locator|None]:
+    # 用 XPath 避免 .gap-[6px] 的 CSS 解析問題
     scrollers = page.locator(
-        "xpath=//div[contains(@class,'overflow-x-scroll') and .//div[contains(@class,'text-center') and contains(@style,'padding-left')]]"
+        "xpath=//div[contains(@class,'overflow-x-scroll') and .//div[contains(@class,'gap-[6px]') and contains(@class,'text-center') and contains(@style,'padding-left')]]"
     )
-    count = scrollers.count() if scrollers else 0
-    for i in range(count):
+    cnt = scrollers.count() if scrollers else 0
+    for i in range(cnt):
         sc = scrollers.nth(i)
         try:
             ok = sc.evaluate(
-                """
+                r"""
                 (el) => {
                   return Array.from(el.querySelectorAll('div')).some(row =>
-                    [0,1,2,3,4].every(k => row.querySelector(`img[data-id^="${k}_"]`))
+                    [0,1,2,3,4].every(k => row.querySelector(`img[data-id^='${k}_']`))
                   );
                 }
                 """
@@ -189,12 +211,12 @@ def _find_sets_scroller(page: Page):
         except Exception:
             ok = False
         if ok:
-            inner = sc.locator("xpath=.//div[contains(@class,'text-center') and contains(@style,'padding-left')]").first
+            inner = sc.locator("xpath=.//div[contains(@class,'gap-[6px]') and contains(@class,'text-center') and contains(@style,'padding-left')]").first
             return sc, inner
     return None, None
 
 
-def _extract_visible_sets(scroller) -> List[Dict[str, Any]]:
+def _extract_visible_sets(scroller: Locator) -> List[Dict[str, Any]]:
     rows = scroller.evaluate(
         r"""
         (el) => {
@@ -215,8 +237,11 @@ def _extract_visible_sets(scroller) -> List[Dict[str, Any]]:
               imgs.push(img);
             }
             if (!imgs.length) continue;
-            const names  = imgs.map(i => (i.alt && i.alt.trim()) ? i.alt.trim() : idFromSrc(i.src||""));
-            const images = imgs.map(i => i.src || "");
+            const names  = imgs.map(i => {
+              const alt = (i.getAttribute('alt')||'').trim();
+              return alt ? alt : idFromSrc(i.getAttribute('src')||'');
+            });
+            const images = imgs.map(i => i.getAttribute('src') || '');
             if (names.some(n => !n)) continue;
             const nums = Array.from(row.querySelectorAll("div.my-1"))
               .map(e => (e.textContent || "").trim())
@@ -235,7 +260,58 @@ def _extract_visible_sets(scroller) -> List[Dict[str, Any]]:
     return rows or []
 
 
-def _collect_sets_from_scoped(imgs0_locator) -> pd.DataFrame:
+def _advance_sets_page(page: Page, scroller: Locator, inner: Locator|None) -> bool:
+    # 先嘗試 scrollLeft
+    try:
+        before, after, maxw = scroller.evaluate(
+            r"""
+            (el, step) => {
+              const before = el.scrollLeft;
+              const max = Math.max(0, el.scrollWidth - el.clientWidth);
+              const next = Math.min(before + step, max);
+              el.scrollLeft = next;
+              el.dispatchEvent(new Event('scroll', {bubbles:true}));
+              return [before, el.scrollLeft, max];
+            }
+            """,
+            SCROLL_STEP,
+        )
+        if after != before:
+            return True
+    except Exception:
+        pass
+
+    # 再嘗試 padding-left（Lux 等個案）
+    if inner is not None:
+        try:
+            moved = scroller.evaluate(
+                r"""
+                (el, step) => {
+                  let list = null;
+                  for (const d of Array.from(el.querySelectorAll('div'))) {
+                    const st = d.getAttribute('style') || '';
+                    if (st.includes('padding-left')) { list = d; break; }
+                  }
+                  if (!list) return false;
+                  const curStr = list.style.paddingLeft || (list.getAttribute('style')||'');
+                  const m = /padding-left:\s*([\-\d\.]+)px/i.exec(curStr);
+                  const cur = m ? parseFloat(m[1]) : 0;
+                  const next = cur + step;
+                  list.style.paddingLeft = `${next}px`;
+                  el.dispatchEvent(new Event('scroll', {bubbles:true}));
+                  window.dispatchEvent(new Event('resize'));
+                  return next !== cur;
+                }
+                """,
+                SCROLL_STEP,
+            )
+            return bool(moved)
+        except Exception:
+            return False
+    return False
+
+
+def _collect_sets_from_scoped(imgs0_locator: Locator) -> pd.DataFrame:
     out, seen = [], set()
     try:
         total = imgs0_locator.count()
@@ -294,8 +370,9 @@ def _parse_sets_5(page: Page) -> pd.DataFrame:
     except Exception:
         pass
 
-    scroller, _ = _find_sets_scroller(page)
+    scroller, inner = _find_sets_scroller(page)
     if not scroller:
+        # 無水平 scroller，退而求其次：抓可視區域
         imgs0 = page.locator("css=img[data-id^='0_']")
         try:
             total = imgs0.count()
@@ -306,8 +383,9 @@ def _parse_sets_5(page: Page) -> pd.DataFrame:
         return _collect_sets_from_scoped(imgs0)
 
     seen_key = set(); out: List[Dict[str, Any]] = []
-    stall = 0; last_left = -1
+    stall = 0; last_seen_count = 0
 
+    # 先觸發一次 scroll 以讓 Qwik 佈局（某些英雄需要）
     try:
         scroller.evaluate("(el)=>{ el.scrollLeft = Math.max(el.scrollLeft, 1); el.dispatchEvent(new Event('scroll', {bubbles:true})); }")
         page.wait_for_timeout(120)
@@ -315,18 +393,19 @@ def _parse_sets_5(page: Page) -> pd.DataFrame:
         pass
 
     for _ in range(MAX_SCROLL_STEPS):
-        rows = _extract_visible_sets(scroller); new_added = 0; stop_small = False
+        rows = _extract_visible_sets(scroller)
+        new_added = 0
         for r in rows:
             names = r.get("names", []); images = r.get("images", [])
             if len(names) != 5 or len(images) != 5:
                 continue
-            if any(src.endswith("/2003.webp") or src.endswith("/2031.webp") for src in images):
+            if any((src or '').endswith("/2003.webp") or (src or '').endswith("/2031.webp") for src in images):
                 continue
             key = "|".join(names)
             if key in seen_key:
                 continue
             seen_key.add(key)
-            win = float(r.get("win",0)); pick = float(r.get("pick",0)); games = int(r.get("sample",0))
+            win = float(r.get("win",0) or 0); pick = float(r.get("pick",0) or 0); games = int(r.get("sample",0) or 0)
             out.append({
                 "items": key,
                 "items_img": "|".join(images),
@@ -335,34 +414,23 @@ def _parse_sets_5(page: Page) -> pd.DataFrame:
                 "set_sample_size": games,
             })
             new_added += 1
-            if games < 2:
-                stop_small = True
-        if stop_small:
-            break
-        before, after, _ = scroller.evaluate(
-            f"""
-            (el) => {{
-              const before = el.scrollLeft;
-              const next = Math.min(before + {SCROLL_STEP}, el.scrollWidth - el.clientWidth);
-              el.scrollLeft = next;
-              el.dispatchEvent(new Event('scroll', {{bubbles:true}}));
-              return [before, el.scrollLeft, el.scrollWidth];
-            }}
-            """
-        )
+        moved = _advance_sets_page(page, scroller, inner)
         page.wait_for_timeout(SCROLL_PAUSE_MS)
-        if after == before:
+
+        if new_added == 0 and not moved:
             stall += 1
         else:
             stall = 0
         if stall >= MAX_STALL:
             break
-        if new_added == 0 and after == last_left:
+        # 若長時間沒有增加，提前結束
+        if len(seen_key) == last_seen_count and not moved:
             break
-        last_left = after
+        last_seen_count = len(seen_key)
 
     cols = ["items","items_img","set_win_rate","set_pick_rate","set_sample_size"]
     if not out:
+        # 保底：再嘗試一次可視區域採集
         imgs0 = page.locator("css=img[data-id^='0_']")
         try:
             total = imgs0.count()

@@ -1,0 +1,9 @@
+**env.example**
+```dotenv
+LANG=zh_tw
+MODE=aram
+HERO=lux
+TIER=d2_plus
+PATCH=7
+CF_STATE=data/cf_state.json
+OUTPUT_DIR=data/processed

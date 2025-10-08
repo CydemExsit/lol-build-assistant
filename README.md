@@ -1,17 +1,26 @@
-# LoL Build Assistant (PoC)
+# lol-build-assistant
 
-用手動輸入的 CSV（Winning Items / Actually Built Sets）產出 ARAM 出裝順序（中文裝備名）。
+以 Playwright 抓取 LoLalytics 單英雄資料，先完成「一條龍」最小可用流程（MVP）。
 
-## 專案資料夾整理
+## MVP 範圍
+- 目標：單一英雄 + 單一模式（示例：`lux / ARAM`）
+- 產出：`data/processed/sets.csv`、`data/processed/winning.csv`
+- 來源：LoLalytics（受 Cloudflare 保護，需先通過一次驗證）
+- 已附 `demo/` 小樣本輸出供瀏覽
 
-執行流程會在 `data/raw/`, `data/processed/` 與 `outputs/` 產出大量中間資料與結果檔案，這些內容現在已加入 `.gitignore`，預設不再納入版本控制：
+## 快速開始
+```bash
+python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python -m playwright install --with-deps
+cp env.example .env
 
-- `data/raw/`：爬蟲或手動整理後的原始 CSV / HTML / 圖像等資料。請自行於本機建立並填入最新資料。
-- `data/processed/`：經 `scripts/normalize_outputs*.py` 清整後的中間資料。
-- `outputs/`：`src/pipeline.py` 或其他腳本輸出的最終 JSON/Markdown 結果。
-- `data/debug/`：除錯時產生的報告或截圖。
-- `data/cf_state.json`：Scraper 與 Cloudflare 互動時的暫存狀態。
+# 1) 先通過 Cloudflare（只需一次）
+python cf_shield_fix.py bootstrap --hero lux --lang zh_tw --mode aram --tier d2_plus --patch 7 --state data/cf_state.json
+# 依指示在跳出的視窗內完成驗證，完成後按 Enter 儲存 cookie
 
-如需保留本地測試用的範例，可使用 `data/samples/` 目錄中的 sample CSV；或自行建立未被忽略的子資料夾。
+# 2) 測試 cookie 有效
+python cf_shield_fix.py test --hero lux --lang zh_tw --mode aram --tier d2_plus --patch 7 --state data/cf_state.json
 
-若要重新產生上述資料夾內容，請參考 `scripts/` 內的工具或自訂流程。 
+# 3) 跑單一流程（產出 sets.csv / winning.csv）
+python run_pipeline.py --hero lux --lang zh_tw --mode aram --tier d2_plus --patch 7 --state data/cf_state.json --out data/processed

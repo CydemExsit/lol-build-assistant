@@ -17,3 +17,8 @@ data/raw/
 data/processed/
 data/debug/
 data/cf_state.json
+# runtime state
+data/cf_state.json
+.venv/
+*.log
+.env
