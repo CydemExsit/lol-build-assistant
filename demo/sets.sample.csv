@@ -1,6 +1,6 @@
-items,set_win_rate,set_pick_rate,set_sample_size
-殞落王者之劍|鬼索的狂暴之刃|智慧末刃|千變萬化之賈克修|臨界點,0.592,0.031,3100
-殞落王者之劍|鬼索的狂暴之刃|智慧末刃|臨界點|千變萬化之賈克修,0.585,0.029,2900
-殞落王者之劍|鬼索的狂暴之刃|智慧末刃|臨界點|芮蘭颶風箭,0.579,0.027,2700
-殞落王者之劍|鬼索的狂暴之刃|智慧末刃|嗜血者|臨界點,0.561,0.019,1900
-殞落王者之劍|鬼索的狂暴之刃|智慧末刃|千變萬化之賈克修|Opportunity,0.575,0.006,600
+source_file,window,source_tag,source_mode,source_tier,source_champion,champion,champion_slug,games,winrate,pickrate,item_id1,item_id2,item_id3,item_id4,item_id5,item_en1,item_en2,item_en3,item_en4,item_en5,item_zh1,item_zh2,item_zh3,item_zh4,item_zh5
+ezreal_aram_d2_plus_7d_sets.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,ezreal,ezreal,280,42.14,2.75,223078,323004,223161,226694,223153,Trinity Force,Manamune,Spear of Shojin,Serylda's Grudge,Blade of The Ruined King,三相之力,魔劍正宗,精進之矛,席利妲咒怨,殞落王者之劍
+ezreal_aram_d2_plus_7d_sets.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,ezreal,ezreal,267,49.81,2.62,223078,323004,223161,226694,223072,Trinity Force,Manamune,Spear of Shojin,Serylda's Grudge,Bloodthirster,三相之力,魔劍正宗,精進之矛,席利妲咒怨,嗜血者
+ezreal_aram_d2_plus_7d_sets.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,ezreal,ezreal,93,56.99,0.91,223078,323004,223161,226694,223156,Trinity Force,Manamune,Spear of Shojin,Serylda's Grudge,Maw of Malmortius,三相之力,魔劍正宗,精進之矛,席利妲咒怨,魔提斯深淵
+ezreal_aram_d2_plus_7d_sets.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,ezreal,ezreal,73,42.47,0.72,223078,323004,226694,223161,223153,Trinity Force,Manamune,Serylda's Grudge,Spear of Shojin,Blade of The Ruined King,三相之力,魔劍正宗,席利妲咒怨,精進之矛,殞落王者之劍
+ezreal_aram_d2_plus_7d_sets.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,ezreal,ezreal,67,44.78,0.66,223078,323004,223161,226694,223074,Trinity Force,Manamune,Spear of Shojin,Serylda's Grudge,Ravenous Hydra,三相之力,魔劍正宗,精進之矛,席利妲咒怨,狂怒九頭蛇

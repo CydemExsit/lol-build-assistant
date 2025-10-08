@@ -18,6 +18,7 @@ from src.scrape_lolalytics import (
     LANG as DEFAULT_LANG,
 )
 from src.pipeline import run as run_pipeline
+from src.render_build import render_markdown
 
 
 def parse_args() -> argparse.Namespace:
@@ -30,6 +31,7 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--out", default="data/processed", help="Directory for generated CSV/JSON")
     ap.add_argument("--topk", type=int, default=50, help="Candidate set size for the scoring algorithm")
     ap.add_argument("--cover", type=float, default=0.80, help="Pickrate coverage threshold")
+    ap.add_argument("--md-topk", type=int, default=8, help="Number of sets to show in the Markdown table")
     ap.add_argument("--no-headless", action="store_true", help="Open a visible browser window during scrape")
     ap.add_argument("--no-explain", dest="explain", action="store_false", help="Skip rationale in output JSON")
     ap.set_defaults(explain=True)
@@ -45,6 +47,7 @@ def main() -> None:
     winning_path = out_dir / f"{prefix}_winning.csv"
     sets_path = out_dir / f"{prefix}_sets.csv"
     build_path = out_dir / f"{prefix}_build.json"
+    md_path = out_dir / f"{prefix}_build.md"
 
     win_df, set_df, url = scrape(
         args.hero,
@@ -67,10 +70,13 @@ def main() -> None:
         cover=args.cover,
     )
 
+    render_markdown(sets_path, md_path, topk=args.md_topk)
+
     print("[ok] scraped:", url)
     print("[ok] winning csv:", winning_path)
     print("[ok] sets csv:", sets_path)
     print("[ok] build json:", build_path)
+    print("[ok] build md:", md_path)
 
 
 if __name__ == "__main__":

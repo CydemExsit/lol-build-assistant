@@ -12,8 +12,8 @@ python scripts/quickstart.py --hero varus --mode aram --lang zh_tw --tier d2_plu
 ```
 流程說明：
 1. 建立虛擬環境並安裝依賴：`scripts/setup.sh` 或 `scripts/setup.ps1`。
-2. 執行上述指令，會自動抓取資料、輸出 CSV 與 JSON。
-3. 產物範例位於 `data/processed`：`varus_aram_d2_plus_7_winning.csv`、`varus_aram_d2_plus_7_sets.csv`、`varus_aram_d2_plus_7_build.json`。
+2. 執行上述指令，會自動抓取資料、輸出 CSV、JSON 與 Markdown 卡片表。
+3. 產物範例位於 `data/processed`：`varus_aram_d2_plus_7_winning.csv`、`varus_aram_d2_plus_7_sets.csv`、`varus_aram_d2_plus_7_build.json`、`varus_aram_d2_plus_7_build.md`。
 
 ## Cloudflare 說明
 Lolalytics 可能以 Cloudflare 擋下自動化請求，建議流程：
