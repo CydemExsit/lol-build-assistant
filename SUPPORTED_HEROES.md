@@ -1,7 +1,7 @@
-# 已驗證可完整跑通的英雄
+# Supported champions
 
-| 英雄 | 模式 | 語系 | 段位 | 視窗 | 備註 |
-| --- | --- | --- | --- | --- | --- |
-| Varus | ARAM | zh_tw | d2_plus | 7（最近 7 天） | 以 `scripts/quickstart.py` 驗證 |
+| Champion | Mode | Lang | Tier | Patch | Status | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Varus | ARAM | zh_tw | d2_plus | 7d | ✅ | Offline snapshots at `snapshots/varus`, validated via `scripts/validate_repo.py`. |
 
-> 若需新增英雄，請於 Issues 提出或附上成功執行的記錄檔。
+_Status legend_: ✅ end-to-end on snapshots; ⚠️ partial parser gaps; ❌ broken.

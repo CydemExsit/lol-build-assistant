@@ -1,0 +1,37 @@
+[
+  {
+    "img":"offline:\/\/item\/0",
+    "name":"臨界點",
+    "win_rate":0.5864,
+    "pick_rate":0.1525,
+    "sample_size":123456
+  },
+  {
+    "img":"offline:\/\/item\/1",
+    "name":"鬼索的狂暴之刃",
+    "win_rate":0.571,
+    "pick_rate":0.402,
+    "sample_size":123456
+  },
+  {
+    "img":"offline:\/\/item\/2",
+    "name":"智慧末刃",
+    "win_rate":0.565,
+    "pick_rate":0.312,
+    "sample_size":123456
+  },
+  {
+    "img":"offline:\/\/item\/3",
+    "name":"殞落王者之劍",
+    "win_rate":0.559,
+    "pick_rate":0.355,
+    "sample_size":123456
+  },
+  {
+    "img":"offline:\/\/item\/4",
+    "name":"千變萬化之賈克修",
+    "win_rate":0.59,
+    "pick_rate":0.082,
+    "sample_size":123456
+  }
+]

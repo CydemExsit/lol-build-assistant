@@ -12,10 +12,20 @@ def _mkdir_for(path: str) -> None:
     if d and not os.path.exists(d):
         os.makedirs(d, exist_ok=True)
 
-def _img_row(items_img: str, items_names: str) -> str:
+def _to_str(value) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, float):
+        return "" if value != value else str(value)
+    return str(value)
+
+
+def _img_row(items_img, items_names) -> str:
     # items_img: pipe 分隔的圖片 URL；items_names: pipe 分隔名稱 (備用 alt)
-    urls  = [s for s in (items_img or "").split("|") if s]
-    names = (items_names or "").split("|")
+    imgs_raw = _to_str(items_img)
+    names_raw = _to_str(items_names)
+    urls = [s for s in imgs_raw.split("|") if s]
+    names = names_raw.split("|")
     if urls:
         tags = []
         for i,u in enumerate(urls):

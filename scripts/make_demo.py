@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -33,16 +32,22 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Create demo CSV snippets from existing outputs")
     ap.add_argument("--sets", required=True, help="Path to the processed *_sets.csv file")
     ap.add_argument("--winning", required=True, help="Path to the processed *_winning.csv file")
-    ap.add_argument("--limit", type=int, default=5, help="Number of rows to include (excluding header)")
+    ap.add_argument(
+        "--max-lines",
+        type=int,
+        default=50,
+        help="Maximum number of lines (including header) to keep in demo CSVs",
+    )
     ap.add_argument("--out-dir", default="demo", help="Destination directory for demo samples")
     args = ap.parse_args()
 
     out_dir = Path(args.out_dir)
     sets_src = Path(args.sets)
     win_src = Path(args.winning)
+    limit = max(args.max_lines - 1, 0)
 
-    sets_rows = _read_head(sets_src, args.limit)
-    win_rows = _read_head(win_src, args.limit)
+    sets_rows = _read_head(sets_src, limit)
+    win_rows = _read_head(win_src, limit)
 
     if sets_rows:
         _write_rows(out_dir / "sets.sample.csv", sets_rows)
