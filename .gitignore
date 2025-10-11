@@ -13,12 +13,9 @@ htmlcov/
 .DS_Store
 outputs/
 data/raw/
-data/processed/
 data/debug/
+data/*state*.json
 data/cf_state.json
+*.log
 .venv/
 .env
-*.log
-data/*state*.json
-demo/*.csv
-!demo/*.sample.csv

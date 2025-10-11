@@ -1,7 +1,10 @@
-# 已驗證可完整跑通的英雄
+# Supported champions
 
-| 英雄 | 模式 | 語系 | 段位 | 視窗 | 備註 |
-| --- | --- | --- | --- | --- | --- |
-| Varus | ARAM | zh_tw | d2_plus | 7（最近 7 天） | 以 `scripts/quickstart.py` 驗證 |
+| Champion | Mode | Lang | Tier | Patch | Channel | Status | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Varus | ARAM | zh_tw | d2_plus | 7d | offline | ✅ | snapshot-backed; validated via `scripts/validate_repo.py`. |
 
-> 若需新增英雄，請於 Issues 提出或附上成功執行的記錄檔。
+_Status legend_: ✅ end-to-end on snapshots; ⚠️ partial parser gaps; ❌ broken.
+
+## Runtime coverage (live mode, not part of quickstart)
+Live scraping can target additional champions when Playwright is enabled, but coverage varies and is not validated here. See [`ISSUES_TODO.md`](ISSUES_TODO.md) for the non-blocking roadmap to bring live mode back safely.
