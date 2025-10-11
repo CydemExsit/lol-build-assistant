@@ -1,0 +1,8 @@
+{
+  "champion": "varus",
+  "mode": "aram",
+  "tier": "d2_plus",
+  "patch": "7d",
+  "source": "data/samples/*.csv",
+  "note": "Captured from existing sample CSVs in repo."
+}

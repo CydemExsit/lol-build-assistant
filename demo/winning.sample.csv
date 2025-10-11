@@ -1,6 +1,6 @@
-source_file,window,source_tag,source_mode,source_tier,source_champion,item_id,item_en,item_zh,games,winrate,pickrate
-ezreal_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,6675,Navori Flickerblade,那歐閃刃,0,53.49,0.42
-ezreal_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,126697,Hubris,傲慢,0,47.78,1.77
-ezreal_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,222504,Kaenic Rookern,凱尼克欺瞞者,0,57.58,0.32
-ezreal_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,223031,Infinity Edge,無盡之刃,0,43.48,0.45
-ezreal_aram_d2_plus_7d_winning.csv,7d,aram_d2_plus,aram,d2_plus,ezreal,223033,Mortal Reminder,致死宣告,0,41.09,2.7
+img,name,win_rate,pick_rate,sample_size
+offline://item/0,臨界點,0.5864,0.1525,123456
+offline://item/1,鬼索的狂暴之刃,0.571,0.402,123456
+offline://item/2,智慧末刃,0.565,0.312,123456
+offline://item/3,殞落王者之劍,0.559,0.355,123456
+offline://item/4,千變萬化之賈克修,0.59,0.082,123456

@@ -1,0 +1,37 @@
+[
+  {
+    "items": "殞落王者之劍|鬼索的狂暴之刃|智慧末刃|千變萬化之賈克修|臨界點",
+    "items_img": "",
+    "set_win_rate": 0.592,
+    "set_pick_rate": 0.031,
+    "set_sample_size": 3100
+  },
+  {
+    "items": "殞落王者之劍|鬼索的狂暴之刃|智慧末刃|臨界點|千變萬化之賈克修",
+    "items_img": "",
+    "set_win_rate": 0.585,
+    "set_pick_rate": 0.029,
+    "set_sample_size": 2900
+  },
+  {
+    "items": "殞落王者之劍|鬼索的狂暴之刃|智慧末刃|臨界點|芮蘭颶風箭",
+    "items_img": "",
+    "set_win_rate": 0.579,
+    "set_pick_rate": 0.027,
+    "set_sample_size": 2700
+  },
+  {
+    "items": "殞落王者之劍|鬼索的狂暴之刃|智慧末刃|嗜血者|臨界點",
+    "items_img": "",
+    "set_win_rate": 0.561,
+    "set_pick_rate": 0.019,
+    "set_sample_size": 1900
+  },
+  {
+    "items": "殞落王者之劍|鬼索的狂暴之刃|智慧末刃|千變萬化之賈克修|Opportunity",
+    "items_img": "",
+    "set_win_rate": 0.575,
+    "set_pick_rate": 0.006,
+    "set_sample_size": 600
+  }
+]
