@@ -2,7 +2,7 @@
 > Offline snapshot-to-build generator for a single League of Legends champion.
 
 ## MVP scope
-- Generates ARAM loadouts for one validated champion (Varus) using bundled snapshots.
+- Offline quickstart bundles a Varus snapshot for deterministic runs.
 - Produces deterministic outputs: `*_winning.csv`, `*_sets.csv`, Markdown table, and rationale JSON.
 - Runs fully offline by default; live scraping is optional and out of MVP scope.
 
@@ -41,9 +41,12 @@ python scripts/validate_repo.py --hero varus --input-dir snapshots/varus --offli
 See [`SUPPORTED_HEROES.md`](SUPPORTED_HEROES.md) for the up-to-date coverage table.
 
 ## Limitations
-- Only Varus (ARAM, zh_tw, d2_plus, 7d window) is validated end-to-end today.
+- Offline quickstart bundles a Varus snapshot for deterministic runs.
+- Live scraping is optional and out of MVP; broader coverage may exist. See [`SUPPORTED_HEROES.md`](SUPPORTED_HEROES.md).
 - Snapshot selectors mirror Lolalytics markup from the captured run; layout changes will require new snapshots.
-- Live scraping with Playwright is not part of the MVP Quickstart and remains experimental.
+
+### Live mode (optional, post-MVP)
+Live scraping requires additional hardening and is not part of the offline MVP. See [`ISSUES_TODO.md`](ISSUES_TODO.md) for the non-blocking follow-up on enabling live mode safely.
 
 ## License
 This project is released under the [MIT License](LICENSE).
