@@ -453,7 +453,8 @@ def scrape(hero: str, mode: str, tier: str, patch: str, lang: str, no_headless: 
             user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                         "AppleWebKit/537.36 (KHTML, like Gecko) "
                         "Chrome/121.0.0.0 Safari/537.36"),
-            viewport={"width": 1440, "height": 2200}
+            viewport={"width": 1440, "height": 2200},
+            ignore_https_errors=True,
         )
         page = ctx.new_page()
         url = _goto_build_page(page, hero, mode, tier, patch, lang)
@@ -467,15 +468,22 @@ def scrape(hero: str, mode: str, tier: str, patch: str, lang: str, no_headless: 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--hero", required=True)
-    ap.add_argument("--mode", default=DEF_MODE)
-    ap.add_argument("--tier", default=DEF_TIER)
-    ap.add_argument("--patch", default=DEF_PATCH)
-    ap.add_argument("--lang", default=LANG)
-    ap.add_argument("--winning_out", required=True)
-    ap.add_argument("--sets_out", required=True)
+    ap.add_argument("--hero", default=os.getenv("LOL_HERO"))
+    ap.add_argument("--mode", default=os.getenv("LOL_MODE", DEF_MODE))
+    ap.add_argument("--tier", default=os.getenv("LOL_TIER", DEF_TIER))
+    ap.add_argument("--patch", default=os.getenv("LOL_PATCH", DEF_PATCH))
+    ap.add_argument("--lang", default=os.getenv("LOL_LANG", LANG))
+    ap.add_argument("--winning_out", default=os.getenv("LOL_WINNING_OUT"))
+    ap.add_argument("--sets_out", default=os.getenv("LOL_SETS_OUT"))
     ap.add_argument("--no-headless", action="store_true", help="run with browser window")
     args = ap.parse_args()
+
+    if not args.hero:
+        ap.error("hero is required (--hero or LOL_HERO)")
+    if not args.winning_out:
+        ap.error("winning output path is required (--winning_out or LOL_WINNING_OUT)")
+    if not args.sets_out:
+        ap.error("sets output path is required (--sets_out or LOL_SETS_OUT)")
 
     win_df, set_df, url = scrape(args.hero, args.mode, args.tier, args.patch, args.lang, no_headless=args.no_headless)
 
