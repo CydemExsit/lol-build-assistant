@@ -12,8 +12,9 @@ __pycache__/
 .coverage
 htmlcov/
 .DS_Store
+.venv/
+.env
 outputs/
 data/raw/
-data/processed/
 data/debug/
 data/cf_state.json

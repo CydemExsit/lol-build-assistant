@@ -1,17 +1,42 @@
-# LoL Build Assistant (PoC)
+# LoL Build Assistant
 
-用手動輸入的 CSV（Winning Items / Actually Built Sets）產出 ARAM 出裝順序（中文裝備名）。
+> LoLalytics → normalized CSVs (single-champion MVP)
 
-## 專案資料夾整理
+- **MVP 範圍：** 單一英雄（Varus）搭配 ARAM 模式，實際產出 `data/processed/varus_aram_winning.csv` 與 `data/processed/varus_aram_sets.csv`。
+- **Quickstart：**
+  ```bash
+  python src/scrape_lolalytics.py --hero varus --mode aram --tier d2_plus --patch 7 --lang zh_tw --winning_out data/processed/varus_aram_winning.csv --sets_out data/processed/varus_aram_sets.csv
+  ```
+- **Demo：** [`demo/winning.sample.csv`](demo/winning.sample.csv) · [`demo/sets.sample.csv`](demo/sets.sample.csv)
+- **限制：** 首次連線可能出現 Cloudflare 驗證，請於瀏覽器通過後重跑；若遇限流請降低頻率或稍後重試。
+- **Roadmap / Issues：** 請依 [`ISSUES_TODO.md`](ISSUES_TODO.md) 建立對應 GitHub Issues（v0.1、v0.2、Good first issue ×2、Known limitations）。
 
-執行流程會在 `data/raw/`, `data/processed/` 與 `outputs/` 產出大量中間資料與結果檔案，這些內容現在已加入 `.gitignore`，預設不再納入版本控制：
+## 需求與環境
 
-- `data/raw/`：爬蟲或手動整理後的原始 CSV / HTML / 圖像等資料。請自行於本機建立並填入最新資料。
-- `data/processed/`：經 `scripts/normalize_outputs*.py` 清整後的中間資料。
-- `outputs/`：`src/pipeline.py` 或其他腳本輸出的最終 JSON/Markdown 結果。
-- `data/debug/`：除錯時產生的報告或截圖。
-- `data/cf_state.json`：Scraper 與 Cloudflare 互動時的暫存狀態。
+1. Python 3.11+。
+2. 安裝套件：
+   ```bash
+   pip install -r requirements.txt
+   pip install playwright
+   playwright install chromium
+   ```
+3. 若缺少 Playwright 執行環境，參考命令輸出安裝對應系統套件（本機範例：`apt-get install libatk1.0-0t64 ...`）。
 
-如需保留本地測試用的範例，可使用 `data/samples/` 目錄中的 sample CSV；或自行建立未被忽略的子資料夾。
+可選：複製 `env.example` 為 `.env` 後修改，命令列參數會自動讀取 `LOL_*` 變數。
 
-若要重新產生上述資料夾內容，請參考 `scripts/` 內的工具或自訂流程。 
+## 執行說明
+
+1. 準備 `.env` 或以指令直接帶入英雄與輸出路徑。
+2. 執行 Quickstart 中的命令，完成後 `data/processed/` 會新增 `varus_aram_winning.csv` 與 `varus_aram_sets.csv`。
+3. 需要查看 Cloudflare 驗證時，可使用 `python cf_shield_fix.py bootstrap ...` 開啟可視化瀏覽器人工通過，再重跑主流程。
+
+## 產出格式
+
+- `*_winning.csv`：`img,name,win_rate,pick_rate,sample_size`，勝率/選用率已正規化為 0~1。
+- `*_sets.csv`：`items,items_img,set_win_rate,set_pick_rate,set_sample_size`，`items` 為 `|` 分隔的繁中裝備名。
+- 範例截圖請參考 `demo/` 目錄。
+
+## 限制與下一步
+
+- Cloudflare 驗證、頻率限制與站點改版需人工處理，詳見 `ISSUES_TODO.md` 的 Known limitations 草稿。
+- 強化錯誤訊息、批次節流與安裝腳本等規劃詳見 `ISSUES_TODO.md` 內的 Roadmap/Good first issue 草稿。
