@@ -8,7 +8,7 @@
   python src/scrape_lolalytics.py --hero varus --mode aram --tier d2_plus --patch 7 --lang zh_tw --winning_out data/processed/varus_aram_winning.csv --sets_out data/processed/varus_aram_sets.csv
   ```
 - **Demo：** [`demo/winning.sample.csv`](demo/winning.sample.csv) · [`demo/sets.sample.csv`](demo/sets.sample.csv)
-- **限制：** 首次連線可能出現 Cloudflare 驗證，請於瀏覽器通過後重跑；若遇限流請降低頻率或稍後重試。
+- **限制：** 目前缺乏重試與節流機制，若 LoLalytics 站點回應為空或速度過慢請稍後重跑。
 - **Roadmap / Issues：** 請依 [`ISSUES_TODO.md`](ISSUES_TODO.md) 建立對應 GitHub Issues（v0.1、v0.2、Good first issue ×2、Known limitations）。
 
 ## 需求與環境
@@ -28,7 +28,7 @@
 
 1. 準備 `.env` 或以指令直接帶入英雄與輸出路徑。
 2. 執行 Quickstart 中的命令，完成後 `data/processed/` 會新增 `varus_aram_winning.csv` 與 `varus_aram_sets.csv`。
-3. 需要查看 Cloudflare 驗證時，可使用 `python cf_shield_fix.py bootstrap ...` 開啟可視化瀏覽器人工通過，再重跑主流程。
+3. 若命令執行過程中出現逾時或空結果，請確認網路可達後再重跑，或降低連續請求次數。
 
 ## 產出格式
 
@@ -38,5 +38,5 @@
 
 ## 限制與下一步
 
-- Cloudflare 驗證、頻率限制與站點改版需人工處理，詳見 `ISSUES_TODO.md` 的 Known limitations 草稿。
+- 站點 DOM 變動或回傳空資料時需人工調查，詳見 `ISSUES_TODO.md` 的 Known limitations 草稿。
 - 強化錯誤訊息、批次節流與安裝腳本等規劃詳見 `ISSUES_TODO.md` 內的 Roadmap/Good first issue 草稿。
