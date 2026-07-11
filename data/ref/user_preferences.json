@@ -1,0 +1,13 @@
+{
+  "item_score_adjustments": {
+    "3153": 1.6,
+    "3072": 1.6,
+    "3157": -3.0,
+    "3139": -2.7
+  },
+  "extreme_damage_enemy_count": 4,
+  "extreme_pure_defense_item_bonus": 1.8,
+  "extreme_multi_defense_route_bonus": 1.5,
+  "marksman_full_ap_min_items": 4,
+  "marksman_full_ap_route_penalty": 6.0
+}

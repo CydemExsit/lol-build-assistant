@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-import argparse, os, csv, json, datetime, requests
+import argparse, os, csv, json, datetime, urllib.request
 VERSIONS_URL = "https://ddragon.leagueoflegends.com/api/versions.json"
 DATA_URL = "https://ddragon.leagueoflegends.com/cdn/{ver}/data/{lang}/item.json"
 
 
 def fetch_json(url):
-    r = requests.get(url, timeout=30)
-    r.raise_for_status()
-    return r.json()
+    req = urllib.request.Request(url, headers={"User-Agent": "lol-build-assistant/0.1"})
+    with urllib.request.urlopen(req, timeout=30) as response:
+        return json.loads(response.read().decode("utf-8"))
 
 
 def ensure_dir(p):
@@ -38,6 +38,12 @@ def main():
             "en_name": meta_en.get("name", ""),
             "zh_tw_name": meta_zh.get("name", ""),
             "tags": ",".join(meta_en.get("tags", [])),
+            "from": ",".join(meta_en.get("from", [])),
+            "into": ",".join(meta_en.get("into", [])),
+            "gold_total": int(meta_en.get("gold", {}).get("total") or 0),
+            "gold_base": int(meta_en.get("gold", {}).get("base") or 0),
+            "gold_purchasable": bool(meta_en.get("gold", {}).get("purchasable")),
+            "maps": ",".join(sorted(k for k, v in (meta_en.get("maps") or {}).items() if v)),
             "ddragon_version": ver,
         })
 
@@ -47,7 +53,22 @@ def main():
     # 版本化輸出：items_map_{ver}.csv + 最新副本 items_map.csv
     versioned = os.path.join(out_dir, f"items_map_{ver}.csv")
     with open(versioned, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["item_id","en_name","zh_tw_name","tags","ddragon_version"])
+        w = csv.DictWriter(
+            f,
+            fieldnames=[
+                "item_id",
+                "en_name",
+                "zh_tw_name",
+                "tags",
+                "from",
+                "into",
+                "gold_total",
+                "gold_base",
+                "gold_purchasable",
+                "maps",
+                "ddragon_version",
+            ],
+        )
         w.writeheader()
         for r in sorted(rows, key=lambda x: x["item_id"]):
             w.writerow(r)

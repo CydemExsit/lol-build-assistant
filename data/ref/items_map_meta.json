@@ -1,10 +1,10 @@
 {
-  "ddragon_version": "15.19.1",
-  "generated_at": "2025-10-04T18:55:40.029939+08:00",
-  "row_count": 635,
+  "ddragon_version": "16.13.1",
+  "generated_at": "2026-07-11T00:17:37.130633+08:00",
+  "row_count": 706,
   "source": {
     "versions": "https://ddragon.leagueoflegends.com/api/versions.json",
-    "item_zh": "https://ddragon.leagueoflegends.com/cdn/15.19.1/data/zh_TW/item.json",
-    "item_en": "https://ddragon.leagueoflegends.com/cdn/15.19.1/data/en_US/item.json"
+    "item_zh": "https://ddragon.leagueoflegends.com/cdn/16.13.1/data/zh_TW/item.json",
+    "item_en": "https://ddragon.leagueoflegends.com/cdn/16.13.1/data/en_US/item.json"
   }
 }

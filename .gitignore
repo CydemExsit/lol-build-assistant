@@ -15,6 +15,14 @@ htmlcov/
 .venv/
 .env
 outputs/
+data/cache/
 data/raw/
 data/debug/
 data/cf_state.json
+data/processed/live_*.json
+data/processed/live_*.md
+data/processed/current_*.json
+data/processed/current_*.md
+data/processed/*_recommendation.json
+data/processed/*_recommendation.md
+data/processed/ui_*.png

@@ -13,4 +13,4 @@ def run(winning_csv: str, sets_csv: str, out_json: str, *, explain: bool, topk: 
         "rationale": result.rationale,
     }
     with open(out_json, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
+        json.dump(payload, f, ensure_ascii=False, indent=2, allow_nan=False)

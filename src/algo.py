@@ -13,21 +13,30 @@ class BuildResult:
 
 EPS = 1e-9
 
+def _unit_rate(value: float) -> float:
+    value = float(value)
+    return value / 100.0 if value > 1.0 else value
+
 def _logit(p: float) -> float:
     p = min(max(p, EPS), 1 - EPS)
     return np.log(p / (1 - p))
 
 def load_winning_items(path: str) -> List[WinningItem]:
     df = pd.read_csv(path)
-    return [
-        WinningItem(
-            name=row["name"],
-            win_rate=float(row["win_rate"]),
-            pick_rate=float(row["pick_rate"]),
-            sample_size=int(row["sample_size"]),
+    items: List[WinningItem] = []
+    for _, row in df.iterrows():
+        name = row.get("name")
+        if pd.isna(name) or not str(name).strip():
+            continue
+        items.append(
+            WinningItem(
+                name=str(name).strip(),
+                win_rate=_unit_rate(row["win_rate"]),
+                pick_rate=_unit_rate(row["pick_rate"]),
+                sample_size=int(row["sample_size"]),
+            )
         )
-        for _, row in df.iterrows()
-    ]
+    return items
 
 def load_built_sets(path: str) -> List[BuiltSet]:
     df = pd.read_csv(path)
@@ -37,8 +46,8 @@ def load_built_sets(path: str) -> List[BuiltSet]:
         sets.append(
             BuiltSet(
                 items=items,
-                set_win_rate=float(row["set_win_rate"]),
-                set_pick_rate=float(row["set_pick_rate"]),
+                set_win_rate=_unit_rate(row["set_win_rate"]),
+                set_pick_rate=_unit_rate(row["set_pick_rate"]),
                 set_sample_size=int(row["set_sample_size"]),
             )
         )

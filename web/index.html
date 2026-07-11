@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LoL Build Assistant</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <h1>LoL Build Assistant</h1>
+          <div id="sourceLine" class="source-line">ARAM · LoLalytics · Actually Built Sets 5</div>
+        </div>
+        <div class="actions">
+          <select id="snapshotSelect" aria-label="Snapshot"></select>
+          <button id="snapshotButton" type="button" title="用下拉選單中的 data/raw/live_* 舊資料重新產生推薦">
+            載入選取 Snapshot
+          </button>
+          <button id="refreshButton" type="button" title="從 Riot 127.0.0.1:2999 讀取正在進行的 loading 或遊戲內資料">
+            抓取目前 Live 對局
+          </button>
+        </div>
+      </header>
+
+      <section id="status" class="status" aria-live="polite"></section>
+
+      <section class="match-strip">
+        <div>
+          <span class="label">英雄</span>
+          <strong id="activeChampion">-</strong>
+        </div>
+        <div>
+          <span class="label">敵方</span>
+          <div id="enemyTeam" class="enemy-team"></div>
+        </div>
+        <div>
+          <span class="label">樣本</span>
+          <strong id="sampleInfo">-</strong>
+        </div>
+      </section>
+
+      <section class="boot-section">
+        <div class="section-head">
+          <h2>鞋子選擇</h2>
+          <span class="badge">LoLalytics 數據</span>
+        </div>
+        <div id="bootOptions" class="boot-options"></div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>推薦五件套</h2>
+          <span id="constraintBadge" class="badge">5 件成套</span>
+        </div>
+        <div id="routes" class="routes"></div>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
