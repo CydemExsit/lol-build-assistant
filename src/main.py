@@ -2,8 +2,8 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from .pipeline import run
 from .live_client import build_match_context, capture_snapshot, load_snapshot
+from .maintenance import apply_cleanup_plan, build_cleanup_plan, format_bytes
 from .recommend import recommend_from_snapshot
 from .lolalytics import DEFAULT_TIER
 
@@ -83,17 +83,6 @@ def _write_recommendation_markdown(result: dict, out_md: str | Path) -> None:
     out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def parse_legacy_args(argv: list[str] | None = None):
-    p = argparse.ArgumentParser()
-    p.add_argument("--winning", required=True)
-    p.add_argument("--sets", required=True)
-    p.add_argument("--out", required=True)
-    p.add_argument("--explain", action="store_true")
-    p.add_argument("--topk", type=int, default=50)
-    p.add_argument("--cover", type=float, default=0.80)
-    return p.parse_args(argv)
-
-
 def parse_args(argv: list[str] | None = None):
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest="command", required=True)
@@ -124,18 +113,29 @@ def parse_args(argv: list[str] | None = None):
     serve.add_argument("--min-champions-analysed", type=int, default=1_000_000)
     serve.add_argument("--refresh-lolalytics", action="store_true")
 
+    cleanup = sub.add_parser("cleanup", help="preview or apply the maintenance storage policy")
+    cleanup.add_argument("--keep-snapshots", type=int, default=5)
+    cleanup.add_argument("--apply", action="store_true", help="delete planned files; default is preview only")
+
     return p.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> None:
     _configure_stdout()
-    argv = list(sys.argv[1:] if argv is None else argv)
-    if not argv or argv[0].startswith("--"):
-        args = parse_legacy_args(argv)
-        run(args.winning, args.sets, args.out, explain=args.explain, topk=args.topk, cover=args.cover)
+    args = parse_args(argv)
+    if args.command == "cleanup":
+        plan = build_cleanup_plan(keep_snapshots=args.keep_snapshots)
+        for entry in plan.entries:
+            relative = entry.path.relative_to(plan.root)
+            print(f"- {relative} ({format_bytes(entry.size_bytes)}): {entry.reason}")
+        print(f"[plan] {len(plan.entries)} paths / {format_bytes(plan.total_bytes)}")
+        if not args.apply:
+            print("[dry-run] no files removed; add --apply to execute")
+            return
+        removed = apply_cleanup_plan(plan)
+        print(f"[ok] removed {len(removed.entries)} paths / {format_bytes(removed.total_bytes)}")
         return
 
-    args = parse_args(argv)
     if args.command == "snapshot-live":
         path = capture_snapshot(out_dir=args.out_dir, timeout=args.timeout)
         print(f"[ok] snapshot -> {path}")

@@ -97,6 +97,18 @@ def cache_path_for(
     return Path(cache_dir) / f"lolalytics_{champion_slug}_{mode}_{tier}_{patch}.html"
 
 
+def build_summary_cache_path_for(
+    champion_slug: str,
+    cache_dir: str | Path = "data/cache",
+    *,
+    mode: str = DEFAULT_MODE,
+    tier: str = DEFAULT_TIER,
+    patch: str = DEFAULT_PATCH,
+) -> Path:
+    html_path = cache_path_for(champion_slug, cache_dir, mode=mode, tier=tier, patch=patch)
+    return html_path.with_name(f"{html_path.stem}_build.json")
+
+
 def built_sets_cache_path_for(
     champion_slug: str,
     cache_dir: str | Path = "data/cache",
@@ -267,11 +279,28 @@ def load_or_fetch_build(
     tier: str = DEFAULT_TIER,
     patch: str = DEFAULT_PATCH,
 ) -> dict[str, Any]:
+    summary_path = build_summary_cache_path_for(
+        champion_slug,
+        cache_dir,
+        mode=mode,
+        tier=tier,
+        patch=patch,
+    )
+    if summary_path.exists() and not refresh:
+        try:
+            cached = json.loads(summary_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            cached = None
+        if isinstance(cached, dict) and isinstance(cached.get("sections"), dict):
+            cached["cache_path"] = str(summary_path)
+            return cached
+
     path = fetch_build_html(champion_slug, cache_dir=cache_dir, refresh=refresh, mode=mode, tier=tier, patch=patch)
     parsed = parse_build_html(path.read_text(encoding="utf-8"))
-    parsed["cache_path"] = str(path)
     parsed["source_url"] = lolalytics_url(champion_slug, mode=mode, tier=tier, patch=patch)
     parsed["params"] = {"mode": mode, "tier": tier, "patch": patch}
+    summary_path.write_text(json.dumps(parsed, ensure_ascii=False, indent=2), encoding="utf-8")
+    parsed["cache_path"] = str(summary_path)
     return parsed
 
 

@@ -1,99 +1,94 @@
-# -*- coding: utf-8 -*-
-import argparse, os, csv, json, datetime, urllib.request
+from __future__ import annotations
+
+import argparse
+import csv
+import datetime
+import json
+import urllib.request
+from pathlib import Path
+
+
 VERSIONS_URL = "https://ddragon.leagueoflegends.com/api/versions.json"
 DATA_URL = "https://ddragon.leagueoflegends.com/cdn/{ver}/data/{lang}/item.json"
+FIELD_NAMES = [
+    "item_id",
+    "en_name",
+    "zh_tw_name",
+    "tags",
+    "from",
+    "into",
+    "gold_total",
+    "gold_base",
+    "gold_purchasable",
+    "maps",
+    "ddragon_version",
+]
 
 
-def fetch_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "lol-build-assistant/0.1"})
-    with urllib.request.urlopen(req, timeout=30) as response:
+def fetch_json(url: str) -> dict | list:
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "lol-build-assistant/1.0"},
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
         return json.loads(response.read().decode("utf-8"))
 
 
-def ensure_dir(p):
-    if p:
-        os.makedirs(p, exist_ok=True)
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--lang", default="zh_TW")
+    parser.add_argument("--out", default="data/ref/items_map.csv")
+    args = parser.parse_args()
 
-
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--lang", default="zh_TW")
-    ap.add_argument("--out", default="data/ref/items_map.csv")
-    args = ap.parse_args()
-
-    versions = fetch_json(VERSIONS_URL)
-    ver = versions[0]
-
-    data_zh = fetch_json(DATA_URL.format(ver=ver, lang=args.lang))
-    data_en = fetch_json(DATA_URL.format(ver=ver, lang="en_US"))
-
+    version = fetch_json(VERSIONS_URL)[0]
+    data_zh = fetch_json(DATA_URL.format(ver=version, lang=args.lang))
+    data_en = fetch_json(DATA_URL.format(ver=version, lang="en_US"))
     items_zh = data_zh.get("data", {})
     items_en = data_en.get("data", {})
 
     rows = []
     for item_id, meta_zh in items_zh.items():
         meta_en = items_en.get(item_id, {})
-        rows.append({
-            "item_id": int(item_id),
-            "en_name": meta_en.get("name", ""),
-            "zh_tw_name": meta_zh.get("name", ""),
-            "tags": ",".join(meta_en.get("tags", [])),
-            "from": ",".join(meta_en.get("from", [])),
-            "into": ",".join(meta_en.get("into", [])),
-            "gold_total": int(meta_en.get("gold", {}).get("total") or 0),
-            "gold_base": int(meta_en.get("gold", {}).get("base") or 0),
-            "gold_purchasable": bool(meta_en.get("gold", {}).get("purchasable")),
-            "maps": ",".join(sorted(k for k, v in (meta_en.get("maps") or {}).items() if v)),
-            "ddragon_version": ver,
-        })
-
-    out_dir = os.path.dirname(os.path.abspath(args.out))
-    ensure_dir(out_dir)
-
-    # 版本化輸出：items_map_{ver}.csv + 最新副本 items_map.csv
-    versioned = os.path.join(out_dir, f"items_map_{ver}.csv")
-    with open(versioned, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(
-            f,
-            fieldnames=[
-                "item_id",
-                "en_name",
-                "zh_tw_name",
-                "tags",
-                "from",
-                "into",
-                "gold_total",
-                "gold_base",
-                "gold_purchasable",
-                "maps",
-                "ddragon_version",
-            ],
+        rows.append(
+            {
+                "item_id": int(item_id),
+                "en_name": meta_en.get("name", ""),
+                "zh_tw_name": meta_zh.get("name", ""),
+                "tags": ",".join(meta_en.get("tags", [])),
+                "from": ",".join(meta_en.get("from", [])),
+                "into": ",".join(meta_en.get("into", [])),
+                "gold_total": int(meta_en.get("gold", {}).get("total") or 0),
+                "gold_base": int(meta_en.get("gold", {}).get("base") or 0),
+                "gold_purchasable": bool(meta_en.get("gold", {}).get("purchasable")),
+                "maps": ",".join(
+                    sorted(key for key, enabled in (meta_en.get("maps") or {}).items() if enabled)
+                ),
+                "ddragon_version": version,
+            }
         )
-        w.writeheader()
-        for r in sorted(rows, key=lambda x: x["item_id"]):
-            w.writerow(r)
 
-    # 複製一份為 items_map.csv（避免 Windows 權限問題不用 symlink）
-    with open(versioned, "r", encoding="utf-8") as src, open(args.out, "w", encoding="utf-8") as dst:
-        dst.write(src.read())
+    out_path = Path(args.out)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with out_path.open("w", newline="", encoding="utf-8") as output:
+        writer = csv.DictWriter(output, fieldnames=FIELD_NAMES)
+        writer.writeheader()
+        writer.writerows(sorted(rows, key=lambda row: row["item_id"]))
 
-    # 寫入中繼資料
-    meta_path = os.path.join(out_dir, "items_map_meta.json")
-    meta = {
-        "ddragon_version": ver,
+    meta_path = out_path.parent / "items_map_meta.json"
+    metadata = {
+        "ddragon_version": version,
         "generated_at": datetime.datetime.now().astimezone().isoformat(),
         "row_count": len(rows),
         "source": {
             "versions": VERSIONS_URL,
-            "item_zh": DATA_URL.format(ver=ver, lang=args.lang),
-            "item_en": DATA_URL.format(ver=ver, lang="en_US"),
+            "item_zh": DATA_URL.format(ver=version, lang=args.lang),
+            "item_en": DATA_URL.format(ver=version, lang="en_US"),
         },
     }
-    with open(meta_path, "w", encoding="utf-8") as f:
-        json.dump(meta, f, ensure_ascii=False, indent=2)
+    with meta_path.open("w", encoding="utf-8") as output:
+        json.dump(metadata, output, ensure_ascii=False, indent=2)
 
-    print(f"Wrote: {versioned}")
-    print(f"Wrote: {args.out}")
+    print(f"Wrote: {out_path}")
     print(f"Wrote: {meta_path}")
 
 

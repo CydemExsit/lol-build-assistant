@@ -2,16 +2,22 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run main",
+      "name": "Serve UI",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/src/main.py",
+      "module": "src.main",
       "console": "integratedTerminal",
-      "args": [
-        "--winning", "${workspaceFolder}/data/samples/winning_items.sample.csv",
-        "--sets",    "${workspaceFolder}/data/samples/actually_sets.sample.csv",
-        "--out",     "${workspaceFolder}/outputs/varus_aram_d2_7d.json"
-      ]
+      "cwd": "${workspaceFolder}",
+      "args": ["serve"]
+    },
+    {
+      "name": "Recommend Live",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "src.main",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": ["recommend-live"]
     }
   ]
 }

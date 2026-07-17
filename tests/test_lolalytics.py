@@ -109,6 +109,30 @@ def test_parse_build_html_extracts_core_and_branch_items():
     assert parsed["candidate_items"] == [{"item_id": 3091, "name": "Wit's End"}]
 
 
+def test_load_or_fetch_build_reuses_json_summary_without_html(monkeypatch, tmp_path):
+    html_path = lolalytics.cache_path_for("ashe", tmp_path)
+    html_path.write_text(
+        "<title>Ashe Build</title>Champions Analysed: <!--t=a-->1,234,567<!---->",
+        encoding="utf-8",
+    )
+
+    initial = lolalytics.load_or_fetch_build("ashe", cache_dir=tmp_path)
+    summary_path = lolalytics.build_summary_cache_path_for("ashe", tmp_path)
+    html_path.unlink()
+    monkeypatch.setattr(
+        lolalytics,
+        "fetch_build_html",
+        lambda *args, **kwargs: pytest.fail("HTML should not be fetched when the summary cache exists"),
+    )
+
+    cached = lolalytics.load_or_fetch_build("ashe", cache_dir=tmp_path)
+
+    assert summary_path.exists()
+    assert initial["champions_analysed"] == 1234567
+    assert cached["champions_analysed"] == 1234567
+    assert cached["cache_path"] == str(summary_path)
+
+
 def test_normalize_playwright_sets_parses_stats_and_rejects_duplicate_items():
     rows = [
         {
