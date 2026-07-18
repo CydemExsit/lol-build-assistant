@@ -112,6 +112,12 @@ def build_cleanup_plan(
             if path.is_file() and path.name not in CANONICAL_PROCESSED_FILES:
                 add(path, "non-canonical generated output")
 
+    runtime_root = workspace / "data" / "runtime"
+    if runtime_root.exists():
+        for path in runtime_root.iterdir():
+            if path.is_file() and path.name != "status.json":
+                add(path, "runtime log or QA artifact")
+
     for parent in (workspace / "src", workspace / "tests", workspace / "scripts"):
         if parent.exists():
             for path in parent.rglob("__pycache__"):

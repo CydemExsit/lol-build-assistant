@@ -2,7 +2,14 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "LoL Build Assistant: Serve UI",
+      "label": "LoL Build Assistant: Auto Watch",
+      "type": "shell",
+      "command": "python -m src.main watch",
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
+      "label": "LoL Build Assistant: Manual UI",
       "type": "shell",
       "command": "python -m src.main serve",
       "options": {"cwd": "${workspaceFolder}"},

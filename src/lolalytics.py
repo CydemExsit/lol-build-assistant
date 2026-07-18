@@ -6,7 +6,7 @@ import re
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -107,6 +107,65 @@ def build_summary_cache_path_for(
 ) -> Path:
     html_path = cache_path_for(champion_slug, cache_dir, mode=mode, tier=tier, patch=patch)
     return html_path.with_name(f"{html_path.stem}_build.json")
+
+
+def _build_fetched_at(
+    champion_slug: str,
+    cache_dir: str | Path,
+    *,
+    mode: str,
+    tier: str,
+    patch: str,
+) -> str | None:
+    html_path = cache_path_for(champion_slug, cache_dir, mode=mode, tier=tier, patch=patch)
+    meta_path = html_path.with_suffix(".meta.json")
+    if meta_path.exists():
+        try:
+            metadata = json.loads(meta_path.read_text(encoding="utf-8"))
+            if metadata.get("fetched_at"):
+                return str(metadata["fetched_at"])
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            pass
+    summary_path = build_summary_cache_path_for(
+        champion_slug,
+        cache_dir,
+        mode=mode,
+        tier=tier,
+        patch=patch,
+    )
+    if summary_path.exists():
+        return datetime.fromtimestamp(
+            summary_path.stat().st_mtime,
+            tz=timezone.utc,
+        ).astimezone().isoformat()
+    return None
+
+
+def build_cache_is_stale(
+    champion_slug: str,
+    cache_dir: str | Path = "data/cache",
+    *,
+    mode: str = DEFAULT_MODE,
+    tier: str = DEFAULT_TIER,
+    patch: str = DEFAULT_PATCH,
+    max_age_hours: int = 168,
+) -> bool:
+    fetched_at = _build_fetched_at(
+        champion_slug,
+        cache_dir,
+        mode=mode,
+        tier=tier,
+        patch=patch,
+    )
+    if not fetched_at:
+        return True
+    try:
+        parsed = datetime.fromisoformat(fetched_at.replace("Z", "+00:00"))
+    except ValueError:
+        return True
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return datetime.now(timezone.utc) - parsed.astimezone(timezone.utc) > timedelta(hours=max_age_hours)
 
 
 def built_sets_cache_path_for(
@@ -292,6 +351,16 @@ def load_or_fetch_build(
         except (OSError, UnicodeError, json.JSONDecodeError):
             cached = None
         if isinstance(cached, dict) and isinstance(cached.get("sections"), dict):
+            cached.setdefault(
+                "fetched_at",
+                _build_fetched_at(
+                    champion_slug,
+                    cache_dir,
+                    mode=mode,
+                    tier=tier,
+                    patch=patch,
+                ),
+            )
             cached["cache_path"] = str(summary_path)
             return cached
 
@@ -299,6 +368,13 @@ def load_or_fetch_build(
     parsed = parse_build_html(path.read_text(encoding="utf-8"))
     parsed["source_url"] = lolalytics_url(champion_slug, mode=mode, tier=tier, patch=patch)
     parsed["params"] = {"mode": mode, "tier": tier, "patch": patch}
+    parsed["fetched_at"] = _build_fetched_at(
+        champion_slug,
+        cache_dir,
+        mode=mode,
+        tier=tier,
+        patch=patch,
+    )
     summary_path.write_text(json.dumps(parsed, ensure_ascii=False, indent=2), encoding="utf-8")
     parsed["cache_path"] = str(summary_path)
     return parsed

@@ -1,0 +1,1863 @@
+{
+  "aatrox": {
+    "id": "Aatrox",
+    "key": 266,
+    "en_name": "Aatrox",
+    "zh_tw_name": "厄薩斯",
+    "tags": [
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "ahri": {
+    "id": "Ahri",
+    "key": 103,
+    "en_name": "Ahri",
+    "zh_tw_name": "阿璃",
+    "tags": [
+      "Mage",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "akali": {
+    "id": "Akali",
+    "key": 84,
+    "en_name": "Akali",
+    "zh_tw_name": "阿卡莉",
+    "tags": [
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "akshan": {
+    "id": "Akshan",
+    "key": 166,
+    "en_name": "Akshan",
+    "zh_tw_name": "埃可尚",
+    "tags": [
+      "Marksman",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "alistar": {
+    "id": "Alistar",
+    "key": 12,
+    "en_name": "Alistar",
+    "zh_tw_name": "亞歷斯塔",
+    "tags": [
+      "Tank",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "ambessa": {
+    "id": "Ambessa",
+    "key": 799,
+    "en_name": "Ambessa",
+    "zh_tw_name": "安比薩",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "amumu": {
+    "id": "Amumu",
+    "key": 32,
+    "en_name": "Amumu",
+    "zh_tw_name": "阿姆姆",
+    "tags": [
+      "Tank",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "anivia": {
+    "id": "Anivia",
+    "key": 34,
+    "en_name": "Anivia",
+    "zh_tw_name": "艾妮維亞",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "annie": {
+    "id": "Annie",
+    "key": 1,
+    "en_name": "Annie",
+    "zh_tw_name": "安妮",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "aphelios": {
+    "id": "Aphelios",
+    "key": 523,
+    "en_name": "Aphelios",
+    "zh_tw_name": "亞菲利歐",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "ashe": {
+    "id": "Ashe",
+    "key": 22,
+    "en_name": "Ashe",
+    "zh_tw_name": "艾希",
+    "tags": [
+      "Marksman",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "aurelionsol": {
+    "id": "AurelionSol",
+    "key": 136,
+    "en_name": "Aurelion Sol",
+    "zh_tw_name": "翱銳龍獸",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "aurora": {
+    "id": "Aurora",
+    "key": 893,
+    "en_name": "Aurora",
+    "zh_tw_name": "歐羅拉",
+    "tags": [
+      "Mage",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "azir": {
+    "id": "Azir",
+    "key": 268,
+    "en_name": "Azir",
+    "zh_tw_name": "阿祈爾",
+    "tags": [
+      "Mage",
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "bard": {
+    "id": "Bard",
+    "key": 432,
+    "en_name": "Bard",
+    "zh_tw_name": "巴德",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "belveth": {
+    "id": "Belveth",
+    "key": 200,
+    "en_name": "Bel'Veth",
+    "zh_tw_name": "貝爾薇斯",
+    "tags": [
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "blitzcrank": {
+    "id": "Blitzcrank",
+    "key": 53,
+    "en_name": "Blitzcrank",
+    "zh_tw_name": "布里茨",
+    "tags": [
+      "Tank",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "brand": {
+    "id": "Brand",
+    "key": 63,
+    "en_name": "Brand",
+    "zh_tw_name": "布蘭德",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "braum": {
+    "id": "Braum",
+    "key": 201,
+    "en_name": "Braum",
+    "zh_tw_name": "布郎姆",
+    "tags": [
+      "Tank",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "briar": {
+    "id": "Briar",
+    "key": 233,
+    "en_name": "Briar",
+    "zh_tw_name": "布蕾爾",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "caitlyn": {
+    "id": "Caitlyn",
+    "key": 51,
+    "en_name": "Caitlyn",
+    "zh_tw_name": "凱特琳",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "camille": {
+    "id": "Camille",
+    "key": 164,
+    "en_name": "Camille",
+    "zh_tw_name": "卡蜜兒",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "cassiopeia": {
+    "id": "Cassiopeia",
+    "key": 69,
+    "en_name": "Cassiopeia",
+    "zh_tw_name": "卡莎碧雅",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "chogath": {
+    "id": "Chogath",
+    "key": 31,
+    "en_name": "Cho'Gath",
+    "zh_tw_name": "科加斯",
+    "tags": [
+      "Tank",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "corki": {
+    "id": "Corki",
+    "key": 42,
+    "en_name": "Corki",
+    "zh_tw_name": "庫奇",
+    "tags": [
+      "Marksman",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "darius": {
+    "id": "Darius",
+    "key": 122,
+    "en_name": "Darius",
+    "zh_tw_name": "達瑞斯",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "diana": {
+    "id": "Diana",
+    "key": 131,
+    "en_name": "Diana",
+    "zh_tw_name": "黛安娜",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "draven": {
+    "id": "Draven",
+    "key": 119,
+    "en_name": "Draven",
+    "zh_tw_name": "達瑞文",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "drmundo": {
+    "id": "DrMundo",
+    "key": 36,
+    "en_name": "Dr. Mundo",
+    "zh_tw_name": "蒙多醫生",
+    "tags": [
+      "Tank",
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "ekko": {
+    "id": "Ekko",
+    "key": 245,
+    "en_name": "Ekko",
+    "zh_tw_name": "艾克",
+    "tags": [
+      "Assassin",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "elise": {
+    "id": "Elise",
+    "key": 60,
+    "en_name": "Elise",
+    "zh_tw_name": "伊莉絲",
+    "tags": [
+      "Assassin",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "evelynn": {
+    "id": "Evelynn",
+    "key": 28,
+    "en_name": "Evelynn",
+    "zh_tw_name": "伊芙琳",
+    "tags": [
+      "Assassin",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "ezreal": {
+    "id": "Ezreal",
+    "key": 81,
+    "en_name": "Ezreal",
+    "zh_tw_name": "伊澤瑞爾",
+    "tags": [
+      "Marksman",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "fiddlesticks": {
+    "id": "Fiddlesticks",
+    "key": 9,
+    "en_name": "Fiddlesticks",
+    "zh_tw_name": "費德提克",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "fiora": {
+    "id": "Fiora",
+    "key": 114,
+    "en_name": "Fiora",
+    "zh_tw_name": "菲歐拉",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "fizz": {
+    "id": "Fizz",
+    "key": 105,
+    "en_name": "Fizz",
+    "zh_tw_name": "飛斯",
+    "tags": [
+      "Assassin",
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "galio": {
+    "id": "Galio",
+    "key": 3,
+    "en_name": "Galio",
+    "zh_tw_name": "加里歐",
+    "tags": [
+      "Tank",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "gangplank": {
+    "id": "Gangplank",
+    "key": 41,
+    "en_name": "Gangplank",
+    "zh_tw_name": "剛普朗克",
+    "tags": [
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "garen": {
+    "id": "Garen",
+    "key": 86,
+    "en_name": "Garen",
+    "zh_tw_name": "蓋倫",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "gnar": {
+    "id": "Gnar",
+    "key": 150,
+    "en_name": "Gnar",
+    "zh_tw_name": "吶兒",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "gragas": {
+    "id": "Gragas",
+    "key": 79,
+    "en_name": "Gragas",
+    "zh_tw_name": "古拉格斯",
+    "tags": [
+      "Fighter",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "graves": {
+    "id": "Graves",
+    "key": 104,
+    "en_name": "Graves",
+    "zh_tw_name": "葛雷夫",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "gwen": {
+    "id": "Gwen",
+    "key": 887,
+    "en_name": "Gwen",
+    "zh_tw_name": "關",
+    "tags": [
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "hecarim": {
+    "id": "Hecarim",
+    "key": 120,
+    "en_name": "Hecarim",
+    "zh_tw_name": "赫克林",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "heimerdinger": {
+    "id": "Heimerdinger",
+    "key": 74,
+    "en_name": "Heimerdinger",
+    "zh_tw_name": "漢默丁格",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "hwei": {
+    "id": "Hwei",
+    "key": 910,
+    "en_name": "Hwei",
+    "zh_tw_name": "赫威",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "illaoi": {
+    "id": "Illaoi",
+    "key": 420,
+    "en_name": "Illaoi",
+    "zh_tw_name": "伊羅旖",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "irelia": {
+    "id": "Irelia",
+    "key": 39,
+    "en_name": "Irelia",
+    "zh_tw_name": "伊瑞莉雅",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "ivern": {
+    "id": "Ivern",
+    "key": 427,
+    "en_name": "Ivern",
+    "zh_tw_name": "埃爾文",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "janna": {
+    "id": "Janna",
+    "key": 40,
+    "en_name": "Janna",
+    "zh_tw_name": "珍娜",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "jarvaniv": {
+    "id": "JarvanIV",
+    "key": 59,
+    "en_name": "Jarvan IV",
+    "zh_tw_name": "嘉文四世",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "jax": {
+    "id": "Jax",
+    "key": 24,
+    "en_name": "Jax",
+    "zh_tw_name": "賈克斯",
+    "tags": [
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "jayce": {
+    "id": "Jayce",
+    "key": 126,
+    "en_name": "Jayce",
+    "zh_tw_name": "杰西",
+    "tags": [
+      "Fighter",
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "jhin": {
+    "id": "Jhin",
+    "key": 202,
+    "en_name": "Jhin",
+    "zh_tw_name": "燼",
+    "tags": [
+      "Marksman",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "jinx": {
+    "id": "Jinx",
+    "key": 222,
+    "en_name": "Jinx",
+    "zh_tw_name": "吉茵珂絲",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "kaisa": {
+    "id": "Kaisa",
+    "key": 145,
+    "en_name": "Kai'Sa",
+    "zh_tw_name": "凱莎",
+    "tags": [
+      "Marksman",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "kalista": {
+    "id": "Kalista",
+    "key": 429,
+    "en_name": "Kalista",
+    "zh_tw_name": "克黎思妲",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "karma": {
+    "id": "Karma",
+    "key": 43,
+    "en_name": "Karma",
+    "zh_tw_name": "卡瑪",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "karthus": {
+    "id": "Karthus",
+    "key": 30,
+    "en_name": "Karthus",
+    "zh_tw_name": "卡爾瑟斯",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "kassadin": {
+    "id": "Kassadin",
+    "key": 38,
+    "en_name": "Kassadin",
+    "zh_tw_name": "卡薩丁",
+    "tags": [
+      "Assassin",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "katarina": {
+    "id": "Katarina",
+    "key": 55,
+    "en_name": "Katarina",
+    "zh_tw_name": "卡特蓮娜",
+    "tags": [
+      "Assassin",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "kayle": {
+    "id": "Kayle",
+    "key": 10,
+    "en_name": "Kayle",
+    "zh_tw_name": "凱爾",
+    "tags": [
+      "Mage",
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "kayn": {
+    "id": "Kayn",
+    "key": 141,
+    "en_name": "Kayn",
+    "zh_tw_name": "慨影",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "kennen": {
+    "id": "Kennen",
+    "key": 85,
+    "en_name": "Kennen",
+    "zh_tw_name": "凱能",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "khazix": {
+    "id": "Khazix",
+    "key": 121,
+    "en_name": "Kha'Zix",
+    "zh_tw_name": "卡力斯",
+    "tags": [
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "kindred": {
+    "id": "Kindred",
+    "key": 203,
+    "en_name": "Kindred",
+    "zh_tw_name": "鏡爪",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "kled": {
+    "id": "Kled",
+    "key": 240,
+    "en_name": "Kled",
+    "zh_tw_name": "克雷德",
+    "tags": [
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "kogmaw": {
+    "id": "KogMaw",
+    "key": 96,
+    "en_name": "Kog'Maw",
+    "zh_tw_name": "寇格魔",
+    "tags": [
+      "Marksman",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "ksante": {
+    "id": "KSante",
+    "key": 897,
+    "en_name": "K'Sante",
+    "zh_tw_name": "卡桑帝",
+    "tags": [
+      "Tank",
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "leblanc": {
+    "id": "Leblanc",
+    "key": 7,
+    "en_name": "LeBlanc",
+    "zh_tw_name": "勒布朗",
+    "tags": [
+      "Assassin",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "leesin": {
+    "id": "LeeSin",
+    "key": 64,
+    "en_name": "Lee Sin",
+    "zh_tw_name": "李星",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "leona": {
+    "id": "Leona",
+    "key": 89,
+    "en_name": "Leona",
+    "zh_tw_name": "雷歐娜",
+    "tags": [
+      "Tank",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "lillia": {
+    "id": "Lillia",
+    "key": 876,
+    "en_name": "Lillia",
+    "zh_tw_name": "莉莉亞",
+    "tags": [
+      "Fighter",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "lissandra": {
+    "id": "Lissandra",
+    "key": 127,
+    "en_name": "Lissandra",
+    "zh_tw_name": "麗珊卓",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "locke": {
+    "id": "Locke",
+    "key": 805,
+    "en_name": "Locke",
+    "zh_tw_name": "洛克",
+    "tags": [
+      "Assassin",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "lucian": {
+    "id": "Lucian",
+    "key": 236,
+    "en_name": "Lucian",
+    "zh_tw_name": "路西恩",
+    "tags": [
+      "Marksman",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "lulu": {
+    "id": "Lulu",
+    "key": 117,
+    "en_name": "Lulu",
+    "zh_tw_name": "露璐",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "lux": {
+    "id": "Lux",
+    "key": 99,
+    "en_name": "Lux",
+    "zh_tw_name": "拉克絲",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "malphite": {
+    "id": "Malphite",
+    "key": 54,
+    "en_name": "Malphite",
+    "zh_tw_name": "墨菲特",
+    "tags": [
+      "Tank",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "malzahar": {
+    "id": "Malzahar",
+    "key": 90,
+    "en_name": "Malzahar",
+    "zh_tw_name": "馬爾札哈",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "maokai": {
+    "id": "Maokai",
+    "key": 57,
+    "en_name": "Maokai",
+    "zh_tw_name": "茂凱",
+    "tags": [
+      "Tank",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "masteryi": {
+    "id": "MasterYi",
+    "key": 11,
+    "en_name": "Master Yi",
+    "zh_tw_name": "易大師",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "mel": {
+    "id": "Mel",
+    "key": 800,
+    "en_name": "Mel",
+    "zh_tw_name": "梅爾",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "milio": {
+    "id": "Milio",
+    "key": 902,
+    "en_name": "Milio",
+    "zh_tw_name": "米里歐",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "missfortune": {
+    "id": "MissFortune",
+    "key": 21,
+    "en_name": "Miss Fortune",
+    "zh_tw_name": "好運姐",
+    "tags": [
+      "Marksman",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "monkeyking": {
+    "id": "MonkeyKing",
+    "key": 62,
+    "en_name": "Wukong",
+    "zh_tw_name": "悟空",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "mordekaiser": {
+    "id": "Mordekaiser",
+    "key": 82,
+    "en_name": "Mordekaiser",
+    "zh_tw_name": "魔鬥凱薩",
+    "tags": [
+      "Fighter",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "morgana": {
+    "id": "Morgana",
+    "key": 25,
+    "en_name": "Morgana",
+    "zh_tw_name": "魔甘娜",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "naafiri": {
+    "id": "Naafiri",
+    "key": 950,
+    "en_name": "Naafiri",
+    "zh_tw_name": "娜菲芮",
+    "tags": [
+      "Assassin",
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "nami": {
+    "id": "Nami",
+    "key": 267,
+    "en_name": "Nami",
+    "zh_tw_name": "娜米",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "nasus": {
+    "id": "Nasus",
+    "key": 75,
+    "en_name": "Nasus",
+    "zh_tw_name": "納瑟斯",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "nautilus": {
+    "id": "Nautilus",
+    "key": 111,
+    "en_name": "Nautilus",
+    "zh_tw_name": "納帝魯斯",
+    "tags": [
+      "Tank",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "neeko": {
+    "id": "Neeko",
+    "key": 518,
+    "en_name": "Neeko",
+    "zh_tw_name": "妮可",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "nidalee": {
+    "id": "Nidalee",
+    "key": 76,
+    "en_name": "Nidalee",
+    "zh_tw_name": "奈德麗",
+    "tags": [
+      "Assassin",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "nilah": {
+    "id": "Nilah",
+    "key": 895,
+    "en_name": "Nilah",
+    "zh_tw_name": "淣菈",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "nocturne": {
+    "id": "Nocturne",
+    "key": 56,
+    "en_name": "Nocturne",
+    "zh_tw_name": "夜曲",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "nunu": {
+    "id": "Nunu",
+    "key": 20,
+    "en_name": "Nunu & Willump",
+    "zh_tw_name": "努努和威朗普",
+    "tags": [
+      "Tank",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "olaf": {
+    "id": "Olaf",
+    "key": 2,
+    "en_name": "Olaf",
+    "zh_tw_name": "歐拉夫",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "orianna": {
+    "id": "Orianna",
+    "key": 61,
+    "en_name": "Orianna",
+    "zh_tw_name": "奧莉安娜",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "ornn": {
+    "id": "Ornn",
+    "key": 516,
+    "en_name": "Ornn",
+    "zh_tw_name": "鄂爾",
+    "tags": [
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "pantheon": {
+    "id": "Pantheon",
+    "key": 80,
+    "en_name": "Pantheon",
+    "zh_tw_name": "潘森",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "poppy": {
+    "id": "Poppy",
+    "key": 78,
+    "en_name": "Poppy",
+    "zh_tw_name": "波比",
+    "tags": [
+      "Tank",
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "pyke": {
+    "id": "Pyke",
+    "key": 555,
+    "en_name": "Pyke",
+    "zh_tw_name": "派克",
+    "tags": [
+      "Support",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "qiyana": {
+    "id": "Qiyana",
+    "key": 246,
+    "en_name": "Qiyana",
+    "zh_tw_name": "姬亞娜",
+    "tags": [
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "quinn": {
+    "id": "Quinn",
+    "key": 133,
+    "en_name": "Quinn",
+    "zh_tw_name": "葵恩",
+    "tags": [
+      "Marksman",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "rakan": {
+    "id": "Rakan",
+    "key": 497,
+    "en_name": "Rakan",
+    "zh_tw_name": "銳空",
+    "tags": [
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "rammus": {
+    "id": "Rammus",
+    "key": 33,
+    "en_name": "Rammus",
+    "zh_tw_name": "拉姆斯",
+    "tags": [
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "reksai": {
+    "id": "RekSai",
+    "key": 421,
+    "en_name": "Rek'Sai",
+    "zh_tw_name": "雷珂煞",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "rell": {
+    "id": "Rell",
+    "key": 526,
+    "en_name": "Rell",
+    "zh_tw_name": "銳兒",
+    "tags": [
+      "Tank",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "renata": {
+    "id": "Renata",
+    "key": 888,
+    "en_name": "Renata Glasc",
+    "zh_tw_name": "睿娜妲‧格萊斯克",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "renekton": {
+    "id": "Renekton",
+    "key": 58,
+    "en_name": "Renekton",
+    "zh_tw_name": "雷尼克頓",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "rengar": {
+    "id": "Rengar",
+    "key": 107,
+    "en_name": "Rengar",
+    "zh_tw_name": "雷葛爾",
+    "tags": [
+      "Assassin",
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "riven": {
+    "id": "Riven",
+    "key": 92,
+    "en_name": "Riven",
+    "zh_tw_name": "雷玟",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "rumble": {
+    "id": "Rumble",
+    "key": 68,
+    "en_name": "Rumble",
+    "zh_tw_name": "藍寶",
+    "tags": [
+      "Fighter",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "ryze": {
+    "id": "Ryze",
+    "key": 13,
+    "en_name": "Ryze",
+    "zh_tw_name": "雷茲",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "samira": {
+    "id": "Samira",
+    "key": 360,
+    "en_name": "Samira",
+    "zh_tw_name": "煞蜜拉",
+    "tags": [
+      "Marksman",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "sejuani": {
+    "id": "Sejuani",
+    "key": 113,
+    "en_name": "Sejuani",
+    "zh_tw_name": "史瓦妮",
+    "tags": [
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "senna": {
+    "id": "Senna",
+    "key": 235,
+    "en_name": "Senna",
+    "zh_tw_name": "姍娜",
+    "tags": [
+      "Support",
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "seraphine": {
+    "id": "Seraphine",
+    "key": 147,
+    "en_name": "Seraphine",
+    "zh_tw_name": "瑟菈紛",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "sett": {
+    "id": "Sett",
+    "key": 875,
+    "en_name": "Sett",
+    "zh_tw_name": "賽特",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "shaco": {
+    "id": "Shaco",
+    "key": 35,
+    "en_name": "Shaco",
+    "zh_tw_name": "薩科",
+    "tags": [
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "shen": {
+    "id": "Shen",
+    "key": 98,
+    "en_name": "Shen",
+    "zh_tw_name": "慎",
+    "tags": [
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "shyvana": {
+    "id": "Shyvana",
+    "key": 102,
+    "en_name": "Shyvana",
+    "zh_tw_name": "希瓦娜",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "singed": {
+    "id": "Singed",
+    "key": 27,
+    "en_name": "Singed",
+    "zh_tw_name": "辛吉德",
+    "tags": [
+      "Tank",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "sion": {
+    "id": "Sion",
+    "key": 14,
+    "en_name": "Sion",
+    "zh_tw_name": "賽恩",
+    "tags": [
+      "Tank",
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "sivir": {
+    "id": "Sivir",
+    "key": 15,
+    "en_name": "Sivir",
+    "zh_tw_name": "希維爾",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "skarner": {
+    "id": "Skarner",
+    "key": 72,
+    "en_name": "Skarner",
+    "zh_tw_name": "史加納",
+    "tags": [
+      "Tank",
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "smolder": {
+    "id": "Smolder",
+    "key": 901,
+    "en_name": "Smolder",
+    "zh_tw_name": "史矛德",
+    "tags": [
+      "Marksman",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "sona": {
+    "id": "Sona",
+    "key": 37,
+    "en_name": "Sona",
+    "zh_tw_name": "索娜",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "soraka": {
+    "id": "Soraka",
+    "key": 16,
+    "en_name": "Soraka",
+    "zh_tw_name": "索拉卡",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "swain": {
+    "id": "Swain",
+    "key": 50,
+    "en_name": "Swain",
+    "zh_tw_name": "斯溫",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "sylas": {
+    "id": "Sylas",
+    "key": 517,
+    "en_name": "Sylas",
+    "zh_tw_name": "賽勒斯",
+    "tags": [
+      "Mage",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "syndra": {
+    "id": "Syndra",
+    "key": 134,
+    "en_name": "Syndra",
+    "zh_tw_name": "星朵拉",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "tahmkench": {
+    "id": "TahmKench",
+    "key": 223,
+    "en_name": "Tahm Kench",
+    "zh_tw_name": "貪啃奇",
+    "tags": [
+      "Tank",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "taliyah": {
+    "id": "Taliyah",
+    "key": 163,
+    "en_name": "Taliyah",
+    "zh_tw_name": "塔莉雅",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "talon": {
+    "id": "Talon",
+    "key": 91,
+    "en_name": "Talon",
+    "zh_tw_name": "塔隆",
+    "tags": [
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "taric": {
+    "id": "Taric",
+    "key": 44,
+    "en_name": "Taric",
+    "zh_tw_name": "塔里克",
+    "tags": [
+      "Support",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "teemo": {
+    "id": "Teemo",
+    "key": 17,
+    "en_name": "Teemo",
+    "zh_tw_name": "提摩",
+    "tags": [
+      "Marksman",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "thresh": {
+    "id": "Thresh",
+    "key": 412,
+    "en_name": "Thresh",
+    "zh_tw_name": "瑟雷西",
+    "tags": [
+      "Support",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "tristana": {
+    "id": "Tristana",
+    "key": 18,
+    "en_name": "Tristana",
+    "zh_tw_name": "崔絲塔娜",
+    "tags": [
+      "Marksman",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "trundle": {
+    "id": "Trundle",
+    "key": 48,
+    "en_name": "Trundle",
+    "zh_tw_name": "特朗德",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "tryndamere": {
+    "id": "Tryndamere",
+    "key": 23,
+    "en_name": "Tryndamere",
+    "zh_tw_name": "泰達米爾",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "twistedfate": {
+    "id": "TwistedFate",
+    "key": 4,
+    "en_name": "Twisted Fate",
+    "zh_tw_name": "逆命",
+    "tags": [
+      "Mage",
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "twitch": {
+    "id": "Twitch",
+    "key": 29,
+    "en_name": "Twitch",
+    "zh_tw_name": "圖奇",
+    "tags": [
+      "Marksman",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "udyr": {
+    "id": "Udyr",
+    "key": 77,
+    "en_name": "Udyr",
+    "zh_tw_name": "烏迪爾",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "urgot": {
+    "id": "Urgot",
+    "key": 6,
+    "en_name": "Urgot",
+    "zh_tw_name": "烏爾加特",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "varus": {
+    "id": "Varus",
+    "key": 110,
+    "en_name": "Varus",
+    "zh_tw_name": "法洛士",
+    "tags": [
+      "Marksman",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "vayne": {
+    "id": "Vayne",
+    "key": 67,
+    "en_name": "Vayne",
+    "zh_tw_name": "汎",
+    "tags": [
+      "Marksman",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "veigar": {
+    "id": "Veigar",
+    "key": 45,
+    "en_name": "Veigar",
+    "zh_tw_name": "維迦",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "velkoz": {
+    "id": "Velkoz",
+    "key": 161,
+    "en_name": "Vel'Koz",
+    "zh_tw_name": "威寇茲",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "vex": {
+    "id": "Vex",
+    "key": 711,
+    "en_name": "Vex",
+    "zh_tw_name": "薇可絲",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "vi": {
+    "id": "Vi",
+    "key": 254,
+    "en_name": "Vi",
+    "zh_tw_name": "菲艾",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "viego": {
+    "id": "Viego",
+    "key": 234,
+    "en_name": "Viego",
+    "zh_tw_name": "維爾戈",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "viktor": {
+    "id": "Viktor",
+    "key": 112,
+    "en_name": "Viktor",
+    "zh_tw_name": "維克特",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "vladimir": {
+    "id": "Vladimir",
+    "key": 8,
+    "en_name": "Vladimir",
+    "zh_tw_name": "弗拉迪米爾",
+    "tags": [
+      "Mage",
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "volibear": {
+    "id": "Volibear",
+    "key": 106,
+    "en_name": "Volibear",
+    "zh_tw_name": "弗力貝爾",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "warwick": {
+    "id": "Warwick",
+    "key": 19,
+    "en_name": "Warwick",
+    "zh_tw_name": "沃維克",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "xayah": {
+    "id": "Xayah",
+    "key": 498,
+    "en_name": "Xayah",
+    "zh_tw_name": "剎雅",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "xerath": {
+    "id": "Xerath",
+    "key": 101,
+    "en_name": "Xerath",
+    "zh_tw_name": "齊勒斯",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "xinzhao": {
+    "id": "XinZhao",
+    "key": 5,
+    "en_name": "Xin Zhao",
+    "zh_tw_name": "趙信",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "yasuo": {
+    "id": "Yasuo",
+    "key": 157,
+    "en_name": "Yasuo",
+    "zh_tw_name": "犽宿",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "yone": {
+    "id": "Yone",
+    "key": 777,
+    "en_name": "Yone",
+    "zh_tw_name": "犽凝",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "yorick": {
+    "id": "Yorick",
+    "key": 83,
+    "en_name": "Yorick",
+    "zh_tw_name": "約瑞科",
+    "tags": [
+      "Fighter",
+      "Tank"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "yunara": {
+    "id": "Yunara",
+    "key": 804,
+    "en_name": "Yunara",
+    "zh_tw_name": "尤娜拉",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "yuumi": {
+    "id": "Yuumi",
+    "key": 350,
+    "en_name": "Yuumi",
+    "zh_tw_name": "悠咪",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "zaahen": {
+    "id": "Zaahen",
+    "key": 904,
+    "en_name": "Zaahen",
+    "zh_tw_name": "薩亨",
+    "tags": [
+      "Fighter",
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "zac": {
+    "id": "Zac",
+    "key": 154,
+    "en_name": "Zac",
+    "zh_tw_name": "札克",
+    "tags": [
+      "Tank",
+      "Fighter"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "zed": {
+    "id": "Zed",
+    "key": 238,
+    "en_name": "Zed",
+    "zh_tw_name": "劫",
+    "tags": [
+      "Assassin"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "zeri": {
+    "id": "Zeri",
+    "key": 221,
+    "en_name": "Zeri",
+    "zh_tw_name": "婕莉",
+    "tags": [
+      "Marksman"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "ziggs": {
+    "id": "Ziggs",
+    "key": 115,
+    "en_name": "Ziggs",
+    "zh_tw_name": "希格斯",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "zilean": {
+    "id": "Zilean",
+    "key": 26,
+    "en_name": "Zilean",
+    "zh_tw_name": "極靈",
+    "tags": [
+      "Support",
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "zoe": {
+    "id": "Zoe",
+    "key": 142,
+    "en_name": "Zoe",
+    "zh_tw_name": "柔依",
+    "tags": [
+      "Mage"
+    ],
+    "ddragon_version": "16.14.1"
+  },
+  "zyra": {
+    "id": "Zyra",
+    "key": 143,
+    "en_name": "Zyra",
+    "zh_tw_name": "枷蘿",
+    "tags": [
+      "Mage",
+      "Support"
+    ],
+    "ddragon_version": "16.14.1"
+  }
+}

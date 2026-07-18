@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import json
 import math
+from itertools import combinations
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from .compliance import freeze_static_recommendation
+from .health import assess_recommendation_data
 from .items import enrich_item, is_boot, is_completed_non_boot_item, load_items_map
-from .live_client import load_match_context
+from .live_client import build_match_context, build_match_key, load_snapshot
 from .lolalytics import (
     DEFAULT_MODE,
     DEFAULT_PATCH,
@@ -275,6 +279,7 @@ PHYSICAL_OUTPUT_TAGS = {"Damage", "AttackSpeed", "CriticalStrike", "OnHit", "Arm
 DEFENSIVE_ITEM_TAGS = {"Health", "Armor", "SpellBlock", "MagicResist"}
 TEAR_ITEM_ID = 3070
 TEAR_UPGRADE_ITEM_IDS = {3003, 3004, 3040, 3042, 3121}
+DEFAULT_STARTER_BUDGET = 1400
 MULTI_ROUTE_CHAMPIONS = {
     "ashe",
     "ezreal",
@@ -297,6 +302,7 @@ ARCHETYPE_LABELS = {
 }
 MIN_ROUTE_PICK_RATE = 0.0005
 MIN_ROUTE_CANDIDATE_PICK_RATE = 0.0003
+MEDIUM_CONFIDENCE_GAMES = 8
 HIGH_CONFIDENCE_PICK_RATE = 0.001
 HIGH_CONFIDENCE_GAMES = 75
 DEFAULT_USER_PREFERENCES_PATH = Path("data/ref/user_preferences.json")
@@ -327,6 +333,24 @@ class ThreatProfile:
             "cc_count": self.cc_count,
             "shield_count": self.shield_count,
             "healing_count": self.healing_count,
+        }
+
+
+@dataclass(frozen=True)
+class AllyProfile:
+    magic_count: int
+    physical_count: int
+    frontline_count: int
+    cc_count: int
+    sustain_count: int
+
+    def to_dict(self) -> dict[str, int]:
+        return {
+            "magic_count": self.magic_count,
+            "physical_count": self.physical_count,
+            "frontline_count": self.frontline_count,
+            "cc_count": self.cc_count,
+            "sustain_count": self.sustain_count,
         }
 
 
@@ -485,6 +509,58 @@ def analyze_threats(context: dict[str, Any]) -> ThreatProfile:
         shield_count=sum(1 for c in enemy_slugs if c in SHIELDS),
         healing_count=sum(1 for c in enemy_slugs if c in HEALING),
     )
+
+
+def analyze_allies(context: dict[str, Any]) -> AllyProfile:
+    ally_slugs = [p.get("champion_slug", "") for p in context.get("allies", [])]
+    return AllyProfile(
+        magic_count=sum(1 for champion in ally_slugs if champion in MAGIC_THREATS),
+        physical_count=sum(1 for champion in ally_slugs if champion in PHYSICAL_THREATS),
+        frontline_count=sum(1 for champion in ally_slugs if champion in TANKS),
+        cc_count=sum(1 for champion in ally_slugs if champion in HARD_CC),
+        sustain_count=sum(1 for champion in ally_slugs if champion in SHIELDS or champion in HEALING),
+    )
+
+
+def _composition_notes(profile: AllyProfile) -> list[str]:
+    notes: list[str] = []
+    if profile.physical_count >= 4 and profile.magic_count <= 1:
+        notes.append("我方陣容以物理輸出為主")
+    elif profile.magic_count >= 4 and profile.physical_count <= 1:
+        notes.append("我方陣容以魔法輸出為主")
+    if profile.frontline_count == 0:
+        notes.append("我方陣容前排較少")
+    if profile.cc_count == 0:
+        notes.append("我方陣容硬控制較少")
+    return notes
+
+
+def _team_route_adjustment(
+    items: list[dict[str, Any]],
+    profile: AllyProfile,
+) -> tuple[float, list[str]]:
+    spell_items = sum(1 for item in items if "SpellDamage" in set(item.get("tags") or []))
+    physical_items = sum(
+        1 for item in items if set(item.get("tags") or []) & PHYSICAL_OUTPUT_TAGS
+    )
+    defensive_items = sum(
+        1 for item in items if set(item.get("tags") or []) & DEFENSIVE_ITEM_TAGS
+    )
+    score = 0.0
+    reasons: list[str] = []
+    if profile.physical_count >= 4 and profile.magic_count <= 1:
+        if spell_items >= 3:
+            score += 0.8
+            reasons.append("此方案能增加我方傷害類型多樣性")
+        elif physical_items >= 3:
+            score -= 0.25
+    elif profile.magic_count >= 4 and profile.physical_count <= 1 and physical_items >= 3:
+        score += 0.55
+        reasons.append("此方案能增加我方傷害類型多樣性")
+    if profile.frontline_count == 0 and defensive_items >= 1:
+        score += 0.3
+        reasons.append("此方案保留較多自保屬性")
+    return score, reasons
 
 
 def _flatten_lolalytics_items(build_data: dict[str, Any]) -> list[dict[str, Any]]:
@@ -839,6 +915,26 @@ def _adjusted_win_rate(win_rate: float, games: int, prior_rate: float = 0.5, pri
     return (wins + prior_rate * prior_games) / (games + prior_games)
 
 
+def _route_confidence(row: dict[str, Any]) -> dict[str, Any]:
+    games = int(row.get("games") or 0)
+    pick_rate = float(row.get("pick_rate") or 0.0)
+    evidence = min(games / HIGH_CONFIDENCE_GAMES, 1.0) * 0.65
+    evidence += min(pick_rate / HIGH_CONFIDENCE_PICK_RATE, 1.0) * 0.35
+    if games >= HIGH_CONFIDENCE_GAMES and pick_rate >= HIGH_CONFIDENCE_PICK_RATE:
+        level, label = "high", "較高可信"
+    elif games >= MEDIUM_CONFIDENCE_GAMES and pick_rate >= MIN_ROUTE_CANDIDATE_PICK_RATE:
+        level, label = "medium", "中等可信"
+    else:
+        level, label = "exploratory", "探索方案"
+    return {
+        "level": level,
+        "label": label,
+        "score": round(evidence * 100),
+        "games": games,
+        "pick_rate": pick_rate,
+    }
+
+
 def _winning_item_signals(items: list[dict[str, Any]], scored_by_id: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
     signals: list[dict[str, Any]] = []
     for item in items:
@@ -1078,6 +1174,176 @@ def _select_boots(
     return options[0] if options else None
 
 
+def _starter_item_payload(item: dict[str, Any]) -> dict[str, Any]:
+    payload = _item_payload(item)
+    payload["gold_total"] = int(item.get("gold_total") or 0)
+    return payload
+
+
+def _starting_items(
+    build_data: dict[str, Any],
+    item_map: dict[int, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    options: list[dict[str, Any]] = []
+    seen: set[int] = set()
+    for raw_item in build_data.get("sections", {}).get("Starting Items", []):
+        item_id = int(raw_item["item_id"])
+        if item_id in seen:
+            continue
+        seen.add(item_id)
+        options.append(enrich_item(raw_item, item_map))
+    return options
+
+
+def _starter_budget(starting_items: list[dict[str, Any]]) -> int:
+    total = sum(int(item.get("gold_total") or 0) for item in starting_items)
+    return total if 800 <= total <= 1800 else DEFAULT_STARTER_BUDGET
+
+
+def _component_ids(item_id: int, item_map: dict[int, dict[str, Any]]) -> set[int]:
+    found: set[int] = set()
+    stack = [item_id]
+    while stack:
+        current = stack.pop()
+        for raw_component in item_map.get(current, {}).get("from") or []:
+            try:
+                component_id = int(raw_component)
+            except (TypeError, ValueError):
+                continue
+            if component_id in found:
+                continue
+            found.add(component_id)
+            stack.append(component_id)
+    return found
+
+
+def _starter_candidate(item_id: int, item_map: dict[int, dict[str, Any]]) -> dict[str, Any] | None:
+    metadata = item_map.get(item_id)
+    if not metadata:
+        return None
+    if metadata.get("gold_purchasable") is False:
+        return None
+    if set(metadata.get("tags") or []) & {"Consumable", "Trinket"}:
+        return None
+    gold = int(metadata.get("gold_total") or 0)
+    if gold <= 0:
+        return None
+    return enrich_item(
+        {"item_id": item_id, "name": metadata.get("en_name") or str(item_id)},
+        item_map,
+    )
+
+
+def _best_direct_component_package(
+    target_item_id: int,
+    item_map: dict[int, dict[str, Any]],
+    budget: int,
+) -> list[dict[str, Any]]:
+    direct: list[dict[str, Any]] = []
+    for raw_component in item_map.get(target_item_id, {}).get("from") or []:
+        try:
+            component_id = int(raw_component)
+        except (TypeError, ValueError):
+            continue
+        candidate = _starter_candidate(component_id, item_map)
+        if candidate is not None:
+            direct.append(candidate)
+
+    best: list[dict[str, Any]] = []
+    best_total = 0
+    for size in range(1, min(3, len(direct)) + 1):
+        for package in combinations(direct, size):
+            total = sum(int(item.get("gold_total") or 0) for item in package)
+            if total <= budget and total > best_total:
+                best = list(package)
+                best_total = total
+    if best:
+        return best
+
+    descendants = [
+        candidate
+        for component_id in _component_ids(target_item_id, item_map)
+        if (candidate := _starter_candidate(component_id, item_map)) is not None
+        and int(candidate.get("gold_total") or 0) <= budget
+    ]
+    return [max(descendants, key=lambda item: int(item.get("gold_total") or 0))] if descendants else []
+
+
+def _route_starter_option(
+    route_items: list[dict[str, Any]],
+    build_data: dict[str, Any],
+    item_map: dict[int, dict[str, Any]],
+) -> dict[str, Any] | None:
+    if not route_items:
+        return None
+    first_item = route_items[0]
+    target_item_id = int(first_item["item_id"])
+    common_start = _starting_items(build_data, item_map)
+    budget = _starter_budget(common_start)
+
+    if any(_item_uses_tear(int(item["item_id"]), item_map) for item in route_items):
+        tear = _starter_candidate(TEAR_ITEM_ID, item_map)
+        if tear is not None:
+            return {
+                "items": [_starter_item_payload(tear)],
+                "total_gold": int(tear.get("gold_total") or 0),
+                "budget": budget,
+                "source": "route_requirement",
+                "target": _item_payload(first_item),
+                "reason": "此路線包含女神之淚升級裝，開場優先疊層",
+            }
+
+    target_components = _component_ids(target_item_id, item_map)
+    matching_common = [item for item in common_start if int(item["item_id"]) in target_components]
+    if matching_common:
+        common_total = sum(int(item.get("gold_total") or 0) for item in common_start)
+        if common_total <= budget:
+            package = common_start
+        else:
+            package = sorted(
+                matching_common,
+                key=lambda item: int(item.get("gold_total") or 0),
+                reverse=True,
+            )
+            boots = next((item for item in common_start if is_boot(item)), None)
+            package_total = sum(int(item.get("gold_total") or 0) for item in package)
+            if boots is not None and package_total + int(boots.get("gold_total") or 0) <= budget:
+                package.append(boots)
+        package_total = sum(int(item.get("gold_total") or 0) for item in package)
+        win_rate = next(
+            (float(item["win_rate"]) for item in common_start if isinstance(item.get("win_rate"), (int, float))),
+            None,
+        )
+        option = {
+            "items": [_starter_item_payload(item) for item in package],
+            "total_gold": package_total,
+            "budget": budget,
+            "source": "lolalytics_starting_items",
+            "target": _item_payload(first_item),
+            "reason": f"LoLalytics 常見起手可直接銜接{first_item.get('zh_tw_name') or first_item.get('name')}",
+        }
+        if win_rate is not None:
+            option["win_rate"] = win_rate
+        return option
+
+    package = _best_direct_component_package(target_item_id, item_map, budget)
+    if not package:
+        return None
+    package_total = sum(int(item.get("gold_total") or 0) for item in package)
+    common_boots = next((item for item in common_start if is_boot(item)), None)
+    if common_boots is not None and package_total + int(common_boots.get("gold_total") or 0) <= budget:
+        package.append(common_boots)
+        package_total += int(common_boots.get("gold_total") or 0)
+    return {
+        "items": [_starter_item_payload(item) for item in package],
+        "total_gold": package_total,
+        "budget": budget,
+        "source": "data_dragon_component_tree",
+        "target": _item_payload(first_item),
+        "reason": f"依合成樹優先銜接{first_item.get('zh_tw_name') or first_item.get('name')}",
+    }
+
+
 def _route_candidate_sets(built_sets: list[dict[str, Any]]) -> list[dict[str, Any]]:
     candidates = [
         row for row in built_sets if float(row.get("pick_rate") or 0.0) >= MIN_ROUTE_CANDIDATE_PICK_RATE
@@ -1091,6 +1357,7 @@ def _build_routes(
     scored_by_id: dict[int, dict[str, Any]],
     build_data: dict[str, Any],
     threats: ThreatProfile,
+    allies: AllyProfile,
     champion_slug: str,
     preferences: dict[str, Any],
     boot_stats_by_id: dict[int, dict[str, Any]] | None = None,
@@ -1104,6 +1371,8 @@ def _build_routes(
             continue
         archetype = _classify_route(items, champion_slug)
         route_score = _score_route(row, items, scored_by_id, threats, archetype, champion_slug, preferences)
+        team_score, team_reasons = _team_route_adjustment(items, allies)
+        route_score += team_score
         winning_item_signals = _winning_item_signals(items, scored_by_id)
         boots = _select_boots(archetype, build_data, item_map, threats, boot_stats_by_id=boot_stats_by_id)
         preference_reasons, preference_flags = _route_preference_details(
@@ -1112,6 +1381,7 @@ def _build_routes(
             champion_slug,
             preferences,
         )
+        starter_option = _route_starter_option(items, build_data, item_map)
         route = {
             "label": _route_label(archetype, items, threats),
             "archetype": archetype,
@@ -1130,15 +1400,20 @@ def _build_routes(
                 "pick_rate": row.get("pick_rate"),
                 "games": row.get("games"),
             },
+            "confidence": _route_confidence(row),
+            "sequence_basis": "LoLalytics Actually Built Sets item order",
             "source": {
                 "lolalytics_params": row.get("source_params") or build_data.get("params"),
                 "built_sets_tab": "Actually Built Sets: 5",
             },
             "winning_item_signals": winning_item_signals,
             "starting_reminders": _route_starting_reminders(items, item_map),
+            "starter_option": starter_option,
             "preference_flags": preference_flags,
             "source_priority": int(row.get("source_priority") or 0),
-            "reasons": preference_reasons + _route_reasons(row, archetype, items, threats, winning_item_signals),
+            "reasons": preference_reasons
+            + team_reasons
+            + _route_reasons(row, archetype, items, threats, winning_item_signals),
         }
         combo_key = tuple(sorted(int(item["item_id"]) for item in items))
         current = best_by_combo.get(combo_key)
@@ -1181,6 +1456,8 @@ def recommend_build(
     mode: str = DEFAULT_MODE,
     tier: str = DEFAULT_TIER,
     min_champions_analysed: int = 1_000_000,
+    learned_item_adjustments: dict[int, float] | None = None,
+    learned_feedback_events: int = 0,
 ) -> dict[str, Any]:
     active = context.get("active_player") or {}
     champion_slug = active.get("champion_slug") or ""
@@ -1198,7 +1475,12 @@ def recommend_build(
     )
     item_map = load_items_map(items_map_path)
     preferences = load_user_preferences(preferences_path)
+    for item_id, adjustment in (learned_item_adjustments or {}).items():
+        key = str(int(item_id))
+        current = float((preferences.get("item_score_adjustments") or {}).get(key, 0.0))
+        preferences["item_score_adjustments"][key] = round(current + float(adjustment), 3)
     threats = analyze_threats(context)
+    allies = analyze_allies(context)
 
     built_set_params = build_data.get("params") or {"mode": mode, "tier": tier, "patch": DEFAULT_PATCH}
     primary_raw_sets = fetch_actual_built_sets_5(
@@ -1319,6 +1601,7 @@ def recommend_build(
         by_id,
         build_data,
         threats,
+        allies,
         champion_slug,
         preferences,
         boot_stats_by_id=boot_stats_by_id,
@@ -1350,12 +1633,32 @@ def recommend_build(
         }
         for p in context.get("enemies", [])
     ]
+    ally_team = [
+        {
+            "champion": p.get("champion_id") or p.get("champion_name"),
+            "slug": p.get("champion_slug"),
+            "position": p.get("position"),
+            "is_active": bool(p.get("is_active")),
+        }
+        for p in context.get("allies", [])
+    ]
+    data_health = assess_recommendation_data(
+        fetched_at=build_data.get("fetched_at"),
+        champions_analysed=int(build_data.get("champions_analysed") or 0),
+        built_sets=len(primary_raw_sets),
+        boots=len(boot_stat_rows),
+        popular_items=len(popular_item_rows),
+        winning_items=len(winning_item_rows),
+    )
 
     return {
         "active_player": active,
         "game": context.get("game"),
+        "ally_team": ally_team,
         "enemy_team": enemies,
         "threat_profile": threats.to_dict(),
+        "ally_profile": allies.to_dict(),
+        "composition_notes": _composition_notes(allies),
         "build": {
             "boots": primary_boots,
             "boot_options": boot_options,
@@ -1367,6 +1670,8 @@ def recommend_build(
                 "lolalytics_patch": build_data.get("patch"),
                 "lolalytics_params": build_data.get("params"),
                 "champions_analysed": build_data.get("champions_analysed"),
+                "data_fetched_at": build_data.get("fetched_at"),
+                "data_health": data_health,
                 "fallback_attempts": build_data.get("fallback_attempts"),
                 "lolalytics_cache": build_data.get("cache_path"),
                 "built_sets_cache": str(
@@ -1384,6 +1689,7 @@ def recommend_build(
                 "route_candidate_min_pick_rate": MIN_ROUTE_CANDIDATE_PICK_RATE,
                 "user_preferences_path": str(preferences_path),
                 "user_preferences": preferences,
+                "learned_feedback_events": int(learned_feedback_events),
                 "built_set_windows": built_set_windows,
                 "boot_stats_available": len(boot_stat_rows),
                 "popular_items_available": len(popular_item_rows),
@@ -1425,15 +1731,30 @@ def recommend_from_snapshot(
     mode: str = DEFAULT_MODE,
     tier: str = DEFAULT_TIER,
     min_champions_analysed: int = 1_000_000,
+    match_key: str | None = None,
+    learned_item_adjustments: dict[int, float] | None = None,
+    learned_feedback_events: int = 0,
 ) -> dict[str, Any]:
-    context = load_match_context(snapshot_path)
+    snapshot = load_snapshot(snapshot_path)
+    captured_at = None
+    captured_text = (snapshot.get("snapshot_meta") or {}).get("captured_at")
+    if captured_text:
+        try:
+            captured_at = datetime.fromisoformat(str(captured_text).replace("Z", "+00:00"))
+        except ValueError:
+            captured_at = None
+    static_match_key = match_key or build_match_key(snapshot, captured_at=captured_at)
+    context = build_match_context(snapshot, source_path=str(snapshot_path))
     result = recommend_build(
         context,
         refresh_lolalytics=refresh_lolalytics,
         mode=mode,
         tier=tier,
         min_champions_analysed=min_champions_analysed,
+        learned_item_adjustments=learned_item_adjustments,
+        learned_feedback_events=learned_feedback_events,
     )
+    result = freeze_static_recommendation(result, match_key=static_match_key)
     if out_path:
         Path(out_path).parent.mkdir(parents=True, exist_ok=True)
         Path(out_path).write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")

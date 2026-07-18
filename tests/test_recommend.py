@@ -1,3 +1,4 @@
+from src.items import enrich_item, load_items_map
 from src.recommend import (
     MIN_ROUTE_CANDIDATE_PICK_RATE,
     ThreatProfile,
@@ -6,6 +7,7 @@ from src.recommend import (
     _is_pure_defense_item,
     _route_candidate_sets,
     _route_reasons,
+    _route_starter_option,
     _route_starting_reminders,
     _score_route,
     analyze_threats,
@@ -110,3 +112,59 @@ def test_marksman_full_ap_penalty_does_not_hit_mixed_damage():
 
 def test_tear_upgrade_adds_starting_reminder():
     assert _route_starting_reminders([{"item_id": 3004}], {}) == ["開場先買女神之淚"]
+
+
+def _tristana_starting_data():
+    return {
+        "sections": {
+            "Starting Items": [
+                {"item_id": 1001, "name": "Boots"},
+                {"item_id": 3134, "name": "Serrated Dirk", "win_rate": 0.5486},
+            ]
+        }
+    }
+
+
+def test_route_starter_uses_component_tree_for_different_first_items():
+    item_map = load_items_map()
+    build_data = _tristana_starting_data()
+    yun_tal = _route_starter_option(
+        [enrich_item({"item_id": 3032}, item_map)],
+        build_data,
+        item_map,
+    )
+    kraken = _route_starter_option(
+        [enrich_item({"item_id": 6672}, item_map)],
+        build_data,
+        item_map,
+    )
+
+    assert [item["item_id"] for item in yun_tal["items"]] == [1038]
+    assert yun_tal["total_gold"] == 1300
+    assert [item["item_id"] for item in kraken["items"]] == [3051]
+    assert kraken["total_gold"] == 1200
+
+
+def test_route_starter_keeps_lolalytics_package_when_it_matches_first_item():
+    item_map = load_items_map()
+    collector = _route_starter_option(
+        [enrich_item({"item_id": 6676}, item_map)],
+        _tristana_starting_data(),
+        item_map,
+    )
+
+    assert collector["source"] == "lolalytics_starting_items"
+    assert [item["item_id"] for item in collector["items"]] == [1001, 3134]
+    assert collector["win_rate"] == 0.5486
+
+
+def test_route_starter_prioritizes_tear_requirement():
+    item_map = load_items_map()
+    tear_route = _route_starter_option(
+        [enrich_item({"item_id": 3004}, item_map)],
+        _tristana_starting_data(),
+        item_map,
+    )
+
+    assert tear_route["source"] == "route_requirement"
+    assert [item["item_id"] for item in tear_route["items"]] == [3070]

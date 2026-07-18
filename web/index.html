@@ -7,56 +7,138 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
+    <header class="topbar">
+      <div class="brand-block">
+        <h1>LoL Build Assistant</h1>
+        <div class="service-line">
+          <span id="serviceDot" class="service-dot offline" aria-hidden="true"></span>
+          <span id="serviceState">背景服務尚未啟動</span>
+        </div>
+      </div>
+
+      <nav class="tabs" aria-label="主要頁面">
+        <button class="tab active" type="button" data-view="recommendation">本場方案</button>
+        <button class="tab" type="button" data-view="history">歷史</button>
+        <button class="tab" type="button" data-view="health">資料狀態</button>
+      </nav>
+
+      <details class="manual-menu">
+        <summary>手動資料</summary>
+        <div class="manual-panel">
+          <label for="snapshotSelect">Snapshot</label>
+          <select id="snapshotSelect"></select>
+          <button id="snapshotButton" type="button">載入選取資料</button>
+          <button id="refreshButton" type="button">重新抓取目前對局</button>
+        </div>
+      </details>
+    </header>
+
+    <div id="statusBar" class="status-bar" role="status" aria-live="polite"></div>
+
     <main class="app-shell">
-      <header class="topbar">
-        <div>
-          <h1>LoL Build Assistant</h1>
-          <div id="sourceLine" class="source-line">ARAM · LoLalytics · Actually Built Sets 5</div>
+      <section id="recommendationView" class="view active" data-view-panel="recommendation">
+        <div id="emptyState" class="empty-state" hidden>
+          <strong>等待新對局</strong>
+          <span>尚未取得可用的賽前資料。</span>
         </div>
-        <div class="actions">
-          <select id="snapshotSelect" aria-label="Snapshot"></select>
-          <button id="snapshotButton" type="button" title="用下拉選單中的 data/raw/live_* 舊資料重新產生推薦">
-            載入選取 Snapshot
-          </button>
-          <button id="refreshButton" type="button" title="從 Riot 127.0.0.1:2999 讀取正在進行的 loading 或遊戲內資料">
-            抓取目前 Live 對局
-          </button>
-        </div>
-      </header>
 
-      <section id="status" class="status" aria-live="polite"></section>
+        <div id="recommendationContent">
+          <section class="freeze-band" aria-label="方案狀態">
+            <div>
+              <span class="eyebrow">賽前靜態方案</span>
+              <strong id="freezeState">已凍結</strong>
+            </div>
+            <div id="generatedAt" class="muted">-</div>
+            <span id="dataHealthBadge" class="health-badge">資料狀態未知</span>
+          </section>
 
-      <section class="match-strip">
-        <div>
-          <span class="label">英雄</span>
-          <strong id="activeChampion">-</strong>
-        </div>
-        <div>
-          <span class="label">敵方</span>
-          <div id="enemyTeam" class="enemy-team"></div>
-        </div>
-        <div>
-          <span class="label">樣本</span>
-          <strong id="sampleInfo">-</strong>
+          <section class="match-band" aria-label="本場陣容">
+            <div class="active-champion">
+              <img id="activePortrait" alt="" />
+              <div>
+                <span class="eyebrow">我的英雄</span>
+                <strong id="activeChampion">-</strong>
+              </div>
+            </div>
+            <div class="team-column">
+              <span class="eyebrow">我方</span>
+              <div id="allyTeam" class="champion-row"></div>
+            </div>
+            <div class="team-column">
+              <span class="eyebrow">敵方</span>
+              <div id="enemyTeam" class="champion-row"></div>
+            </div>
+            <div class="sample-block">
+              <span class="eyebrow">Champions Analysed</span>
+              <strong id="sampleInfo">-</strong>
+              <span id="sourceLine" class="muted">ARAM</span>
+            </div>
+          </section>
+
+          <div id="compositionNotes" class="observation-band" hidden></div>
+
+          <section class="content-section">
+            <div class="section-head">
+              <h2>鞋子選擇</h2>
+              <span class="section-meta">勝率 · 選取率 · 場次</span>
+            </div>
+            <div id="bootOptions" class="boot-options"></div>
+          </section>
+
+          <section class="content-section">
+            <div class="section-head">
+              <h2>五件成裝路線</h2>
+              <span id="constraintBadge" class="section-meta">Actually Built Sets 5</span>
+            </div>
+            <div id="routes" class="routes"></div>
+          </section>
         </div>
       </section>
 
-      <section class="boot-section">
-        <div class="section-head">
-          <h2>鞋子選擇</h2>
-          <span class="badge">LoLalytics 數據</span>
+      <section id="historyView" class="view" data-view-panel="history" hidden>
+        <div class="view-heading">
+          <div>
+            <span class="eyebrow">本機紀錄</span>
+            <h2>歷史方案與回饋</h2>
+          </div>
+          <span id="historySummary" class="section-meta">-</span>
         </div>
-        <div id="bootOptions" class="boot-options"></div>
+        <div id="historyList" class="history-list"></div>
       </section>
 
-      <section>
-        <div class="section-head">
-          <h2>推薦五件套</h2>
-          <span id="constraintBadge" class="badge">5 件成套</span>
+      <section id="healthView" class="view" data-view-panel="health" hidden>
+        <div class="view-heading">
+          <div>
+            <span class="eyebrow">本機服務</span>
+            <h2>資料與合規狀態</h2>
+          </div>
+          <button id="healthRefresh" type="button" class="quiet-button">重新整理</button>
         </div>
-        <div id="routes" class="routes"></div>
+        <div id="healthGrid" class="health-grid"></div>
+        <section class="boundary-section">
+          <h3>固定資料界線</h3>
+          <div class="boundary-columns">
+            <div>
+              <span class="boundary-label allowed">使用</span>
+              <p>本場可見英雄與隊伍、LoLalytics 聚合數據、Data Dragon 靜態資料、過往本機回饋。</p>
+            </div>
+            <div>
+              <span class="boundary-label blocked">不使用</span>
+              <p>玩家身分、局內金錢與裝備、比分、事件、冷卻、即時位置，以及局內動態改動方案。</p>
+            </div>
+          </div>
+        </section>
       </section>
     </main>
+
+    <footer class="legal-footer">
+      <p>LoL Build Assistant isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
+      <div>
+        <a href="https://developer.riotgames.com/docs/lol" target="_blank" rel="noreferrer">League of Legends policy</a>
+        <a href="https://developer.riotgames.com/policies/general" target="_blank" rel="noreferrer">Riot general policy</a>
+      </div>
+    </footer>
+
     <script src="/app.js"></script>
   </body>
 </html>

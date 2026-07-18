@@ -1,11 +1,17 @@
+from __future__ import annotations
+
 import argparse
 import json
 import sys
 from pathlib import Path
+
+from .autostart import autostart_status, install_autostart, remove_autostart
+from .data_dragon import update_static_data
+from .evaluation import audit_file
 from .live_client import build_match_context, capture_snapshot, load_snapshot
-from .maintenance import apply_cleanup_plan, build_cleanup_plan, format_bytes
-from .recommend import recommend_from_snapshot
 from .lolalytics import DEFAULT_TIER
+from .maintenance import apply_cleanup_plan, build_cleanup_plan, format_bytes
+from .service import RecommendationService
 
 
 def _configure_stdout() -> None:
@@ -16,113 +22,91 @@ def _configure_stdout() -> None:
         pass
 
 
-def _write_recommendation_markdown(result: dict, out_md: str | Path) -> None:
-    active = result.get("active_player") or {}
-    source = result.get("build", {}).get("source", {})
-    boot_options = result.get("build", {}).get("boot_options", [])
-    routes = result.get("build", {}).get("routes", [])
-    lines = [
-        "# LoL Build Assistant 推薦",
-        "",
-        f"- 英雄：{active.get('champion_id') or active.get('champion_name')} ({active.get('position')})",
-        f"- 模式：{(source.get('lolalytics_params') or {}).get('mode', 'aram')}",
-        f"- LoLalytics：{source.get('lolalytics_url')}",
-        f"- Champions Analysed：{source.get('champions_analysed'):,}" if source.get("champions_analysed") else "- Champions Analysed：未知",
-        f"- 成套限制：{source.get('built_sets_tab', 'Actually Built Sets: 5')}，五件非鞋成裝必須同時出現在該表",
-        "",
-        "## 敵方陣容",
-        "",
-    ]
-    for enemy in result.get("enemy_team", []):
-        lines.append(f"- {enemy.get('champion')} ({enemy.get('position')})")
-    lines.extend(["", "## 鞋子選擇", ""])
-    for boot_index, boot in enumerate(boot_options, start=1):
-        boot_display = boot.get("display_name") or boot.get("zh_tw_name") or boot.get("name")
-        win_rate = f"{boot.get('win_rate') * 100:.2f}%" if isinstance(boot.get("win_rate"), (int, float)) else "-"
-        pick_rate = f"{boot.get('pick_rate') * 100:.2f}%" if isinstance(boot.get("pick_rate"), (int, float)) else "-"
-        games = f"{int(boot.get('games')):,}" if isinstance(boot.get("games"), int) else "-"
-        lines.append(
-            f"{boot_index}. {boot_display} / {boot.get('name')} (`{boot.get('item_id')}`) "
-            f"- 勝率 {win_rate} / 選取率 {pick_rate} / 場次 {games}"
-        )
-    lines.extend(["", "## 推薦五件套路線", ""])
-    for route_index, route in enumerate(routes, start=1):
-        stats = route.get("set_stats") or {}
-        params = (route.get("source") or {}).get("lolalytics_params") or {}
-        lines.append(f"### 路線 {route_index}：{route.get('label')}")
-        lines.append("")
-        item_names = [
-            f"{item.get('display_name') or item.get('zh_tw_name') or item.get('name')} (`{item.get('item_id')}`)"
-            for item in route.get("items", [])
-        ]
-        lines.append(f"- 五件成裝：{' > '.join(item_names)}")
-        for reminder in route.get("starting_reminders", []):
-            lines.append(f"- 開場提醒：{reminder}")
-        if stats:
-            lines.append(
-                "- LoLalytics set："
-                f"勝率 {(stats.get('win_rate') or 0) * 100:.2f}% / "
-                f"選取率 {(stats.get('pick_rate') or 0) * 100:.2f}% / "
-                f"{int(stats.get('games') or 0):,} 場 / "
-                f"window={params.get('patch', '7')}"
-            )
-        for reason in route.get("reasons", []):
-            lines.append(f"- {reason}")
-        lines.append("")
-    lines.extend(
-        [
-            "## 合規邊界",
-            "",
-            "- 只使用 Riot 本機 Live Client Data API 的遊戲內可見資料。",
-            "- 不分析敵方玩家個人帳號、牌位、勝率或歷史戰績。",
-            "- 不自動操作遊戲、不讀記憶體、不繞過 Riot / Vanguard。",
-        ]
-    )
-    out_path = Path(out_md)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+def _add_recommendation_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--out", default="data/processed/live_recommendation.json")
+    parser.add_argument("--out-md", default="data/processed/live_recommendation.md")
+    parser.add_argument("--mode", default="aram")
+    parser.add_argument("--tier", default=DEFAULT_TIER)
+    parser.add_argument("--min-champions-analysed", type=int, default=1_000_000)
+    parser.add_argument("--refresh-lolalytics", action="store_true")
+    parser.add_argument("--cache-max-age-hours", type=int, default=168)
 
 
-def parse_args(argv: list[str] | None = None):
-    p = argparse.ArgumentParser()
-    sub = p.add_subparsers(dest="command", required=True)
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Static pre-game ARAM build assistant")
+    commands = parser.add_subparsers(dest="command", required=True)
 
-    snap = sub.add_parser("snapshot-live", help="capture Riot Live Client Data API JSON")
-    snap.add_argument("--out-dir", default=None)
-    snap.add_argument("--timeout", type=float, default=5.0)
+    snapshot = commands.add_parser("snapshot-live", help="capture a sanitized static snapshot")
+    snapshot.add_argument("--out-dir", default=None)
+    snapshot.add_argument("--timeout", type=float, default=5.0)
 
-    ctx = sub.add_parser("context", help="build match context JSON from a live snapshot")
-    ctx.add_argument("--snapshot", required=True)
-    ctx.add_argument("--out", required=True)
+    context = commands.add_parser("context", help="build match context JSON from a snapshot")
+    context.add_argument("--snapshot", required=True)
+    context.add_argument("--out", required=True)
 
-    rec = sub.add_parser("recommend-live", help="recommend a build from a live snapshot")
-    rec.add_argument("--snapshot", default=None, help="snapshot directory; captures live data when omitted")
-    rec.add_argument("--out", default="data/processed/live_recommendation.json")
-    rec.add_argument("--out-md", default="data/processed/live_recommendation.md")
-    rec.add_argument("--refresh-lolalytics", action="store_true")
-    rec.add_argument("--mode", default="aram", help="LoLalytics mode; default is aram")
-    rec.add_argument("--tier", default=DEFAULT_TIER, help=f"LoLalytics tier; default is {DEFAULT_TIER}")
-    rec.add_argument("--min-champions-analysed", type=int, default=1_000_000)
+    recommend = commands.add_parser("recommend-live", help="generate one frozen recommendation")
+    recommend.add_argument("--snapshot", default=None)
+    _add_recommendation_options(recommend)
 
-    serve = sub.add_parser("serve", help="start local web UI")
+    serve = commands.add_parser("serve", help="start the browser UI without match detection")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8765)
-    serve.add_argument("--out", default="data/processed/live_recommendation.json")
-    serve.add_argument("--mode", default="aram")
-    serve.add_argument("--tier", default=DEFAULT_TIER)
-    serve.add_argument("--min-champions-analysed", type=int, default=1_000_000)
-    serve.add_argument("--refresh-lolalytics", action="store_true")
+    _add_recommendation_options(serve)
 
-    cleanup = sub.add_parser("cleanup", help="preview or apply the maintenance storage policy")
+    watch = commands.add_parser("watch", help="start UI and detect new matches automatically")
+    watch.add_argument("--host", default="127.0.0.1")
+    watch.add_argument("--port", type=int, default=8765)
+    watch.add_argument("--poll-interval", type=float, default=3.0)
+    watch.add_argument("--no-auto-open", action="store_true")
+    _add_recommendation_options(watch)
+
+    sync = commands.add_parser("sync-data", help="refresh Riot Data Dragon static metadata")
+    sync.add_argument("--force", action="store_true")
+
+    startup = commands.add_parser("autostart", help="manage Windows sign-in startup")
+    startup.add_argument("action", choices=("install", "remove", "status"))
+
+    audit = commands.add_parser("audit", help="audit a frozen recommendation")
+    audit.add_argument(
+        "--recommendation",
+        default="data/processed/live_recommendation.json",
+    )
+
+    cleanup = commands.add_parser("cleanup", help="preview or apply the storage policy")
     cleanup.add_argument("--keep-snapshots", type=int, default=5)
-    cleanup.add_argument("--apply", action="store_true", help="delete planned files; default is preview only")
+    cleanup.add_argument("--apply", action="store_true")
 
-    return p.parse_args(argv)
+    return parser.parse_args(argv)
+
+
+def _service_from_args(args: argparse.Namespace) -> RecommendationService:
+    return RecommendationService(
+        out_path=args.out,
+        out_markdown_path=args.out_md,
+        mode=args.mode,
+        tier=args.tier,
+        min_champions_analysed=args.min_champions_analysed,
+        refresh_lolalytics=args.refresh_lolalytics,
+        cache_max_age_hours=args.cache_max_age_hours,
+    )
+
+
+def _print_recommendation(result: dict, out: str, out_md: str) -> None:
+    print(f"[ok] recommendation -> {out}")
+    print(f"[ok] readable report -> {out_md}")
+    routes = result.get("build", {}).get("routes") or []
+    boots = result.get("build", {}).get("boot_options") or []
+    if boots:
+        print("[ok] boot options -> " + " | ".join(boot.get("display_name") or boot.get("name") for boot in boots))
+    if routes:
+        print("[ok] routes -> " + " | ".join(route.get("label", "route") for route in routes))
+    print("[ok] result is frozen for this match and will not change during play")
 
 
 def main(argv: list[str] | None = None) -> None:
     _configure_stdout()
     args = parse_args(argv)
+
     if args.command == "cleanup":
         plan = build_cleanup_plan(keep_snapshots=args.keep_snapshots)
         for entry in plan.entries:
@@ -138,64 +122,73 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.command == "snapshot-live":
         path = capture_snapshot(out_dir=args.out_dir, timeout=args.timeout)
-        print(f"[ok] snapshot -> {path}")
+        print(f"[ok] sanitized snapshot -> {path}")
         return
 
     if args.command == "context":
         context = build_match_context(load_snapshot(args.snapshot), source_path=args.snapshot)
-        with open(args.out, "w", encoding="utf-8") as f:
-            json.dump(context, f, ensure_ascii=False, indent=2)
+        Path(args.out).write_text(json.dumps(context, ensure_ascii=False, indent=2), encoding="utf-8")
         active = context.get("active_player") or {}
         print(f"[ok] context -> {args.out}")
         print(f"[ok] active champion -> {active.get('champion_id') or active.get('champion_name')}")
         return
 
     if args.command == "recommend-live":
-        snapshot = args.snapshot
-        if snapshot is None:
-            try:
-                snapshot = str(capture_snapshot())
-            except Exception as exc:
-                raise SystemExit(
-                    "[error] Riot Live Client Data API is not available at https://127.0.0.1:2999.\n"
-                    "        請確認你已經進入 loading 畫面或遊戲內；只在 client/lobby/選角時通常抓不到。\n"
-                    f"        detail: {exc}"
-                )
-            print(f"[ok] snapshot -> {snapshot}")
-        result = recommend_from_snapshot(
-            snapshot,
-            out_path=args.out,
-            refresh_lolalytics=args.refresh_lolalytics,
-            mode=args.mode,
-            tier=args.tier,
-            min_champions_analysed=args.min_champions_analysed,
-        )
-        _write_recommendation_markdown(result, args.out_md)
-        print(f"[ok] recommendation -> {args.out}")
-        print(f"[ok] readable report -> {args.out_md}")
-        primary = (result.get("build", {}).get("routes") or [{}])[0]
-        boot_options = result.get("build", {}).get("boot_options") or []
-        if boot_options:
-            print("[ok] boot options -> " + " | ".join(boot.get("display_name") or boot.get("name") for boot in boot_options))
-        print("[ok] 5-item set -> " + " > ".join(item.get("display_name") or item["name"] for item in primary.get("items", [])))
-        if len(result.get("build", {}).get("routes", [])) > 1:
-            labels = " | ".join(route.get("label", "route") for route in result["build"]["routes"])
-            print(f"[ok] routes -> {labels}")
+        service = _service_from_args(args)
+        try:
+            if args.snapshot:
+                result = service.recommend_snapshot(args.snapshot)
+            else:
+                snapshot, result = service.capture_and_recommend()
+                print(f"[ok] sanitized snapshot -> {snapshot}")
+        except Exception as exc:
+            raise SystemExit(
+                "[error] 無法產生本場方案。請確認已進入 loading 畫面或遊戲內，"
+                "且本機 127.0.0.1:2999 可用。\n"
+                f"        detail: {exc}"
+            ) from exc
+        _print_recommendation(result, args.out, args.out_md)
         return
 
     if args.command == "serve":
         from .server import serve
 
-        serve(
+        serve(host=args.host, port=args.port, service=_service_from_args(args))
+        return
+
+    if args.command == "watch":
+        from .watcher import run_assistant
+
+        run_assistant(
             host=args.host,
             port=args.port,
-            out_path=args.out,
-            mode=args.mode,
-            tier=args.tier,
-            min_champions_analysed=args.min_champions_analysed,
-            refresh_lolalytics=args.refresh_lolalytics,
+            poll_interval=args.poll_interval,
+            auto_open=not args.no_auto_open,
+            service=_service_from_args(args),
         )
         return
+
+    if args.command == "sync-data":
+        result = update_static_data(force=args.force)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return
+
+    if args.command == "autostart":
+        if args.action == "install":
+            path = install_autostart()
+            print(f"[ok] Windows 登入啟動已安裝 -> {path}")
+        elif args.action == "remove":
+            print("[ok] Windows 登入啟動已移除" if remove_autostart() else "[ok] 尚未安裝")
+        else:
+            print(json.dumps(autostart_status(), ensure_ascii=False, indent=2))
+        return
+
+    if args.command == "audit":
+        report = audit_file(args.recommendation)
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        if not report["passed"]:
+            raise SystemExit(1)
+
 
 if __name__ == "__main__":
     main()

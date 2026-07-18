@@ -18,4 +18,6 @@ data/cache/
 data/raw/
 data/debug/
 data/processed/
+data/history/
+data/runtime/
 data/ref/items_map_*.csv

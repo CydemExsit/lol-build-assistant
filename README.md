@@ -1,105 +1,95 @@
 # LoL Build Assistant
 
-英雄聯盟 ARAM 出裝助手。程式會透過 Riot 本機 Live Client Data API 辨識目前對局的十位英雄、敵我隊伍與自己的英雄，再依 LoLalytics ARAM 統計、敵方陣容及個人偏好產生推薦。
+英雄聯盟 ARAM 賽前出裝助手。背景服務會在 Riot 本機 Live Client Data API 出現新對局時辨識十位英雄、敵我隊伍與自己的英雄，開啟瀏覽器，並依 LoLalytics 聚合數據產生一次性的靜態方案。
 
-目前推薦規則：
+## 目前行為
 
-- 預設使用 `aram`、`gold_plus` 與最近 7 天資料；樣本不足時依序擴大到 14、30 天。
-- 五件非鞋成裝必須是 LoLalytics `Actually Built Sets: 5` 真實出現過的完整套裝。
-- 鞋子獨立列出，只呈現勝率、選取率與場次。
-- 綜合相對勝率、選取率、樣本量、敵方傷害類型與英雄路線，提供最多三種方向。
-- 套用 [user_preferences.json](data/ref/user_preferences.json) 中的喜好、防禦傾向、厭惡裝備與女神之淚提醒。
-- 使用 Riot Data Dragon 的繁體中文物品名稱與圖示。
+- 固定 ARAM，預設 `gold_plus` 與最近 7 天；Champions Analysed 不足時才擴大資料窗。
+- 五件非鞋成裝必須完整出現在 LoLalytics `Actually Built Sets: 5`。
+- 候選套裝以選取率百分比過濾，不用固定組數截斷完整資料。
+- 鞋子獨立列出，照搬勝率、選取率與場次。
+- 同時提供最多三條靜態路線、成裝順序、樣本可信度與陣容觀察。
+- 每條路線依第一件成裝提供自己的起手銜接；能對應時採用 LoLalytics 起手，否則使用 Data Dragon 合成樹。
+- 使用 Riot Data Dragon 的繁體中文裝備名稱，並自動同步靜態資料版本。
+- 路線回饋只存在本機，下一場才會成為小幅個人偏好調整。
+- 每場方案產生後立即凍結，局內不重新分析或改動。
 
-## 安裝
+## 一次性安裝
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m playwright install chromium
-python scripts/build_items_map.py --lang zh_TW
+python -m src.main sync-data --force
+python -m src.main autostart install
 ```
 
-`items_map.csv` 已包含在專案內；只有遊戲版本更新或物品名稱需要同步時，才需要重新執行最後一行。
+完成後，Windows 登入時會在背景啟動。沒有遊戲時只會等待；發現新對局後會自動開啟 [http://127.0.0.1:8765](http://127.0.0.1:8765)，不需要再輸入命令。
 
-## Web 介面
+移除 Windows 登入啟動：
+
+```powershell
+python -m src.main autostart remove
+```
+
+## 瀏覽器介面
+
+- `本場方案`：陣容、鞋子，以及各自附帶起手銜接的三條五件成裝路線。
+- `歷史`：本機方案紀錄、套路回饋及手動勝敗標記。
+- `資料狀態`：Data Dragon 版本、LoLalytics 快取、本機學習與合規資料界線。
+- 路線右上角箭頭可在本場置頂；`適合我` / `不適合` 會影響後續對局，不會改動當前凍結方案。
+- `手動資料` 保留舊 Snapshot 重算與目前對局重新抓取，供維護與除錯使用。
+
+## 手動啟動
+
+背景偵測與 UI：
+
+```powershell
+python -m src.main watch
+```
+
+只開 UI、不偵測新對局：
 
 ```powershell
 python -m src.main serve
 ```
 
-開啟 [http://127.0.0.1:8765](http://127.0.0.1:8765)。
-
-- `載入選取 Snapshot`：用下拉選單中已保存的對局重新計算，不需要遊戲仍在進行。
-- `抓取目前 Live 對局`：即時讀取 `https://127.0.0.1:2999/liveclientdata/*`、保存 Snapshot，並產生推薦；必須已進入 loading 畫面或遊戲內。
-- 推薦路線可手動置頂；選擇只保存在目前瀏覽器。
-
-執行結果會寫入：
-
-- `data/processed/live_recommendation.json`
-- `data/processed/live_recommendation.md`
-- `data/raw/live_*` 對局 Snapshot
-- `data/cache/` 可重建的 LoLalytics 統計快取
-
-## CLI
-
-直接抓取目前對局並推薦：
-
-```powershell
-python -m src.main recommend-live
-```
-
-使用既有 Snapshot：
+使用既有 Snapshot 產生凍結方案：
 
 ```powershell
 python -m src.main recommend-live --snapshot data/raw/live_YYYYMMDD_HHMMSS
 ```
 
-只保存目前對局：
+## 資料與維護
 
-```powershell
-python -m src.main snapshot-live
-```
+- `data/raw/live_*`：已去識別化的靜態對局 Snapshot。
+- `data/cache/`：可重建的 LoLalytics 統計快取。
+- `data/processed/`：目前凍結方案 JSON 與 Markdown。
+- `data/history/assistant.db`：本機歷史、回饋與手動勝敗。
+- `data/ref/`：Data Dragon 裝備、英雄與個人偏好。
 
-所有子命令與選項：
-
-```powershell
-python -m src.main --help
-python -m src.main recommend-live --help
-```
-
-## 維護清理
-
-預覽可清理項目，不會刪除任何檔案：
+預覽或套用儲存空間清理：
 
 ```powershell
 python -m src.main cleanup
-```
-
-套用預設策略：
-
-```powershell
 python -m src.main cleanup --apply
 ```
 
-預設保留最新 5 份 Snapshot、正式推薦輸出與有效 JSON 統計快取；清除舊 Snapshot、可重建 HTML、空白或舊格式快取、測試畫面、暫存輸出及 Python 快取。可自行調整保留數量：
+預設保留最新 5 份 Snapshot；不會刪除本機歷史、個人偏好、Data Dragon 參考表、虛擬環境或程式碼。
+
+## 驗證
 
 ```powershell
-python -m src.main cleanup --keep-snapshots 10 --apply
-```
-
-清理指令不會碰觸 `.venv`、`.git`、物品表、個人偏好或正式程式碼。
-
-## 測試
-
-```powershell
-python -B -m pytest -q -p no:cacheprovider
+python -B -m pytest -q
 node --check web/app.js
+python -B -m src.main audit
 ```
 
-## Riot 合規邊界
+`audit` 會檢查凍結標記、私人/動態欄位、五件唯一非鞋成裝、Actually Built Sets 樣本與鞋子類型。
 
-本專案只讀取 Riot 官方本機 Live Client Data API 在當前遊戲中可見的資料，以及 LoLalytics 聚合統計與 Riot Data Dragon 靜態資料。它不分析敵方玩家的個人帳號或歷史戰績、不讀取遊戲記憶體、不注入程序、不繞過 Vanguard，也不自動操作遊戲。
+## Riot 合規
 
-Live Client Data API 在未進入對局時無法連線是正常情況；既有 Snapshot 仍可離線重新載入，缺少的 LoLalytics 快取則需要網路。
+完整資料界線見 [COMPLIANCE.md](COMPLIANCE.md)。本專案只產生多個賽前靜態選項，不依局內資訊替玩家指揮決策。Riot 的政策可能更新；若要公開散布，仍須依當時規則完成產品註冊與審核。
+
+LoL Build Assistant isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
