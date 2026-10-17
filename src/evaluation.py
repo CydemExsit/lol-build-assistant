@@ -90,6 +90,25 @@ def audit_recommendation(result: dict[str, Any]) -> dict[str, Any]:
         if item_id in item_map and not is_boot(item_map[item_id]):
             errors.append(f"boot option {item_id} is not tagged as boots")
 
+    damage_analysis = result.get("damage_analysis") or {}
+    damage_mix = damage_analysis.get("damage_mix") or {}
+    if damage_mix:
+        damage_values = [
+            float(damage_mix.get(key) or 0.0)
+            for key in ("physical", "magic", "true")
+        ]
+        if any(value < 0 or value > 1 for value in damage_values):
+            errors.append("damage analysis contains an invalid share")
+        if abs(sum(damage_values) - 1.0) > 0.02:
+            errors.append("damage analysis shares do not sum to 100%")
+
+    defensive_options = result.get("build", {}).get("defensive_options") or []
+    for option in defensive_options:
+        item_id = int(option.get("item_id") or 0)
+        metadata = item_map.get(item_id)
+        if not metadata or not is_completed_non_boot_item(metadata):
+            errors.append(f"defensive option {item_id} is not a completed non-boot item")
+
     return {
         "passed": not errors,
         "errors": errors,
@@ -98,6 +117,7 @@ def audit_recommendation(result: dict[str, Any]) -> dict[str, Any]:
             "routes": len(routes),
             "route_starters": starter_count,
             "boot_options": len(boots),
+            "defensive_options": len(defensive_options),
             "champions_analysed": int(source.get("champions_analysed") or 0),
             "data_health": data_health.get("level") or "unknown",
         },

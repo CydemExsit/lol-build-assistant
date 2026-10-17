@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "ddragon_version": "16.14.1",
+  "method": "Static ARAM-oriented estimates. Damage shares are normalized, then weighted by expected teamfight damage contribution.",
+  "profiles": {
+    "akali": {
+      "physical": 0.25,
+      "magic": 0.72,
+      "true": 0.03,
+      "output_weight": 0.85,
+      "confidence": 0.75
+    },
+    "alistar": {
+      "physical": 0.1,
+      "magic": 0.85,
+      "true": 0.05,
+      "output_weight": 0.2,
+      "confidence": 0.85
+    },
+    "bard": {
+      "physical": 0.2,
+      "magic": 0.75,
+      "true": 0.05,
+      "output_weight": 0.4,
+      "confidence": 0.75
+    },
+    "braum": {
+      "physical": 0.3,
+      "magic": 0.65,
+      "true": 0.05,
+      "output_weight": 0.2,
+      "confidence": 0.8
+    },
+    "camille": {
+      "physical": 0.65,
+      "magic": 0.05,
+      "true": 0.3,
+      "output_weight": 0.85,
+      "confidence": 0.8
+    },
+    "cassiopeia": {
+      "physical": 0.0,
+      "magic": 0.95,
+      "true": 0.05,
+      "output_weight": 0.9,
+      "confidence": 0.9
+    },
+    "chogath": {
+      "physical": 0.05,
+      "magic": 0.75,
+      "true": 0.2,
+      "output_weight": 0.55,
+      "confidence": 0.85
+    },
+    "corki": {
+      "physical": 0.75,
+      "magic": 0.15,
+      "true": 0.1,
+      "output_weight": 0.9,
+      "confidence": 0.65
+    },
+    "darius": {
+      "physical": 0.76,
+      "magic": 0.04,
+      "true": 0.2,
+      "output_weight": 0.85,
+      "confidence": 0.85
+    },
+    "ezreal": {
+      "physical": 0.65,
+      "magic": 0.32,
+      "true": 0.03,
+      "output_weight": 0.9,
+      "confidence": 0.75
+    },
+    "fiora": {
+      "physical": 0.65,
+      "magic": 0.05,
+      "true": 0.3,
+      "output_weight": 0.85,
+      "confidence": 0.85
+    },
+    "garen": {
+      "physical": 0.78,
+      "magic": 0.02,
+      "true": 0.2,
+      "output_weight": 0.8,
+      "confidence": 0.85
+    },
+    "gwen": {
+      "physical": 0.08,
+      "magic": 0.72,
+      "true": 0.2,
+      "output_weight": 0.85,
+      "confidence": 0.85
+    },
+    "hwei": {
+      "physical": 0.01,
+      "magic": 0.94,
+      "true": 0.05,
+      "output_weight": 0.9,
+      "confidence": 0.9
+    },
+    "jax": {
+      "physical": 0.55,
+      "magic": 0.42,
+      "true": 0.03,
+      "output_weight": 0.85,
+      "confidence": 0.75
+    },
+    "kaisa": {
+      "physical": 0.5,
+      "magic": 0.47,
+      "true": 0.03,
+      "output_weight": 0.9,
+      "confidence": 0.7
+    },
+    "katarina": {
+      "physical": 0.35,
+      "magic": 0.6,
+      "true": 0.05,
+      "output_weight": 0.9,
+      "confidence": 0.65
+    },
+    "kayle": {
+      "physical": 0.35,
+      "magic": 0.6,
+      "true": 0.05,
+      "output_weight": 0.9,
+      "confidence": 0.7
+    },
+    "kogmaw": {
+      "physical": 0.43,
+      "magic": 0.54,
+      "true": 0.03,
+      "output_weight": 0.9,
+      "confidence": 0.65
+    },
+    "leona": {
+      "physical": 0.1,
+      "magic": 0.85,
+      "true": 0.05,
+      "output_weight": 0.2,
+      "confidence": 0.9
+    },
+    "masteryi": {
+      "physical": 0.65,
+      "magic": 0.08,
+      "true": 0.27,
+      "output_weight": 0.9,
+      "confidence": 0.85
+    },
+    "milio": {
+      "physical": 0.05,
+      "magic": 0.9,
+      "true": 0.05,
+      "output_weight": 0.15,
+      "confidence": 0.8
+    },
+    "olaf": {
+      "physical": 0.82,
+      "magic": 0.03,
+      "true": 0.15,
+      "output_weight": 0.85,
+      "confidence": 0.8
+    },
+    "ornn": {
+      "physical": 0.2,
+      "magic": 0.75,
+      "true": 0.05,
+      "output_weight": 0.45,
+      "confidence": 0.8
+    },
+    "rakan": {
+      "physical": 0.1,
+      "magic": 0.85,
+      "true": 0.05,
+      "output_weight": 0.25,
+      "confidence": 0.8
+    },
+    "rell": {
+      "physical": 0.1,
+      "magic": 0.85,
+      "true": 0.05,
+      "output_weight": 0.2,
+      "confidence": 0.85
+    },
+    "renata": {
+      "physical": 0.15,
+      "magic": 0.8,
+      "true": 0.05,
+      "output_weight": 0.3,
+      "confidence": 0.75
+    },
+    "rumble": {
+      "physical": 0.03,
+      "magic": 0.94,
+      "true": 0.03,
+      "output_weight": 0.85,
+      "confidence": 0.9
+    },
+    "sett": {
+      "physical": 0.72,
+      "magic": 0.03,
+      "true": 0.25,
+      "output_weight": 0.82,
+      "confidence": 0.85
+    },
+    "shaco": {
+      "physical": 0.5,
+      "magic": 0.45,
+      "true": 0.05,
+      "output_weight": 0.75,
+      "confidence": 0.55
+    },
+    "shen": {
+      "physical": 0.35,
+      "magic": 0.6,
+      "true": 0.05,
+      "output_weight": 0.45,
+      "confidence": 0.75
+    },
+    "shyvana": {
+      "physical": 0.35,
+      "magic": 0.62,
+      "true": 0.03,
+      "output_weight": 0.8,
+      "confidence": 0.6
+    },
+    "skarner": {
+      "physical": 0.55,
+      "magic": 0.4,
+      "true": 0.05,
+      "output_weight": 0.65,
+      "confidence": 0.65
+    },
+    "smolder": {
+      "physical": 0.68,
+      "magic": 0.17,
+      "true": 0.15,
+      "output_weight": 0.9,
+      "confidence": 0.75
+    },
+    "taric": {
+      "physical": 0.2,
+      "magic": 0.75,
+      "true": 0.05,
+      "output_weight": 0.25,
+      "confidence": 0.8
+    },
+    "thresh": {
+      "physical": 0.2,
+      "magic": 0.75,
+      "true": 0.05,
+      "output_weight": 0.3,
+      "confidence": 0.7
+    },
+    "udyr": {
+      "physical": 0.45,
+      "magic": 0.5,
+      "true": 0.05,
+      "output_weight": 0.75,
+      "confidence": 0.6
+    },
+    "varus": {
+      "physical": 0.55,
+      "magic": 0.42,
+      "true": 0.03,
+      "output_weight": 0.9,
+      "confidence": 0.65
+    },
+    "vayne": {
+      "physical": 0.43,
+      "magic": 0.05,
+      "true": 0.52,
+      "output_weight": 0.9,
+      "confidence": 0.9
+    },
+    "velkoz": {
+      "physical": 0.02,
+      "magic": 0.73,
+      "true": 0.25,
+      "output_weight": 0.9,
+      "confidence": 0.9
+    },
+    "volibear": {
+      "physical": 0.42,
+      "magic": 0.55,
+      "true": 0.03,
+      "output_weight": 0.8,
+      "confidence": 0.65
+    },
+    "warwick": {
+      "physical": 0.45,
+      "magic": 0.48,
+      "true": 0.07,
+      "output_weight": 0.7,
+      "confidence": 0.85
+    },
+    "yone": {
+      "physical": 0.47,
+      "magic": 0.47,
+      "true": 0.06,
+      "output_weight": 0.9,
+      "confidence": 0.8
+    },
+    "yuumi": {
+      "physical": 0.05,
+      "magic": 0.9,
+      "true": 0.05,
+      "output_weight": 0.2,
+      "confidence": 0.8
+    }
+  }
+}

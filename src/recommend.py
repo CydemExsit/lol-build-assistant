@@ -13,14 +13,14 @@ from .health import assess_recommendation_data
 from .items import enrich_item, is_boot, is_completed_non_boot_item, load_items_map
 from .live_client import build_match_context, build_match_key, load_snapshot
 from .lolalytics import (
+    DEFAULT_CACHE_MAX_AGE_HOURS,
     DEFAULT_MODE,
     DEFAULT_PATCH,
     DEFAULT_TIER,
     built_sets_cache_path_for,
     fetch_actual_built_sets_5,
     fetch_boot_pair_stats,
-    fetch_boot_stats,
-    fetch_item_stats,
+    fetch_stat_tables,
     load_best_build,
 )
 
@@ -236,6 +236,18 @@ POKE_ITEM_IDS = {126697, 6697, 3004, 6676, 6694, 3814, 3142, 6696, 6699, 3179, 6
 ON_HIT_ITEM_IDS = {3153, 3124, 3091, 3302, 6672, 3085, 3095, 6675, 3004}
 CRIT_ITEM_IDS = {3031, 3036, 3033, 6672, 6673, 6676, 3085, 3095, 3508, 3032}
 DEFENSIVE_ITEM_IDS = {6665, 3072, 3139, 3143, 3156, 3078, 2502, 2504, 2501, 3742}
+MATCHUP_DEFENSIVE_OPTIONS = {
+    "magic": [
+        (2504, "pure_defense", "大型魔法護盾，優先承受高比例魔法爆發與消耗"),
+        (4401, "pure_defense", "多名持續施法來源時，長時間交戰的魔防收益更高"),
+        (3156, "hybrid_defense", "需要保留輸出時，以攻擊力與魔法護盾換取生存"),
+    ],
+    "physical": [
+        (3143, "pure_defense", "高物理壓力下提供生命與護甲，並降低暴擊爆發"),
+        (3110, "pure_defense", "面對持續普攻與攻速來源時提供大量護甲"),
+        (3075, "pure_defense", "敵方回復或普攻壓力高時，以護甲與重創反制"),
+    ],
+}
 MARKSMAN_CHAMPIONS = {
     "akshan",
     "aphelios",
@@ -279,6 +291,7 @@ PHYSICAL_OUTPUT_TAGS = {"Damage", "AttackSpeed", "CriticalStrike", "OnHit", "Arm
 DEFENSIVE_ITEM_TAGS = {"Health", "Armor", "SpellBlock", "MagicResist"}
 TEAR_ITEM_ID = 3070
 TEAR_UPGRADE_ITEM_IDS = {3003, 3004, 3040, 3042, 3121}
+STARTER_POTION_ITEM_IDS = {2003, 2031, 2033}
 DEFAULT_STARTER_BUDGET = 1400
 MULTI_ROUTE_CHAMPIONS = {
     "ashe",
@@ -306,14 +319,42 @@ MEDIUM_CONFIDENCE_GAMES = 8
 HIGH_CONFIDENCE_PICK_RATE = 0.001
 HIGH_CONFIDENCE_GAMES = 75
 DEFAULT_USER_PREFERENCES_PATH = Path("data/ref/user_preferences.json")
+DEFAULT_CHAMPION_MAP_PATH = Path("data/ref/champions_map.json")
+DEFAULT_DAMAGE_PROFILES_PATH = Path("data/ref/champion_damage_profiles.json")
 DEFAULT_USER_PREFERENCES = {
     "item_score_adjustments": {"3153": 1.6, "3072": 1.6, "3157": -3.0, "3139": -2.7},
     "extreme_damage_enemy_count": 4,
+    "extreme_damage_share": 0.72,
+    "extreme_damage_pressure": 0.55,
+    "heavy_damage_share": 0.62,
+    "heavy_damage_pressure": 0.45,
     "extreme_pure_defense_item_bonus": 1.8,
     "extreme_multi_defense_route_bonus": 1.5,
     "marksman_full_ap_min_items": 4,
     "marksman_full_ap_route_penalty": 6.0,
 }
+
+
+@dataclass(frozen=True)
+class ChampionDamageProfile:
+    champion_slug: str
+    physical_share: float
+    magic_share: float
+    true_share: float
+    output_weight: float
+    confidence: float
+    source: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "champion_slug": self.champion_slug,
+            "physical": round(self.physical_share, 4),
+            "magic": round(self.magic_share, 4),
+            "true": round(self.true_share, 4),
+            "output_weight": round(self.output_weight, 4),
+            "confidence": round(self.confidence, 4),
+            "source": self.source,
+        }
 
 
 @dataclass(frozen=True)
@@ -324,15 +365,31 @@ class ThreatProfile:
     cc_count: int
     shield_count: int
     healing_count: int
+    true_count: int = 0
+    physical_share: float = 0.0
+    magic_share: float = 0.0
+    true_share: float = 0.0
+    output_weight: float = 0.0
+    profile_confidence: float = 0.0
+    champion_profiles: tuple[ChampionDamageProfile, ...] = ()
 
-    def to_dict(self) -> dict[str, int]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "magic_count": self.magic_count,
             "physical_count": self.physical_count,
+            "true_count": self.true_count,
             "tank_count": self.tank_count,
             "cc_count": self.cc_count,
             "shield_count": self.shield_count,
             "healing_count": self.healing_count,
+            "damage_mix": {
+                "physical": round(self.physical_share, 4),
+                "magic": round(self.magic_share, 4),
+                "true": round(self.true_share, 4),
+            },
+            "output_weight": round(self.output_weight, 4),
+            "profile_confidence": round(self.profile_confidence, 4),
+            "champions": [profile.to_dict() for profile in self.champion_profiles],
         }
 
 
@@ -387,6 +444,111 @@ def load_user_preferences(path: str | Path = DEFAULT_USER_PREFERENCES_PATH) -> d
     return preferences
 
 
+def _load_champion_tags(path: str | Path = DEFAULT_CHAMPION_MAP_PATH) -> dict[str, set[str]]:
+    target = Path(path)
+    if not target.exists():
+        return {}
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        return {}
+    return {
+        str(slug): {str(tag) for tag in (metadata.get("tags") or [])}
+        for slug, metadata in payload.items()
+        if isinstance(metadata, dict)
+    }
+
+
+def _load_damage_profile_overrides(
+    path: str | Path = DEFAULT_DAMAGE_PROFILES_PATH,
+) -> dict[str, dict[str, Any]]:
+    target = Path(path)
+    if not target.exists():
+        return {}
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    profiles = payload.get("profiles") if isinstance(payload, dict) else None
+    if not isinstance(profiles, dict):
+        return {}
+    return {
+        str(slug): profile
+        for slug, profile in profiles.items()
+        if isinstance(profile, dict)
+    }
+
+
+def _default_output_weight(tags: set[str]) -> float:
+    if {"Tank", "Support"} <= tags:
+        return 0.25
+    if "Marksman" in tags:
+        return 0.90
+    if "Mage" in tags or "Assassin" in tags:
+        return 0.88
+    if "Fighter" in tags:
+        return 0.82
+    if "Tank" in tags:
+        return 0.50
+    if "Support" in tags:
+        return 0.40
+    return 0.70
+
+
+def _default_damage_shares(champion_slug: str, tags: set[str]) -> tuple[float, float, float, float]:
+    is_magic = champion_slug in MAGIC_THREATS
+    is_physical = champion_slug in PHYSICAL_THREATS
+    if is_magic and is_physical:
+        return 0.45, 0.50, 0.05, 0.72
+    if is_magic:
+        return 0.04, 0.93, 0.03, 0.72
+    if is_physical:
+        return 0.93, 0.04, 0.03, 0.72
+    if "Mage" in tags:
+        return 0.04, 0.93, 0.03, 0.52
+    if "Marksman" in tags:
+        return 0.92, 0.05, 0.03, 0.52
+    if "Assassin" in tags or "Fighter" in tags:
+        return 0.88, 0.08, 0.04, 0.48
+    if "Tank" in tags or "Support" in tags:
+        return 0.15, 0.80, 0.05, 0.45
+    return 0.45, 0.50, 0.05, 0.35
+
+
+def _champion_damage_profile(
+    champion_slug: str,
+    champion_tags: dict[str, set[str]],
+    overrides: dict[str, dict[str, Any]],
+) -> ChampionDamageProfile:
+    metadata_slug = "monkeyking" if champion_slug == "wukong" else champion_slug
+    tags = champion_tags.get(metadata_slug, set())
+    physical, magic, true, confidence = _default_damage_shares(champion_slug, tags)
+    output_weight = _default_output_weight(tags)
+    source = "archetype_fallback"
+
+    override = overrides.get(champion_slug)
+    if override:
+        physical = float(override.get("physical", physical))
+        magic = float(override.get("magic", magic))
+        true = float(override.get("true", true))
+        output_weight = float(override.get("output_weight", output_weight))
+        confidence = float(override.get("confidence", 0.85))
+        source = "curated_static_profile"
+
+    physical = max(0.0, physical)
+    magic = max(0.0, magic)
+    true = max(0.0, true)
+    total = physical + magic + true
+    if total <= 0:
+        physical, magic, true, total = 0.45, 0.50, 0.05, 1.0
+        confidence = min(confidence, 0.35)
+    return ChampionDamageProfile(
+        champion_slug=champion_slug,
+        physical_share=physical / total,
+        magic_share=magic / total,
+        true_share=true / total,
+        output_weight=min(max(output_weight, 0.05), 1.0),
+        confidence=min(max(confidence, 0.0), 1.0),
+        source=source,
+    )
+
+
 def _item_preference_adjustment(item_id: int, preferences: dict[str, Any]) -> float:
     adjustments = preferences.get("item_score_adjustments") or {}
     value = adjustments.get(str(item_id), adjustments.get(item_id, 0.0))
@@ -394,12 +556,110 @@ def _item_preference_adjustment(item_id: int, preferences: dict[str, Any]) -> fl
 
 
 def _extreme_damage_type(threats: ThreatProfile, preferences: dict[str, Any]) -> str | None:
+    if threats.physical_share + threats.magic_share + threats.true_share > 0:
+        share_threshold = float(preferences.get("extreme_damage_share") or 0.72)
+        pressure_threshold = float(preferences.get("extreme_damage_pressure") or 0.55)
+        if threats.output_weight < pressure_threshold:
+            return None
+        if threats.magic_share >= share_threshold and threats.magic_share > threats.physical_share:
+            return "magic"
+        if threats.physical_share >= share_threshold and threats.physical_share > threats.magic_share:
+            return "physical"
+        return None
+
     threshold = int(preferences.get("extreme_damage_enemy_count") or 4)
     if threats.magic_count >= threshold and threats.magic_count > threats.physical_count:
         return "magic"
     if threats.physical_count >= threshold and threats.physical_count > threats.magic_count:
         return "physical"
     return None
+
+
+def _extreme_damage_severity(threats: ThreatProfile, preferences: dict[str, Any]) -> float:
+    damage_type = _extreme_damage_type(threats, preferences)
+    if not damage_type or threats.output_weight <= 0:
+        return 0.0
+    share = threats.magic_share if damage_type == "magic" else threats.physical_share
+    share_threshold = float(preferences.get("extreme_damage_share") or 0.72)
+    pressure_threshold = float(preferences.get("extreme_damage_pressure") or 0.55)
+    share_score = min(max((share - share_threshold) / max(1.0 - share_threshold, 0.01), 0.0), 1.0)
+    pressure_score = min(
+        max((threats.output_weight - pressure_threshold) / max(1.0 - pressure_threshold, 0.01), 0.0),
+        1.0,
+    )
+    return round(0.55 + share_score * 0.30 + pressure_score * 0.15, 4)
+
+
+def _has_weighted_damage_profile(threats: ThreatProfile) -> bool:
+    return threats.physical_share + threats.magic_share + threats.true_share > 0
+
+
+def _has_damage_pressure(threats: ThreatProfile, damage_type: str) -> bool:
+    if _has_weighted_damage_profile(threats):
+        share = threats.magic_share if damage_type == "magic" else threats.physical_share
+        return share >= 0.55 and threats.output_weight >= 0.40
+    count = threats.magic_count if damage_type == "magic" else threats.physical_count
+    return count >= 3
+
+
+def _damage_analysis_payload(
+    threats: ThreatProfile,
+    preferences: dict[str, Any],
+) -> dict[str, Any]:
+    mix = {
+        "physical": threats.physical_share,
+        "magic": threats.magic_share,
+        "true": threats.true_share,
+    }
+    dominant_type = max(mix, key=mix.get) if sum(mix.values()) > 0 else None
+    dominant_share = mix.get(dominant_type, 0.0) if dominant_type else 0.0
+    extreme_type = _extreme_damage_type(threats, preferences)
+    heavy_share = float(preferences.get("heavy_damage_share") or 0.62)
+    heavy_pressure = float(preferences.get("heavy_damage_pressure") or 0.45)
+
+    if dominant_type == "true" and dominant_share >= 0.40:
+        level = "true_heavy"
+        label = "真實傷害偏高"
+        defense_strength = "limited"
+        defense_type = None
+        defense_label = "單一護甲或魔防收益有限，優先生命值與續戰"
+    elif extreme_type:
+        damage_label = "魔法" if extreme_type == "magic" else "物理"
+        level = "extreme"
+        label = f"{damage_label}傷害極高"
+        defense_strength = "strong"
+        defense_type = extreme_type
+        defense_label = f"強烈建議保留 1 件大型{'魔防' if extreme_type == 'magic' else '物防'}"
+    elif (
+        dominant_type in {"magic", "physical"}
+        and dominant_share >= heavy_share
+        and threats.output_weight >= heavy_pressure
+    ):
+        damage_label = "魔法" if dominant_type == "magic" else "物理"
+        level = "heavy"
+        label = f"{damage_label}傷害偏高"
+        defense_strength = "consider"
+        defense_type = dominant_type
+        defense_label = f"核心裝後可考慮 1 件大型{'魔防' if dominant_type == 'magic' else '物防'}"
+    else:
+        level = "mixed"
+        label = "傷害類型較均衡"
+        defense_strength = "none"
+        defense_type = None
+        defense_label = "暫不需要為單一抗性犧牲完整輸出"
+
+    return {
+        "estimated": True,
+        "damage_mix": {key: round(value, 4) for key, value in mix.items()},
+        "output_weight": round(threats.output_weight, 4),
+        "profile_confidence": round(threats.profile_confidence, 4),
+        "dominant_type": dominant_type,
+        "level": level,
+        "label": label,
+        "defense_strength": defense_strength,
+        "defense_type": defense_type,
+        "defense_label": defense_label,
+    }
 
 
 def _is_offensive_item(item: dict[str, Any]) -> bool:
@@ -491,7 +751,11 @@ def _route_preference_details(
     ]
     if damage_type and pure_defense and sum(1 for item in items if _is_offensive_item(item)) >= 2:
         damage_label = "魔法" if damage_type == "magic" else "物理"
-        reasons.append(f"敵方{damage_label}傷害極端，核心裝後補純防禦：" + "、".join(pure_defense))
+        damage_share = threats.magic_share if damage_type == "magic" else threats.physical_share
+        reasons.append(
+            f"敵方{damage_label}傷害估算 {damage_share * 100:.1f}%，核心裝後補純防禦："
+            + "、".join(pure_defense)
+        )
 
     if _is_full_ap_marksman_route(items, champion_slug, preferences):
         flags.append("marksman_full_ap")
@@ -499,15 +763,51 @@ def _route_preference_details(
     return reasons, flags
 
 
-def analyze_threats(context: dict[str, Any]) -> ThreatProfile:
+def analyze_threats(
+    context: dict[str, Any],
+    *,
+    damage_profiles_path: str | Path = DEFAULT_DAMAGE_PROFILES_PATH,
+    champions_map_path: str | Path = DEFAULT_CHAMPION_MAP_PATH,
+) -> ThreatProfile:
     enemy_slugs = [p.get("champion_slug", "") for p in context.get("enemies", [])]
+    champion_tags = _load_champion_tags(champions_map_path)
+    overrides = _load_damage_profile_overrides(damage_profiles_path)
+    damage_profiles = tuple(
+        _champion_damage_profile(champion_slug, champion_tags, overrides)
+        for champion_slug in enemy_slugs
+        if champion_slug
+    )
+    total_weight = sum(profile.output_weight for profile in damage_profiles)
+    if total_weight > 0:
+        physical_share = sum(
+            profile.physical_share * profile.output_weight for profile in damage_profiles
+        ) / total_weight
+        magic_share = sum(
+            profile.magic_share * profile.output_weight for profile in damage_profiles
+        ) / total_weight
+        true_share = sum(
+            profile.true_share * profile.output_weight for profile in damage_profiles
+        ) / total_weight
+        profile_confidence = sum(
+            profile.confidence * profile.output_weight for profile in damage_profiles
+        ) / total_weight
+    else:
+        physical_share = magic_share = true_share = profile_confidence = 0.0
+
     return ThreatProfile(
-        magic_count=sum(1 for c in enemy_slugs if c in MAGIC_THREATS),
-        physical_count=sum(1 for c in enemy_slugs if c in PHYSICAL_THREATS),
+        magic_count=sum(1 for profile in damage_profiles if profile.magic_share >= 0.35),
+        physical_count=sum(1 for profile in damage_profiles if profile.physical_share >= 0.35),
         tank_count=sum(1 for c in enemy_slugs if c in TANKS),
         cc_count=sum(1 for c in enemy_slugs if c in HARD_CC),
         shield_count=sum(1 for c in enemy_slugs if c in SHIELDS),
         healing_count=sum(1 for c in enemy_slugs if c in HEALING),
+        true_count=sum(1 for profile in damage_profiles if profile.true_share >= 0.12),
+        physical_share=physical_share,
+        magic_share=magic_share,
+        true_share=true_share,
+        output_weight=min(total_weight / max(len(enemy_slugs), 1), 1.0),
+        profile_confidence=profile_confidence,
+        champion_profiles=damage_profiles,
     )
 
 
@@ -735,10 +1035,10 @@ def _score_item(
             score += 3.0
             reasons.append("汎的基準核心裝")
 
-    if threats.magic_count >= 3 and ("SpellBlock" in tags or "MagicResist" in tags):
+    if _has_damage_pressure(threats, "magic") and ("SpellBlock" in tags or "MagicResist" in tags):
         score += 2.4
         reasons.append("敵方魔法傷害偏多")
-    if threats.magic_count >= 3 and item_id == 3156:
+    if _has_damage_pressure(threats, "magic") and item_id == 3156:
         score += 2.0
         reasons.append("魔提斯深淵適合高魔法壓力局")
     if threats.cc_count >= 2 and ("Tenacity" in tags or "Active" in tags):
@@ -747,7 +1047,7 @@ def _score_item(
     if threats.tank_count >= 1 and ("ArmorPenetration" in tags or "OnHit" in tags or item_id in {3153, 3302}):
         score += 1.3
         reasons.append("更適合處理前排血量與抗性")
-    if threats.physical_count >= 3 and "Armor" in tags:
+    if _has_damage_pressure(threats, "physical") and "Armor" in tags:
         score += 1.3
         reasons.append("敵方物理壓力高")
     if threats.shield_count >= 1 and item_id == 6695:
@@ -768,9 +1068,16 @@ def _score_item(
 
     extreme_damage_type = _extreme_damage_type(threats, preferences)
     if extreme_damage_type and _is_pure_defense_item(item, extreme_damage_type):
-        score += float(preferences.get("extreme_pure_defense_item_bonus") or 0.0)
+        severity = _extreme_damage_severity(threats, preferences)
+        base_bonus = float(preferences.get("extreme_pure_defense_item_bonus") or 0.0)
+        score += base_bonus * (1.0 + severity * 0.65)
         damage_label = "魔法" if extreme_damage_type == "magic" else "物理"
-        reasons.append(f"敵方{damage_label}傷害極端，可作為純防禦補位")
+        damage_share = (
+            threats.magic_share if extreme_damage_type == "magic" else threats.physical_share
+        )
+        reasons.append(
+            f"敵方{damage_label}傷害估算 {damage_share * 100:.1f}%，可作為大型防禦補位"
+        )
 
     # Avoid low-synergy defensive tank items unless the matchup strongly demands them.
     if (
@@ -799,6 +1106,39 @@ def _item_payload(item: dict[str, Any], *, score: float | None = None, reasons: 
     if reasons is not None:
         payload["reasons"] = reasons[:4]
     return payload
+
+
+def _build_matchup_defensive_options(
+    analysis: dict[str, Any],
+    item_map: dict[int, dict[str, Any]],
+    item_stats_by_id: dict[int, dict[str, Any]],
+    *,
+    limit: int = 3,
+) -> list[dict[str, Any]]:
+    damage_type = analysis.get("defense_type")
+    if damage_type not in MATCHUP_DEFENSIVE_OPTIONS:
+        return []
+
+    options: list[dict[str, Any]] = []
+    for item_id, category, reason in MATCHUP_DEFENSIVE_OPTIONS[damage_type]:
+        metadata = item_map.get(item_id)
+        if not metadata or "12" not in set(metadata.get("maps") or []):
+            continue
+        if not is_completed_non_boot_item(metadata):
+            continue
+        stats = item_stats_by_id.get(item_id) or {}
+        item = {
+            **enrich_item({"item_id": item_id}, item_map),
+            **stats,
+        }
+        payload = _item_payload(item)
+        payload["category"] = category
+        payload["reason"] = reason
+        payload["source"] = "static_matchup_evaluation"
+        options.append(payload)
+        if len(options) >= limit:
+            break
+    return options
 
 
 def _enrich_by_id(item_id: int, item_name: str, item_map: dict[int, dict[str, Any]]) -> dict[str, Any]:
@@ -861,7 +1201,10 @@ def _route_label(archetype: str, items: list[dict[str, Any]], threats: ThreatPro
     modifiers: list[str] = []
     if threats.tank_count and ({"OnHit", "ArmorPenetration"} & set(tags) or ids & {3153, 3302, 3036, 3033}):
         modifiers.append("打坦")
-    if threats.magic_count >= 3 and any({"SpellBlock", "MagicResist"} & set(item.get("tags") or []) for item in items):
+    if _has_damage_pressure(threats, "magic") and any(
+        {"SpellBlock", "MagicResist"} & set(item.get("tags") or [])
+        for item in items
+    ):
         modifiers.append("抗魔")
     if threats.cc_count >= 2 and any("Tenacity" in set(item.get("tags") or []) for item in items):
         modifiers.append("抗控")
@@ -895,9 +1238,14 @@ def _route_reasons(
         reasons.append("含較多防禦屬性，適合被強開或魔法壓力高的局")
     if threats.tank_count and ("ArmorPenetration" in tags or "OnHit" in tags):
         reasons.append("敵方有前排，穿透或命中特效價值提高")
-    if threats.magic_count >= 3 and ("SpellBlock" in tags or "MagicResist" in tags):
-        reasons.append("敵方魔法傷害偏多，抗魔裝備價值提高")
-    if threats.magic_count >= 3 and any(int(item["item_id"]) == 3156 for item in items):
+    if _has_damage_pressure(threats, "magic") and ("SpellBlock" in tags or "MagicResist" in tags):
+        if threats.magic_share:
+            reasons.append(f"敵方魔法傷害估算 {threats.magic_share * 100:.1f}%，抗魔裝備價值提高")
+        else:
+            reasons.append("敵方魔法傷害偏多，抗魔裝備價值提高")
+    if _has_damage_pressure(threats, "magic") and any(
+        int(item["item_id"]) == 3156 for item in items
+    ):
         reasons.append("對面魔法傷害占比高，魔提斯深淵是高優先度防禦輸出裝")
     if winning_item_signals:
         names = [
@@ -1035,9 +1383,9 @@ def _score_route(
             score -= min(float(pick_rate) * 3.5, 0.8)
     if threats.tank_count and ("OnHit" in tags or "ArmorPenetration" in tags or ids & {3153, 3302, 3036, 3033}):
         score += 0.8
-    if threats.magic_count >= 3 and ("SpellBlock" in tags or "MagicResist" in tags):
+    if _has_damage_pressure(threats, "magic") and ("SpellBlock" in tags or "MagicResist" in tags):
         score += 0.7
-    if threats.magic_count >= 3 and 3156 in ids:
+    if _has_damage_pressure(threats, "magic") and 3156 in ids:
         score += 1.4
     if threats.cc_count >= 2 and "Tenacity" in tags:
         score += 0.4
@@ -1051,9 +1399,12 @@ def _score_route(
     pure_defense_count = sum(1 for item in items if _is_pure_defense_item(item, extreme_damage_type))
     offensive_count = sum(1 for item in items if _is_offensive_item(item))
     if extreme_damage_type and pure_defense_count and offensive_count >= 2:
-        score += pure_defense_count * float(preferences.get("extreme_pure_defense_item_bonus") or 0.0)
+        severity = _extreme_damage_severity(threats, preferences)
+        pure_defense_bonus = float(preferences.get("extreme_pure_defense_item_bonus") or 0.0)
+        score += pure_defense_count * pure_defense_bonus * (1.0 + severity * 0.65)
         if pure_defense_count >= 2:
-            score += float(preferences.get("extreme_multi_defense_route_bonus") or 0.0)
+            multi_bonus = float(preferences.get("extreme_multi_defense_route_bonus") or 0.0)
+            score += multi_bonus * (1.0 + severity * 0.35)
     if _is_full_ap_marksman_route(items, champion_slug, preferences):
         score -= float(preferences.get("marksman_full_ap_route_penalty") or 0.0)
     return score
@@ -1101,13 +1452,13 @@ def _score_boot_option(
     if archetype == "poke" and item_id == 3158:
         score += 1.8
         reasons.append("Poke 路線重視技能急速")
-    if threats.magic_count >= 3 and item_id == 3111:
+    if _has_damage_pressure(threats, "magic") and item_id == 3111:
         score += 1.5
         reasons.append("敵方魔法傷害偏多")
     if threats.cc_count >= 3 and item_id == 3111:
         score += 1.3
         reasons.append("敵方控制偏多")
-    if threats.physical_count >= 3 and item_id == 3047:
+    if _has_damage_pressure(threats, "physical") and item_id == 3047:
         score += 1.4
         reasons.append("敵方物理壓力偏高")
     if threats.cc_count >= 2 and item_id == 3009:
@@ -1200,6 +1551,13 @@ def _starter_budget(starting_items: list[dict[str, Any]]) -> int:
     return total if 800 <= total <= 1800 else DEFAULT_STARTER_BUDGET
 
 
+def _is_starter_potion(item: dict[str, Any]) -> bool:
+    if int(item.get("item_id") or 0) in STARTER_POTION_ITEM_IDS:
+        return True
+    names = f"{item.get('name') or ''} {item.get('zh_tw_name') or ''}".lower()
+    return "potion" in names or "藥水" in names or "藥劑" in names
+
+
 def _component_ids(item_id: int, item_map: dict[int, dict[str, Any]]) -> set[int]:
     found: set[int] = set()
     stack = [item_id]
@@ -1278,8 +1636,9 @@ def _route_starter_option(
         return None
     first_item = route_items[0]
     target_item_id = int(first_item["item_id"])
-    common_start = _starting_items(build_data, item_map)
-    budget = _starter_budget(common_start)
+    raw_common_start = _starting_items(build_data, item_map)
+    budget = _starter_budget(raw_common_start)
+    common_start = [item for item in raw_common_start if not _is_starter_potion(item)]
 
     if any(_item_uses_tear(int(item["item_id"]), item_map) for item in route_items):
         tear = _starter_candidate(TEAR_ITEM_ID, item_map)
@@ -1311,7 +1670,11 @@ def _route_starter_option(
                 package.append(boots)
         package_total = sum(int(item.get("gold_total") or 0) for item in package)
         win_rate = next(
-            (float(item["win_rate"]) for item in common_start if isinstance(item.get("win_rate"), (int, float))),
+            (
+                float(item["win_rate"])
+                for item in raw_common_start
+                if isinstance(item.get("win_rate"), (int, float))
+            ),
             None,
         )
         option = {
@@ -1364,6 +1727,7 @@ def _build_routes(
     limit: int = 3,
 ) -> list[dict[str, Any]]:
     best_by_combo: dict[tuple[int, ...], dict[str, Any]] = {}
+    boots_by_archetype: dict[str, dict[str, Any] | None] = {}
     candidate_sets = _route_candidate_sets(built_sets)
     for row in candidate_sets:
         items = _items_for_set(row, item_map)
@@ -1374,7 +1738,11 @@ def _build_routes(
         team_score, team_reasons = _team_route_adjustment(items, allies)
         route_score += team_score
         winning_item_signals = _winning_item_signals(items, scored_by_id)
-        boots = _select_boots(archetype, build_data, item_map, threats, boot_stats_by_id=boot_stats_by_id)
+        if archetype not in boots_by_archetype:
+            boots_by_archetype[archetype] = _select_boots(
+                archetype, build_data, item_map, threats, boot_stats_by_id=boot_stats_by_id,
+            )
+        boots = boots_by_archetype[archetype]
         preference_reasons, preference_flags = _route_preference_details(
             items,
             threats,
@@ -1451,6 +1819,7 @@ def recommend_build(
     *,
     cache_dir: str | Path = "data/cache",
     refresh_lolalytics: bool = False,
+    cache_max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
     items_map_path: str | Path = "data/ref/items_map.csv",
     preferences_path: str | Path = DEFAULT_USER_PREFERENCES_PATH,
     mode: str = DEFAULT_MODE,
@@ -1472,6 +1841,7 @@ def recommend_build(
         tier=tier,
         patches=(DEFAULT_PATCH, "14", "30"),
         min_champions_analysed=min_champions_analysed,
+        max_age_hours=cache_max_age_hours,
     )
     item_map = load_items_map(items_map_path)
     preferences = load_user_preferences(preferences_path)
@@ -1490,20 +1860,20 @@ def recommend_build(
         mode=built_set_params.get("mode", mode),
         tier=built_set_params.get("tier", tier),
         patch=built_set_params.get("patch", DEFAULT_PATCH),
+        max_age_hours=cache_max_age_hours,
     )
     built_sets = [{**row, "source_params": built_set_params, "source_priority": 0} for row in primary_raw_sets]
     built_set_windows = [{"params": built_set_params, "raw_sets": len(primary_raw_sets), "added_sets": len(primary_raw_sets)}]
-    try:
-        boot_stat_rows = fetch_boot_stats(
-            champion_slug,
-            cache_dir=cache_dir,
-            refresh=refresh_lolalytics,
-            mode=built_set_params.get("mode", mode),
-            tier=built_set_params.get("tier", tier),
-            patch=built_set_params.get("patch", DEFAULT_PATCH),
-        )
-    except Exception:
-        boot_stat_rows = []
+    stat_tables = fetch_stat_tables(
+        champion_slug,
+        cache_dir=cache_dir,
+        refresh=refresh_lolalytics,
+        mode=built_set_params.get("mode", mode),
+        tier=built_set_params.get("tier", tier),
+        patch=built_set_params.get("patch", DEFAULT_PATCH),
+        max_age_hours=cache_max_age_hours,
+    )
+    boot_stat_rows = stat_tables["Boots"]
     if not boot_stat_rows:
         try:
             boot_stat_rows = fetch_boot_pair_stats(
@@ -1513,39 +1883,25 @@ def recommend_build(
                 mode=built_set_params.get("mode", mode),
                 tier=built_set_params.get("tier", tier),
                 patch=built_set_params.get("patch", DEFAULT_PATCH),
+                max_age_hours=cache_max_age_hours,
             )
         except Exception:
             boot_stat_rows = []
     boot_stats_by_id = _boot_stats_by_id(boot_stat_rows, item_map)
-    try:
-        popular_item_rows = fetch_item_stats(
-            champion_slug,
-            table="Popular Items",
-            cache_dir=cache_dir,
-            refresh=refresh_lolalytics,
-            mode=built_set_params.get("mode", mode),
-            tier=built_set_params.get("tier", tier),
-            patch=built_set_params.get("patch", DEFAULT_PATCH),
-        )
-    except Exception:
-        popular_item_rows = []
-    try:
-        winning_item_rows = fetch_item_stats(
-            champion_slug,
-            table="Winning Items",
-            cache_dir=cache_dir,
-            refresh=refresh_lolalytics,
-            mode=built_set_params.get("mode", mode),
-            tier=built_set_params.get("tier", tier),
-            patch=built_set_params.get("patch", DEFAULT_PATCH),
-        )
-    except Exception:
-        winning_item_rows = []
+    popular_item_rows = stat_tables["Popular Items"]
+    winning_item_rows = stat_tables["Winning Items"]
     item_stats_by_id = _build_item_stats_by_id(popular_item_rows, winning_item_rows)
+    damage_analysis = _damage_analysis_payload(threats, preferences)
+    defensive_options = _build_matchup_defensive_options(
+        damage_analysis,
+        item_map,
+        item_stats_by_id,
+    )
     seen_archetypes = {
         archetype
         for row in built_sets
-        if (archetype := _set_archetype(row, item_map, champion_slug)) is not None
+        if champion_slug in MULTI_ROUTE_CHAMPIONS
+        and (archetype := _set_archetype(row, item_map, champion_slug)) is not None
     }
     if champion_slug in MULTI_ROUTE_CHAMPIONS and len(seen_archetypes) < 2:
         for extra_patch in ("14", "30"):
@@ -1563,6 +1919,7 @@ def recommend_build(
                 mode=extra_params["mode"],
                 tier=extra_params["tier"],
                 patch=extra_params["patch"],
+                max_age_hours=cache_max_age_hours,
             )
             added_sets: list[dict[str, Any]] = []
             for row in extra_raw_sets:
@@ -1649,6 +2006,7 @@ def recommend_build(
         boots=len(boot_stat_rows),
         popular_items=len(popular_item_rows),
         winning_items=len(winning_item_rows),
+        max_age_hours=cache_max_age_hours,
     )
 
     return {
@@ -1657,11 +2015,13 @@ def recommend_build(
         "ally_team": ally_team,
         "enemy_team": enemies,
         "threat_profile": threats.to_dict(),
+        "damage_analysis": damage_analysis,
         "ally_profile": allies.to_dict(),
         "composition_notes": _composition_notes(allies),
         "build": {
             "boots": primary_boots,
             "boot_options": boot_options,
+            "defensive_options": defensive_options,
             "items": primary_items,
             "routes": routes,
             "order": order,
@@ -1688,6 +2048,7 @@ def recommend_build(
                 "built_sets_considered": len(_route_candidate_sets(built_sets)),
                 "route_candidate_min_pick_rate": MIN_ROUTE_CANDIDATE_PICK_RATE,
                 "user_preferences_path": str(preferences_path),
+                "damage_profiles_path": str(DEFAULT_DAMAGE_PROFILES_PATH),
                 "user_preferences": preferences,
                 "learned_feedback_events": int(learned_feedback_events),
                 "built_set_windows": built_set_windows,
@@ -1713,6 +2074,7 @@ def recommend_build(
                 "Riot local Live Client Data API visible in-game player/champion/team data",
                 "LoLalytics aggregate champion build statistics",
                 "Riot Data Dragon public item metadata",
+                "curated static champion damage-type profiles",
             ],
             "not_used": [
                 "hidden player identification",
@@ -1728,6 +2090,8 @@ def recommend_from_snapshot(
     *,
     out_path: str | Path | None = None,
     refresh_lolalytics: bool = False,
+    cache_max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
+    cache_dir: str | Path = "data/cache",
     mode: str = DEFAULT_MODE,
     tier: str = DEFAULT_TIER,
     min_champions_analysed: int = 1_000_000,
@@ -1748,6 +2112,8 @@ def recommend_from_snapshot(
     result = recommend_build(
         context,
         refresh_lolalytics=refresh_lolalytics,
+        cache_max_age_hours=cache_max_age_hours,
+        cache_dir=cache_dir,
         mode=mode,
         tier=tier,
         min_champions_analysed=min_champions_analysed,

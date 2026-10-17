@@ -1,20 +1,28 @@
 # LoL Build Assistant
 
-英雄聯盟 ARAM 賽前出裝助手。背景服務會在 Riot 本機 Live Client Data API 出現新對局時辨識十位英雄、敵我隊伍與自己的英雄，開啟瀏覽器，並依 LoLalytics 聚合數據產生一次性的靜態方案。
+[![CI](https://github.com/CydemExsit/lol-build-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/CydemExsit/lol-build-assistant/actions/workflows/ci.yml)
+
+英雄聯盟 ARAM 賽前出裝助手。背景服務會在 Riot 本機 Live Client Data API 出現新對局時辨識十位英雄、敵我隊伍與自己的英雄，並依 LoLalytics 聚合數據產生一次性的靜態方案；已開啟的瀏覽器介面會自動更新。
 
 ## 目前行為
 
 - 固定 ARAM，預設 `gold_plus` 與最近 7 天；Champions Analysed 不足時才擴大資料窗。
+- 新對局優先使用 6 小時內有效的 LoLalytics 快取，各份資料獨立判斷效期；只補抓缺少或過期的資料。可用 `--cache-max-age-hours` 調整，`--refresh-lolalytics` 強制更新。
+- 鞋子、熱門裝備與高勝率裝備共用一次瀏覽器頁面載入；本場方案產生後仍維持凍結。
 - 五件非鞋成裝必須完整出現在 LoLalytics `Actually Built Sets: 5`。
 - 候選套裝以選取率百分比過濾，不用固定組數截斷完整資料。
 - 鞋子獨立列出，照搬勝率、選取率與場次。
 - 同時提供最多三條靜態路線、成裝順序、樣本可信度與陣容觀察。
+- 敵方傷害輪廓以每名英雄的物理／魔法／真實傷害分布與輸出權重估算，極端陣容會額外評估大型防裝。
 - 每條路線依第一件成裝提供自己的起手銜接；能對應時採用 LoLalytics 起手，否則使用 Data Dragon 合成樹。
+- 起手銜接一律排除生命藥水、回復藥水與其他藥劑。
 - 使用 Riot Data Dragon 的繁體中文裝備名稱，並自動同步靜態資料版本。
 - 路線回饋只存在本機，下一場才會成為小幅個人偏好調整。
 - 每場方案產生後立即凍結，局內不重新分析或改動。
 
 ## 一次性安裝
+
+需要 Python 3.11 以上版本。自動對局偵測與登入啟動以 Windows 為主要使用環境。
 
 ```powershell
 python -m venv .venv
@@ -25,7 +33,7 @@ python -m src.main sync-data --force
 python -m src.main autostart install
 ```
 
-完成後，Windows 登入時會在背景啟動。沒有遊戲時只會等待；發現新對局後會自動開啟 [http://127.0.0.1:8765](http://127.0.0.1:8765)，不需要再輸入命令。
+完成後，Windows 登入時會在背景啟動。平時將 [http://127.0.0.1:8765](http://127.0.0.1:8765) 保持開啟即可；十人名單完整後只處理一次，方案完成時目前頁面會自動更新，不會另開視窗。
 
 移除 Windows 登入啟動：
 
@@ -49,6 +57,8 @@ python -m src.main autostart remove
 python -m src.main watch
 ```
 
+預設不會開啟新瀏覽器視窗；只有明確需要時才可加上 `--auto-open`。
+
 只開 UI、不偵測新對局：
 
 ```powershell
@@ -68,6 +78,7 @@ python -m src.main recommend-live --snapshot data/raw/live_YYYYMMDD_HHMMSS
 - `data/processed/`：目前凍結方案 JSON 與 Markdown。
 - `data/history/assistant.db`：本機歷史、回饋與手動勝敗。
 - `data/ref/`：Data Dragon 裝備、英雄與個人偏好。
+- `data/ref/champion_damage_profiles.json`：混傷、真實傷害及低輸出前排的靜態校正值。
 
 預覽或套用儲存空間清理：
 
@@ -87,6 +98,8 @@ python -B -m src.main audit
 ```
 
 `audit` 會檢查凍結標記、私人/動態欄位、五件唯一非鞋成裝、Actually Built Sets 樣本與鞋子類型。
+
+GitHub Actions 會在 Windows／Linux 與 Python 3.11／3.13 執行離線測試及 JavaScript 語法檢查。快取與頁面共用的效能測量範圍見 [效能紀錄](docs/performance.md)。
 
 ## Riot 合規
 

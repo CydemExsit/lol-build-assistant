@@ -29,6 +29,31 @@ def write_recommendation_markdown(result: dict, out_path: str | Path) -> None:
     lines.extend(f"- {player.get('champion')}" for player in result.get("ally_team", []))
     lines.extend(["", "## 敵方陣容", ""])
     lines.extend(f"- {player.get('champion')}" for player in result.get("enemy_team", []))
+    damage = result.get("damage_analysis") or {}
+    mix = damage.get("damage_mix") or {}
+    if mix:
+        lines.extend(
+            [
+                "",
+                "## 敵方傷害輪廓",
+                "",
+                (
+                    f"- 估算：物理 {_percent(mix.get('physical'))} / "
+                    f"魔法 {_percent(mix.get('magic'))} / 真實 {_percent(mix.get('true'))}"
+                ),
+                f"- 整隊輸出權重：{_percent(damage.get('output_weight'))}",
+                f"- 判斷：{damage.get('label', '-')}；{damage.get('defense_label', '-')}",
+            ]
+        )
+        defensive_options = result.get("build", {}).get("defensive_options") or []
+        if defensive_options:
+            lines.append(
+                "- 大型防裝備選："
+                + "、".join(
+                    f"{_name(item)}（{item.get('reason', '')}）"
+                    for item in defensive_options
+                )
+            )
     lines.extend(["", "## 鞋子統計", ""])
     for index, boot in enumerate(result.get("build", {}).get("boot_options", []), start=1):
         lines.append(

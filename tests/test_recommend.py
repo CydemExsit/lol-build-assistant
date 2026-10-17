@@ -1,8 +1,13 @@
+import pytest
+
 from src.items import enrich_item, load_items_map
 from src.recommend import (
     MIN_ROUTE_CANDIDATE_PICK_RATE,
     ThreatProfile,
+    _build_matchup_defensive_options,
+    _damage_analysis_payload,
     _extreme_damage_type,
+    _has_damage_pressure,
     _is_full_ap_marksman_route,
     _is_pure_defense_item,
     _route_candidate_sets,
@@ -94,6 +99,111 @@ def test_magic_heavy_comp_counts_ap_tanks_and_hybrids():
     assert _extreme_damage_type(threats, load_user_preferences()) == "magic"
 
 
+def test_weighted_damage_profile_matches_hwei_rumble_leona_cassiopeia_warwick():
+    context = {
+        "enemies": [
+            {"champion_slug": champion}
+            for champion in ("hwei", "rumble", "leona", "cassiopeia", "warwick")
+        ]
+    }
+
+    threats = analyze_threats(context)
+    analysis = _damage_analysis_payload(threats, load_user_preferences())
+
+    assert threats.physical_share == pytest.approx(0.1041, abs=0.0001)
+    assert threats.magic_share == pytest.approx(0.8468, abs=0.0001)
+    assert threats.true_share == pytest.approx(0.0492, abs=0.0001)
+    assert threats.output_weight == pytest.approx(0.71)
+    assert threats.magic_count == 5
+    assert threats.physical_count == 1
+    assert analysis["level"] == "extreme"
+    assert analysis["defense_type"] == "magic"
+    assert analysis["defense_strength"] == "strong"
+
+
+def test_extreme_magic_profile_offers_large_magic_defense_first():
+    context = {
+        "enemies": [
+            {"champion_slug": champion}
+            for champion in ("hwei", "rumble", "leona", "cassiopeia", "warwick")
+        ]
+    }
+    threats = analyze_threats(context)
+    analysis = _damage_analysis_payload(threats, load_user_preferences())
+
+    options = _build_matchup_defensive_options(analysis, load_items_map(), {})
+
+    assert [option["item_id"] for option in options] == [2504, 4401, 3156]
+    assert options[0]["display_name"] == "凱尼克欺瞞者"
+    assert options[0]["category"] == "pure_defense"
+
+
+def test_extreme_magic_profile_promotes_actual_sets_with_large_magic_defense():
+    threats = analyze_threats(
+        {
+            "enemies": [
+                {"champion_slug": champion}
+                for champion in ("hwei", "rumble", "leona", "cassiopeia", "warwick")
+            ]
+        }
+    )
+    preferences = load_user_preferences()
+    row = {"win_rate": 0.5, "pick_rate": 0.001, "games": 100}
+    offensive = [
+        {"item_id": item_id, "tags": ["Damage", "CriticalStrike"]}
+        for item_id in (3031, 3036, 3085, 3072)
+    ]
+    kaenic_route = offensive + [
+        {"item_id": 2504, "tags": ["Health", "SpellBlock", "HealthRegen"]}
+    ]
+    full_damage_route = offensive + [
+        {"item_id": 6673, "tags": ["Damage", "CriticalStrike"]}
+    ]
+    scored_by_id = {
+        int(item["item_id"]): {"score": 0.0}
+        for item in kaenic_route + full_damage_route
+    }
+
+    kaenic_score = _score_route(
+        row,
+        kaenic_route,
+        scored_by_id,
+        threats,
+        "crit",
+        "kaisa",
+        preferences,
+    )
+    damage_score = _score_route(
+        row,
+        full_damage_route,
+        scored_by_id,
+        threats,
+        "crit",
+        "kaisa",
+        preferences,
+    )
+
+    assert kaenic_score > damage_score + 2.0
+
+
+def test_weighted_mix_does_not_trigger_both_resistance_bonuses():
+    threats = ThreatProfile(
+        magic_count=5,
+        physical_count=5,
+        tank_count=0,
+        cc_count=0,
+        shield_count=0,
+        healing_count=0,
+        physical_share=0.48,
+        magic_share=0.48,
+        true_share=0.04,
+        output_weight=0.9,
+    )
+
+    assert not _has_damage_pressure(threats, "magic")
+    assert not _has_damage_pressure(threats, "physical")
+
+
 def test_marksman_full_ap_penalty_does_not_hit_mixed_damage():
     preferences = load_user_preferences()
     pure_ap = [
@@ -156,6 +266,27 @@ def test_route_starter_keeps_lolalytics_package_when_it_matches_first_item():
     assert collector["source"] == "lolalytics_starting_items"
     assert [item["item_id"] for item in collector["items"]] == [1001, 3134]
     assert collector["win_rate"] == 0.5486
+
+
+def test_route_starter_removes_all_potions_from_lolalytics_package():
+    item_map = load_items_map()
+    build_data = _tristana_starting_data()
+    build_data["sections"]["Starting Items"].extend(
+        [
+            {"item_id": 2003, "name": "Health Potion"},
+            {"item_id": 2031, "name": "Refillable Potion"},
+            {"item_id": 2033, "name": "Corrupting Potion"},
+        ]
+    )
+
+    collector = _route_starter_option(
+        [enrich_item({"item_id": 6676}, item_map)],
+        build_data,
+        item_map,
+    )
+
+    assert [item["item_id"] for item in collector["items"]] == [1001, 3134]
+    assert not {2003, 2031, 2033} & {item["item_id"] for item in collector["items"]}
 
 
 def test_route_starter_prioritizes_tear_requirement():

@@ -7,7 +7,7 @@
     "tags": [
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "ahri": {
     "id": "Ahri",
@@ -18,7 +18,7 @@
       "Mage",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "akali": {
     "id": "Akali",
@@ -28,7 +28,7 @@
     "tags": [
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "akshan": {
     "id": "Akshan",
@@ -39,7 +39,7 @@
       "Marksman",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "alistar": {
     "id": "Alistar",
@@ -50,7 +50,7 @@
       "Tank",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "ambessa": {
     "id": "Ambessa",
@@ -61,7 +61,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "amumu": {
     "id": "Amumu",
@@ -72,7 +72,7 @@
       "Tank",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "anivia": {
     "id": "Anivia",
@@ -82,7 +82,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "annie": {
     "id": "Annie",
@@ -93,7 +93,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "aphelios": {
     "id": "Aphelios",
@@ -103,7 +103,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "ashe": {
     "id": "Ashe",
@@ -114,7 +114,7 @@
       "Marksman",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "aurelionsol": {
     "id": "AurelionSol",
@@ -124,7 +124,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "aurora": {
     "id": "Aurora",
@@ -135,7 +135,7 @@
       "Mage",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "azir": {
     "id": "Azir",
@@ -146,7 +146,7 @@
       "Mage",
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "bard": {
     "id": "Bard",
@@ -157,7 +157,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "belveth": {
     "id": "Belveth",
@@ -167,7 +167,7 @@
     "tags": [
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "blitzcrank": {
     "id": "Blitzcrank",
@@ -178,7 +178,7 @@
       "Tank",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "brand": {
     "id": "Brand",
@@ -189,7 +189,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "braum": {
     "id": "Braum",
@@ -200,7 +200,7 @@
       "Tank",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "briar": {
     "id": "Briar",
@@ -211,7 +211,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "caitlyn": {
     "id": "Caitlyn",
@@ -221,7 +221,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "camille": {
     "id": "Camille",
@@ -232,7 +232,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "cassiopeia": {
     "id": "Cassiopeia",
@@ -242,7 +242,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "chogath": {
     "id": "Chogath",
@@ -253,7 +253,7 @@
       "Tank",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "corki": {
     "id": "Corki",
@@ -264,7 +264,7 @@
       "Marksman",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "darius": {
     "id": "Darius",
@@ -275,7 +275,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "diana": {
     "id": "Diana",
@@ -286,7 +286,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "draven": {
     "id": "Draven",
@@ -296,7 +296,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "drmundo": {
     "id": "DrMundo",
@@ -307,7 +307,7 @@
       "Tank",
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "ekko": {
     "id": "Ekko",
@@ -318,7 +318,7 @@
       "Assassin",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "elise": {
     "id": "Elise",
@@ -329,7 +329,7 @@
       "Assassin",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "evelynn": {
     "id": "Evelynn",
@@ -340,7 +340,7 @@
       "Assassin",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "ezreal": {
     "id": "Ezreal",
@@ -351,7 +351,7 @@
       "Marksman",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "fiddlesticks": {
     "id": "Fiddlesticks",
@@ -362,7 +362,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "fiora": {
     "id": "Fiora",
@@ -373,7 +373,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "fizz": {
     "id": "Fizz",
@@ -384,7 +384,7 @@
       "Assassin",
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "galio": {
     "id": "Galio",
@@ -395,7 +395,7 @@
       "Tank",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "gangplank": {
     "id": "Gangplank",
@@ -405,7 +405,7 @@
     "tags": [
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "garen": {
     "id": "Garen",
@@ -416,7 +416,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "gnar": {
     "id": "Gnar",
@@ -427,7 +427,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "gragas": {
     "id": "Gragas",
@@ -438,7 +438,7 @@
       "Fighter",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "graves": {
     "id": "Graves",
@@ -448,7 +448,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "gwen": {
     "id": "Gwen",
@@ -458,7 +458,7 @@
     "tags": [
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "hecarim": {
     "id": "Hecarim",
@@ -469,7 +469,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "heimerdinger": {
     "id": "Heimerdinger",
@@ -480,7 +480,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "hwei": {
     "id": "Hwei",
@@ -491,7 +491,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "illaoi": {
     "id": "Illaoi",
@@ -502,7 +502,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "irelia": {
     "id": "Irelia",
@@ -513,7 +513,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "ivern": {
     "id": "Ivern",
@@ -524,7 +524,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "janna": {
     "id": "Janna",
@@ -535,7 +535,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "jarvaniv": {
     "id": "JarvanIV",
@@ -546,7 +546,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "jax": {
     "id": "Jax",
@@ -556,7 +556,7 @@
     "tags": [
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "jayce": {
     "id": "Jayce",
@@ -567,7 +567,7 @@
       "Fighter",
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "jhin": {
     "id": "Jhin",
@@ -578,7 +578,7 @@
       "Marksman",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "jinx": {
     "id": "Jinx",
@@ -588,7 +588,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "kaisa": {
     "id": "Kaisa",
@@ -599,7 +599,7 @@
       "Marksman",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "kalista": {
     "id": "Kalista",
@@ -609,7 +609,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "karma": {
     "id": "Karma",
@@ -620,7 +620,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "karthus": {
     "id": "Karthus",
@@ -630,7 +630,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "kassadin": {
     "id": "Kassadin",
@@ -641,7 +641,7 @@
       "Assassin",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "katarina": {
     "id": "Katarina",
@@ -652,7 +652,7 @@
       "Assassin",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "kayle": {
     "id": "Kayle",
@@ -660,10 +660,10 @@
     "en_name": "Kayle",
     "zh_tw_name": "凱爾",
     "tags": [
-      "Mage",
-      "Marksman"
+      "Marksman",
+      "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "kayn": {
     "id": "Kayn",
@@ -674,7 +674,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "kennen": {
     "id": "Kennen",
@@ -684,7 +684,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "khazix": {
     "id": "Khazix",
@@ -694,7 +694,7 @@
     "tags": [
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "kindred": {
     "id": "Kindred",
@@ -704,7 +704,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "kled": {
     "id": "Kled",
@@ -714,7 +714,7 @@
     "tags": [
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "kogmaw": {
     "id": "KogMaw",
@@ -725,7 +725,7 @@
       "Marksman",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "ksante": {
     "id": "KSante",
@@ -736,7 +736,7 @@
       "Tank",
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "leblanc": {
     "id": "Leblanc",
@@ -747,7 +747,7 @@
       "Assassin",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "leesin": {
     "id": "LeeSin",
@@ -758,7 +758,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "leona": {
     "id": "Leona",
@@ -769,7 +769,7 @@
       "Tank",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "lillia": {
     "id": "Lillia",
@@ -780,7 +780,7 @@
       "Fighter",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "lissandra": {
     "id": "Lissandra",
@@ -790,7 +790,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "locke": {
     "id": "Locke",
@@ -801,7 +801,7 @@
       "Assassin",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "lucian": {
     "id": "Lucian",
@@ -812,7 +812,7 @@
       "Marksman",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "lulu": {
     "id": "Lulu",
@@ -823,7 +823,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "lux": {
     "id": "Lux",
@@ -834,7 +834,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "malphite": {
     "id": "Malphite",
@@ -845,7 +845,7 @@
       "Tank",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "malzahar": {
     "id": "Malzahar",
@@ -855,7 +855,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "maokai": {
     "id": "Maokai",
@@ -866,7 +866,7 @@
       "Tank",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "masteryi": {
     "id": "MasterYi",
@@ -877,7 +877,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "mel": {
     "id": "Mel",
@@ -888,7 +888,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "milio": {
     "id": "Milio",
@@ -899,7 +899,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "missfortune": {
     "id": "MissFortune",
@@ -910,7 +910,7 @@
       "Marksman",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "monkeyking": {
     "id": "MonkeyKing",
@@ -921,7 +921,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "mordekaiser": {
     "id": "Mordekaiser",
@@ -932,7 +932,7 @@
       "Fighter",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "morgana": {
     "id": "Morgana",
@@ -943,7 +943,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "naafiri": {
     "id": "Naafiri",
@@ -954,7 +954,7 @@
       "Assassin",
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "nami": {
     "id": "Nami",
@@ -965,7 +965,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "nasus": {
     "id": "Nasus",
@@ -976,7 +976,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "nautilus": {
     "id": "Nautilus",
@@ -987,7 +987,7 @@
       "Tank",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "neeko": {
     "id": "Neeko",
@@ -998,7 +998,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "nidalee": {
     "id": "Nidalee",
@@ -1009,7 +1009,7 @@
       "Assassin",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "nilah": {
     "id": "Nilah",
@@ -1020,7 +1020,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "nocturne": {
     "id": "Nocturne",
@@ -1031,7 +1031,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "nunu": {
     "id": "Nunu",
@@ -1042,7 +1042,7 @@
       "Tank",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "olaf": {
     "id": "Olaf",
@@ -1053,7 +1053,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "orianna": {
     "id": "Orianna",
@@ -1064,7 +1064,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "ornn": {
     "id": "Ornn",
@@ -1074,7 +1074,7 @@
     "tags": [
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "pantheon": {
     "id": "Pantheon",
@@ -1085,7 +1085,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "poppy": {
     "id": "Poppy",
@@ -1096,7 +1096,7 @@
       "Tank",
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "pyke": {
     "id": "Pyke",
@@ -1107,7 +1107,7 @@
       "Support",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "qiyana": {
     "id": "Qiyana",
@@ -1117,7 +1117,7 @@
     "tags": [
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "quinn": {
     "id": "Quinn",
@@ -1128,7 +1128,7 @@
       "Marksman",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "rakan": {
     "id": "Rakan",
@@ -1138,7 +1138,7 @@
     "tags": [
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "rammus": {
     "id": "Rammus",
@@ -1148,7 +1148,7 @@
     "tags": [
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "reksai": {
     "id": "RekSai",
@@ -1159,7 +1159,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "rell": {
     "id": "Rell",
@@ -1170,7 +1170,7 @@
       "Tank",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "renata": {
     "id": "Renata",
@@ -1181,7 +1181,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "renekton": {
     "id": "Renekton",
@@ -1192,7 +1192,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "rengar": {
     "id": "Rengar",
@@ -1203,7 +1203,7 @@
       "Assassin",
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "riven": {
     "id": "Riven",
@@ -1214,7 +1214,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "rumble": {
     "id": "Rumble",
@@ -1225,7 +1225,7 @@
       "Fighter",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "ryze": {
     "id": "Ryze",
@@ -1235,7 +1235,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "samira": {
     "id": "Samira",
@@ -1246,7 +1246,7 @@
       "Marksman",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "sejuani": {
     "id": "Sejuani",
@@ -1256,7 +1256,7 @@
     "tags": [
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "senna": {
     "id": "Senna",
@@ -1267,7 +1267,7 @@
       "Support",
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "seraphine": {
     "id": "Seraphine",
@@ -1278,7 +1278,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "sett": {
     "id": "Sett",
@@ -1289,7 +1289,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "shaco": {
     "id": "Shaco",
@@ -1299,7 +1299,7 @@
     "tags": [
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "shen": {
     "id": "Shen",
@@ -1309,7 +1309,7 @@
     "tags": [
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "shyvana": {
     "id": "Shyvana",
@@ -1320,7 +1320,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "singed": {
     "id": "Singed",
@@ -1331,7 +1331,7 @@
       "Tank",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "sion": {
     "id": "Sion",
@@ -1342,7 +1342,7 @@
       "Tank",
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "sivir": {
     "id": "Sivir",
@@ -1352,7 +1352,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "skarner": {
     "id": "Skarner",
@@ -1363,7 +1363,7 @@
       "Tank",
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "smolder": {
     "id": "Smolder",
@@ -1374,7 +1374,7 @@
       "Marksman",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "sona": {
     "id": "Sona",
@@ -1385,7 +1385,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "soraka": {
     "id": "Soraka",
@@ -1396,7 +1396,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "swain": {
     "id": "Swain",
@@ -1407,7 +1407,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "sylas": {
     "id": "Sylas",
@@ -1418,7 +1418,7 @@
       "Mage",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "syndra": {
     "id": "Syndra",
@@ -1428,7 +1428,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "tahmkench": {
     "id": "TahmKench",
@@ -1439,7 +1439,7 @@
       "Tank",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "taliyah": {
     "id": "Taliyah",
@@ -1450,7 +1450,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "talon": {
     "id": "Talon",
@@ -1460,7 +1460,7 @@
     "tags": [
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "taric": {
     "id": "Taric",
@@ -1471,7 +1471,7 @@
       "Support",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "teemo": {
     "id": "Teemo",
@@ -1482,7 +1482,7 @@
       "Marksman",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "thresh": {
     "id": "Thresh",
@@ -1493,7 +1493,7 @@
       "Support",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "tristana": {
     "id": "Tristana",
@@ -1504,7 +1504,7 @@
       "Marksman",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "trundle": {
     "id": "Trundle",
@@ -1515,7 +1515,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "tryndamere": {
     "id": "Tryndamere",
@@ -1526,7 +1526,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "twistedfate": {
     "id": "TwistedFate",
@@ -1537,7 +1537,7 @@
       "Mage",
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "twitch": {
     "id": "Twitch",
@@ -1548,7 +1548,7 @@
       "Marksman",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "udyr": {
     "id": "Udyr",
@@ -1559,7 +1559,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "urgot": {
     "id": "Urgot",
@@ -1570,7 +1570,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "varus": {
     "id": "Varus",
@@ -1581,7 +1581,7 @@
       "Marksman",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "vayne": {
     "id": "Vayne",
@@ -1592,7 +1592,7 @@
       "Marksman",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "veigar": {
     "id": "Veigar",
@@ -1602,7 +1602,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "velkoz": {
     "id": "Velkoz",
@@ -1613,7 +1613,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "vex": {
     "id": "Vex",
@@ -1623,7 +1623,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "vi": {
     "id": "Vi",
@@ -1634,7 +1634,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "viego": {
     "id": "Viego",
@@ -1645,7 +1645,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "viktor": {
     "id": "Viktor",
@@ -1655,7 +1655,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "vladimir": {
     "id": "Vladimir",
@@ -1666,7 +1666,7 @@
       "Mage",
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "volibear": {
     "id": "Volibear",
@@ -1677,7 +1677,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "warwick": {
     "id": "Warwick",
@@ -1688,7 +1688,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "xayah": {
     "id": "Xayah",
@@ -1698,7 +1698,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "xerath": {
     "id": "Xerath",
@@ -1709,7 +1709,7 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "xinzhao": {
     "id": "XinZhao",
@@ -1720,7 +1720,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "yasuo": {
     "id": "Yasuo",
@@ -1731,7 +1731,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "yone": {
     "id": "Yone",
@@ -1742,7 +1742,7 @@
       "Fighter",
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "yorick": {
     "id": "Yorick",
@@ -1753,7 +1753,7 @@
       "Fighter",
       "Tank"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "yunara": {
     "id": "Yunara",
@@ -1763,7 +1763,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "yuumi": {
     "id": "Yuumi",
@@ -1774,7 +1774,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "zaahen": {
     "id": "Zaahen",
@@ -1782,10 +1782,9 @@
     "en_name": "Zaahen",
     "zh_tw_name": "薩亨",
     "tags": [
-      "Fighter",
-      "Assassin"
+      "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "zac": {
     "id": "Zac",
@@ -1796,7 +1795,7 @@
       "Tank",
       "Fighter"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "zed": {
     "id": "Zed",
@@ -1806,7 +1805,7 @@
     "tags": [
       "Assassin"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "zeri": {
     "id": "Zeri",
@@ -1816,7 +1815,7 @@
     "tags": [
       "Marksman"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "ziggs": {
     "id": "Ziggs",
@@ -1826,7 +1825,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "zilean": {
     "id": "Zilean",
@@ -1837,7 +1836,7 @@
       "Support",
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "zoe": {
     "id": "Zoe",
@@ -1847,7 +1846,7 @@
     "tags": [
       "Mage"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   },
   "zyra": {
     "id": "Zyra",
@@ -1858,6 +1857,6 @@
       "Mage",
       "Support"
     ],
-    "ddragon_version": "16.14.1"
+    "ddragon_version": "16.20.1"
   }
 }

@@ -1,13 +1,13 @@
 {
-  "ddragon_version": "16.14.1",
-  "generated_at": "2026-07-18T11:03:06.376435+08:00",
-  "row_count": 706,
+  "ddragon_version": "16.20.1",
+  "generated_at": "2026-10-11T14:12:57.946274+08:00",
+  "row_count": 870,
   "champion_count": 173,
   "source": {
     "versions": "https://ddragon.leagueoflegends.com/api/versions.json",
-    "item_zh": "https://ddragon.leagueoflegends.com/cdn/16.14.1/data/zh_TW/item.json",
-    "item_en": "https://ddragon.leagueoflegends.com/cdn/16.14.1/data/en_US/item.json",
-    "champion_zh": "https://ddragon.leagueoflegends.com/cdn/16.14.1/data/zh_TW/champion.json",
-    "champion_en": "https://ddragon.leagueoflegends.com/cdn/16.14.1/data/en_US/champion.json"
+    "item_zh": "https://ddragon.leagueoflegends.com/cdn/16.20.1/data/zh_TW/item.json",
+    "item_en": "https://ddragon.leagueoflegends.com/cdn/16.20.1/data/en_US/item.json",
+    "champion_zh": "https://ddragon.leagueoflegends.com/cdn/16.20.1/data/zh_TW/champion.json",
+    "champion_en": "https://ddragon.leagueoflegends.com/cdn/16.20.1/data/en_US/champion.json"
   }
 }

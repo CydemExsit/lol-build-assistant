@@ -6,6 +6,10 @@
     "3139": -2.7
   },
   "extreme_damage_enemy_count": 4,
+  "extreme_damage_share": 0.72,
+  "extreme_damage_pressure": 0.55,
+  "heavy_damage_share": 0.62,
+  "heavy_damage_pressure": 0.45,
   "extreme_pure_defense_item_bonus": 1.8,
   "extreme_multi_defense_route_bonus": 1.5,
   "marksman_full_ap_min_items": 4,

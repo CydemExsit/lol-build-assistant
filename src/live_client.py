@@ -314,14 +314,41 @@ def _active_raw_player(snapshot: dict[str, Any]) -> dict[str, Any] | None:
     return next((player for player in raw_players if not bool(player.get("isBot"))), None)
 
 
-def build_match_key(snapshot: dict[str, Any], *, captured_at: datetime | None = None) -> str:
+def is_static_roster_ready(snapshot: dict[str, Any], *, expected_players: int = 10) -> bool:
+    """Return true only when the full roster and active player are explicit."""
+
+    raw_players = _players_from_snapshot(snapshot)
+    if len(raw_players) != expected_players or any(not isinstance(player, dict) for player in raw_players):
+        return False
+    players = [_to_live_player(player) for player in raw_players]
+    if any(
+        not player.team or not player.champion_slug or player.champion_slug == "name"
+        for player in players
+    ):
+        return False
+    team_counts: dict[str, int] = {}
+    for player in players:
+        team_counts[player.team] = team_counts.get(player.team, 0) + 1
+    if len(team_counts) != 2 or sorted(team_counts.values()) != [expected_players // 2] * 2:
+        return False
+
+    if any(bool(player.get("isActivePlayer")) for player in raw_players):
+        return True
+    active = _active_from_snapshot(snapshot)
+    active_identities = _identity_values(active)
+    active_name = str(snapshot.get("activeplayername") or "").strip().lower()
+    if active_name:
+        active_identities.add(active_name)
+    return bool(
+        active_identities
+        and any(active_identities & _identity_values(player) for player in raw_players)
+    )
+
+
+def build_roster_key(snapshot: dict[str, Any]) -> str:
     players = [_to_live_player(player) for player in _players_from_snapshot(snapshot)]
     active = _active_raw_player(snapshot)
     game = _game_from_snapshot(snapshot)
-    game_time = float(game.get("gameTime") or 0.0)
-    observed_at = captured_at or datetime.now(timezone.utc).astimezone()
-    estimated_start = observed_at - timedelta(seconds=max(game_time, 0.0))
-    start_minute = int(round(estimated_start.timestamp() / 60.0))
     roster = sorted(f"{player.team}:{player.champion_slug}" for player in players)
     active_slug = champion_slug(
         champion_id_from_raw((active or {}).get("rawChampionName"))
@@ -331,9 +358,23 @@ def build_match_key(snapshot: dict[str, Any], *, captured_at: datetime | None = 
         [
             str(game.get("gameMode") or ""),
             str(game.get("mapNumber") or game.get("mapName") or ""),
-            str(start_minute),
             active_slug,
             *roster,
+        ]
+    )
+    return hashlib.sha256(material.encode("utf-8")).hexdigest()[:20]
+
+
+def build_match_key(snapshot: dict[str, Any], *, captured_at: datetime | None = None) -> str:
+    game = _game_from_snapshot(snapshot)
+    game_time = float(game.get("gameTime") or 0.0)
+    observed_at = captured_at or datetime.now(timezone.utc).astimezone()
+    estimated_start = observed_at - timedelta(seconds=max(game_time, 0.0))
+    start_minute = int(round(estimated_start.timestamp() / 60.0))
+    material = "|".join(
+        [
+            build_roster_key(snapshot),
+            str(start_minute),
         ]
     )
     return hashlib.sha256(material.encode("utf-8")).hexdigest()[:20]
