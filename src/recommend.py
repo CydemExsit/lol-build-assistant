@@ -13,14 +13,14 @@ from .health import assess_recommendation_data
 from .items import enrich_item, is_boot, is_completed_non_boot_item, load_items_map
 from .live_client import build_match_context, build_match_key, load_snapshot
 from .lolalytics import (
+    DEFAULT_CACHE_MAX_AGE_HOURS,
     DEFAULT_MODE,
     DEFAULT_PATCH,
     DEFAULT_TIER,
     built_sets_cache_path_for,
     fetch_actual_built_sets_5,
     fetch_boot_pair_stats,
-    fetch_boot_stats,
-    fetch_item_stats,
+    fetch_stat_tables,
     load_best_build,
 )
 
@@ -1727,6 +1727,7 @@ def _build_routes(
     limit: int = 3,
 ) -> list[dict[str, Any]]:
     best_by_combo: dict[tuple[int, ...], dict[str, Any]] = {}
+    boots_by_archetype: dict[str, dict[str, Any] | None] = {}
     candidate_sets = _route_candidate_sets(built_sets)
     for row in candidate_sets:
         items = _items_for_set(row, item_map)
@@ -1737,7 +1738,11 @@ def _build_routes(
         team_score, team_reasons = _team_route_adjustment(items, allies)
         route_score += team_score
         winning_item_signals = _winning_item_signals(items, scored_by_id)
-        boots = _select_boots(archetype, build_data, item_map, threats, boot_stats_by_id=boot_stats_by_id)
+        if archetype not in boots_by_archetype:
+            boots_by_archetype[archetype] = _select_boots(
+                archetype, build_data, item_map, threats, boot_stats_by_id=boot_stats_by_id,
+            )
+        boots = boots_by_archetype[archetype]
         preference_reasons, preference_flags = _route_preference_details(
             items,
             threats,
@@ -1814,6 +1819,7 @@ def recommend_build(
     *,
     cache_dir: str | Path = "data/cache",
     refresh_lolalytics: bool = False,
+    cache_max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
     items_map_path: str | Path = "data/ref/items_map.csv",
     preferences_path: str | Path = DEFAULT_USER_PREFERENCES_PATH,
     mode: str = DEFAULT_MODE,
@@ -1835,6 +1841,7 @@ def recommend_build(
         tier=tier,
         patches=(DEFAULT_PATCH, "14", "30"),
         min_champions_analysed=min_champions_analysed,
+        max_age_hours=cache_max_age_hours,
     )
     item_map = load_items_map(items_map_path)
     preferences = load_user_preferences(preferences_path)
@@ -1853,20 +1860,20 @@ def recommend_build(
         mode=built_set_params.get("mode", mode),
         tier=built_set_params.get("tier", tier),
         patch=built_set_params.get("patch", DEFAULT_PATCH),
+        max_age_hours=cache_max_age_hours,
     )
     built_sets = [{**row, "source_params": built_set_params, "source_priority": 0} for row in primary_raw_sets]
     built_set_windows = [{"params": built_set_params, "raw_sets": len(primary_raw_sets), "added_sets": len(primary_raw_sets)}]
-    try:
-        boot_stat_rows = fetch_boot_stats(
-            champion_slug,
-            cache_dir=cache_dir,
-            refresh=refresh_lolalytics,
-            mode=built_set_params.get("mode", mode),
-            tier=built_set_params.get("tier", tier),
-            patch=built_set_params.get("patch", DEFAULT_PATCH),
-        )
-    except Exception:
-        boot_stat_rows = []
+    stat_tables = fetch_stat_tables(
+        champion_slug,
+        cache_dir=cache_dir,
+        refresh=refresh_lolalytics,
+        mode=built_set_params.get("mode", mode),
+        tier=built_set_params.get("tier", tier),
+        patch=built_set_params.get("patch", DEFAULT_PATCH),
+        max_age_hours=cache_max_age_hours,
+    )
+    boot_stat_rows = stat_tables["Boots"]
     if not boot_stat_rows:
         try:
             boot_stat_rows = fetch_boot_pair_stats(
@@ -1876,34 +1883,13 @@ def recommend_build(
                 mode=built_set_params.get("mode", mode),
                 tier=built_set_params.get("tier", tier),
                 patch=built_set_params.get("patch", DEFAULT_PATCH),
+                max_age_hours=cache_max_age_hours,
             )
         except Exception:
             boot_stat_rows = []
     boot_stats_by_id = _boot_stats_by_id(boot_stat_rows, item_map)
-    try:
-        popular_item_rows = fetch_item_stats(
-            champion_slug,
-            table="Popular Items",
-            cache_dir=cache_dir,
-            refresh=refresh_lolalytics,
-            mode=built_set_params.get("mode", mode),
-            tier=built_set_params.get("tier", tier),
-            patch=built_set_params.get("patch", DEFAULT_PATCH),
-        )
-    except Exception:
-        popular_item_rows = []
-    try:
-        winning_item_rows = fetch_item_stats(
-            champion_slug,
-            table="Winning Items",
-            cache_dir=cache_dir,
-            refresh=refresh_lolalytics,
-            mode=built_set_params.get("mode", mode),
-            tier=built_set_params.get("tier", tier),
-            patch=built_set_params.get("patch", DEFAULT_PATCH),
-        )
-    except Exception:
-        winning_item_rows = []
+    popular_item_rows = stat_tables["Popular Items"]
+    winning_item_rows = stat_tables["Winning Items"]
     item_stats_by_id = _build_item_stats_by_id(popular_item_rows, winning_item_rows)
     damage_analysis = _damage_analysis_payload(threats, preferences)
     defensive_options = _build_matchup_defensive_options(
@@ -1914,7 +1900,8 @@ def recommend_build(
     seen_archetypes = {
         archetype
         for row in built_sets
-        if (archetype := _set_archetype(row, item_map, champion_slug)) is not None
+        if champion_slug in MULTI_ROUTE_CHAMPIONS
+        and (archetype := _set_archetype(row, item_map, champion_slug)) is not None
     }
     if champion_slug in MULTI_ROUTE_CHAMPIONS and len(seen_archetypes) < 2:
         for extra_patch in ("14", "30"):
@@ -1932,6 +1919,7 @@ def recommend_build(
                 mode=extra_params["mode"],
                 tier=extra_params["tier"],
                 patch=extra_params["patch"],
+                max_age_hours=cache_max_age_hours,
             )
             added_sets: list[dict[str, Any]] = []
             for row in extra_raw_sets:
@@ -2018,6 +2006,7 @@ def recommend_build(
         boots=len(boot_stat_rows),
         popular_items=len(popular_item_rows),
         winning_items=len(winning_item_rows),
+        max_age_hours=cache_max_age_hours,
     )
 
     return {
@@ -2101,6 +2090,8 @@ def recommend_from_snapshot(
     *,
     out_path: str | Path | None = None,
     refresh_lolalytics: bool = False,
+    cache_max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
+    cache_dir: str | Path = "data/cache",
     mode: str = DEFAULT_MODE,
     tier: str = DEFAULT_TIER,
     min_champions_analysed: int = 1_000_000,
@@ -2121,6 +2112,8 @@ def recommend_from_snapshot(
     result = recommend_build(
         context,
         refresh_lolalytics=refresh_lolalytics,
+        cache_max_age_hours=cache_max_age_hours,
+        cache_dir=cache_dir,
         mode=mode,
         tier=tier,
         min_champions_analysed=min_champions_analysed,

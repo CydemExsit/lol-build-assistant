@@ -9,7 +9,7 @@ from .autostart import autostart_status, install_autostart, remove_autostart
 from .data_dragon import update_static_data
 from .evaluation import audit_file
 from .live_client import build_match_context, capture_snapshot, load_snapshot
-from .lolalytics import DEFAULT_TIER
+from .lolalytics import DEFAULT_CACHE_MAX_AGE_HOURS, DEFAULT_TIER
 from .maintenance import apply_cleanup_plan, build_cleanup_plan, format_bytes
 from .service import RecommendationService
 
@@ -29,7 +29,10 @@ def _add_recommendation_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--tier", default=DEFAULT_TIER)
     parser.add_argument("--min-champions-analysed", type=int, default=1_000_000)
     parser.add_argument("--refresh-lolalytics", action="store_true")
-    parser.add_argument("--cache-max-age-hours", type=int, default=168)
+    parser.add_argument(
+        "--cache-max-age-hours", type=int, default=DEFAULT_CACHE_MAX_AGE_HOURS,
+        help="reuse each LoLalytics cache for this many hours (default: 6)",
+    )
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:

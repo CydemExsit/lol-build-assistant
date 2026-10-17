@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import html as html_lib
 import json
+import math
 import re
+import tempfile
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
@@ -16,6 +18,7 @@ DEFAULT_ITEM_SET_API_URL = "https://a1.lolalytics.com/mega/"
 DEFAULT_MODE = "aram"
 DEFAULT_TIER = "gold_plus"
 DEFAULT_PATCH = "7"
+DEFAULT_CACHE_MAX_AGE_HOURS = 6
 SECTION_ORDER = ["Starting Items", "Core Build", "Item 4", "Item 5", "Item 6", "LEGEND:"]
 BANNED_SET_ITEM_IDS = {2003, 2031, 2138, 2139, 2140, 1055, 1054, 1056, 1082, 1101, 1102, 1103, 1104, 1042, 1036}
 IMG_RE = re.compile(
@@ -122,7 +125,7 @@ def _build_fetched_at(
     if meta_path.exists():
         try:
             metadata = json.loads(meta_path.read_text(encoding="utf-8"))
-            if metadata.get("fetched_at"):
+            if isinstance(metadata, dict) and metadata.get("fetched_at"):
                 return str(metadata["fetched_at"])
         except (OSError, UnicodeError, json.JSONDecodeError):
             pass
@@ -134,8 +137,16 @@ def _build_fetched_at(
         patch=patch,
     )
     if summary_path.exists():
+        try:
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+            if isinstance(summary, dict) and summary.get("fetched_at"):
+                return str(summary["fetched_at"])
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            pass
+    fallback_path = summary_path if summary_path.exists() else html_path
+    if fallback_path.exists():
         return datetime.fromtimestamp(
-            summary_path.stat().st_mtime,
+            fallback_path.stat().st_mtime,
             tz=timezone.utc,
         ).astimezone().isoformat()
     return None
@@ -148,7 +159,7 @@ def build_cache_is_stale(
     mode: str = DEFAULT_MODE,
     tier: str = DEFAULT_TIER,
     patch: str = DEFAULT_PATCH,
-    max_age_hours: int = 168,
+    max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
 ) -> bool:
     fetched_at = _build_fetched_at(
         champion_slug,
@@ -165,7 +176,57 @@ def build_cache_is_stale(
         return True
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
-    return datetime.now(timezone.utc) - parsed.astimezone(timezone.utc) > timedelta(hours=max_age_hours)
+    age = datetime.now(timezone.utc) - parsed.astimezone(timezone.utc)
+    return not timedelta(0) <= age <= timedelta(hours=max_age_hours)
+
+
+def _read_rows_cache(target: Path, *, refresh: bool, max_age_hours: int) -> list[dict[str, Any]] | None:
+    if refresh:
+        return None
+    try:
+        age = datetime.now(timezone.utc).timestamp() - target.stat().st_mtime
+        if not 0 <= age <= max_age_hours * 3600:
+            return None
+        cached = json.loads(target.read_text(encoding="utf-8"))
+        ids_key = "item_ids" if target.name.endswith(("_sets5.json", "_boots_ab2.json")) else "item_id"
+        item_count = 5 if target.name.endswith("_sets5.json") else 2
+
+        def valid_row(row: Any) -> bool:
+            if not isinstance(row, dict):
+                return False
+            ids = row.get(ids_key) if ids_key == "item_ids" else [row.get(ids_key)]
+            if not isinstance(ids, list) or not ids or any(type(value) is not int or value <= 0 for value in ids):
+                return False
+            if ids_key == "item_ids" and (len(ids) != item_count or len(set(ids)) != item_count):
+                return False
+            for key in ("win_rate", "pick_rate", "games"):
+                value = row.get(key)
+                if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
+                    return False
+                if key != "games" and value > 1:
+                    return False
+            return True
+
+        if isinstance(cached, list) and cached and all(
+            valid_row(row) for row in cached
+        ):
+            return cached
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        pass
+    return None
+
+
+def _write_json_cache(target: Path, payload: Any) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=target.parent, suffix=".tmp", delete=False) as output:
+            temporary = Path(output.name)
+            json.dump(payload, output, ensure_ascii=False, indent=2)
+        temporary.replace(target)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def built_sets_cache_path_for(
@@ -337,6 +398,7 @@ def load_or_fetch_build(
     mode: str = DEFAULT_MODE,
     tier: str = DEFAULT_TIER,
     patch: str = DEFAULT_PATCH,
+    max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
 ) -> dict[str, Any]:
     summary_path = build_summary_cache_path_for(
         champion_slug,
@@ -345,12 +407,20 @@ def load_or_fetch_build(
         tier=tier,
         patch=patch,
     )
-    if summary_path.exists() and not refresh:
+    stale = build_cache_is_stale(
+        champion_slug, cache_dir, mode=mode, tier=tier, patch=patch, max_age_hours=max_age_hours,
+    )
+    if summary_path.exists() and not refresh and not stale:
         try:
             cached = json.loads(summary_path.read_text(encoding="utf-8"))
         except (OSError, UnicodeError, json.JSONDecodeError):
             cached = None
-        if isinstance(cached, dict) and isinstance(cached.get("sections"), dict):
+        expected_params = {"mode": mode, "tier": tier, "patch": patch}
+        if (
+            isinstance(cached, dict)
+            and isinstance(cached.get("sections"), dict)
+            and cached.get("params") == expected_params
+        ):
             cached.setdefault(
                 "fetched_at",
                 _build_fetched_at(
@@ -364,7 +434,7 @@ def load_or_fetch_build(
             cached["cache_path"] = str(summary_path)
             return cached
 
-    path = fetch_build_html(champion_slug, cache_dir=cache_dir, refresh=refresh, mode=mode, tier=tier, patch=patch)
+    path = fetch_build_html(champion_slug, cache_dir=cache_dir, refresh=refresh or stale, mode=mode, tier=tier, patch=patch)
     parsed = parse_build_html(path.read_text(encoding="utf-8"))
     parsed["source_url"] = lolalytics_url(champion_slug, mode=mode, tier=tier, patch=patch)
     parsed["params"] = {"mode": mode, "tier": tier, "patch": patch}
@@ -375,7 +445,7 @@ def load_or_fetch_build(
         tier=tier,
         patch=patch,
     )
-    summary_path.write_text(json.dumps(parsed, ensure_ascii=False, indent=2), encoding="utf-8")
+    _write_json_cache(summary_path, parsed)
     parsed["cache_path"] = str(summary_path)
     return parsed
 
@@ -389,6 +459,7 @@ def load_best_build(
     tier: str = DEFAULT_TIER,
     patches: tuple[str, ...] = ("7", "14", "30"),
     min_champions_analysed: int = 1_000_000,
+    max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
 ) -> dict[str, Any]:
     attempts: list[dict[str, Any]] = []
     for patch in patches:
@@ -399,6 +470,7 @@ def load_best_build(
             mode=mode,
             tier=tier,
             patch=patch,
+            max_age_hours=max_age_hours,
         )
         attempts.append(
             {
@@ -824,6 +896,67 @@ def _normalize_playwright_item_rows(rows: list[dict[str, Any]], *, source: str) 
     return out
 
 
+def fetch_stat_tables(
+    champion_slug: str,
+    *,
+    tables: tuple[str, ...] = ("Boots", "Popular Items", "Winning Items"),
+    cache_dir: str | Path = "data/cache",
+    refresh: bool = False,
+    mode: str = DEFAULT_MODE,
+    tier: str = DEFAULT_TIER,
+    patch: str = DEFAULT_PATCH,
+    max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
+) -> dict[str, list[dict[str, Any]]]:
+    """Read fresh tables first, then collect missing tables in one browser page."""
+    results: dict[str, list[dict[str, Any]]] = {}
+    missing: dict[str, Path] = {}
+    for table in dict.fromkeys(tables):
+        target = (
+            boot_stats_cache_path_for(champion_slug, cache_dir, mode=mode, tier=tier, patch=patch)
+            if table == "Boots"
+            else item_stats_cache_path_for(champion_slug, cache_dir, table=table, mode=mode, tier=tier, patch=patch)
+        )
+        cached = _read_rows_cache(target, refresh=refresh, max_age_hours=max_age_hours)
+        results[table] = cached or []
+        if cached is None:
+            missing[table] = target
+    if not missing:
+        return results
+
+    source_url = lolalytics_url(champion_slug, mode=mode, tier=tier, patch=patch)
+    try:
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            try:
+                page = browser.new_page(viewport={"width": 1440, "height": 1600}, locale="en-US")
+                page.goto(source_url, wait_until="domcontentloaded", timeout=60000)
+                try:
+                    page.wait_for_load_state("networkidle", timeout=15000)
+                except Exception:
+                    pass
+                for table, target in missing.items():
+                    try:
+                        rows = page.evaluate(_scroll_collect_stat_cards_script(), {"label": table})
+                        stats = (
+                            _normalize_playwright_boot_rows(rows)
+                            if table == "Boots"
+                            else _normalize_playwright_item_rows(rows, source=table)
+                        )
+                        results[table] = stats
+                        if stats:
+                            _write_json_cache(target, stats)
+                    except Exception:
+                        # Tables are optional and fail independently; retain fresh hits.
+                        continue
+            finally:
+                browser.close()
+    except Exception:
+        pass
+    return results
+
+
 def fetch_boot_stats(
     champion_slug: str,
     *,
@@ -832,31 +965,12 @@ def fetch_boot_stats(
     mode: str = DEFAULT_MODE,
     tier: str = DEFAULT_TIER,
     patch: str = DEFAULT_PATCH,
+    max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
 ) -> list[dict[str, Any]]:
-    target = boot_stats_cache_path_for(champion_slug, cache_dir, mode=mode, tier=tier, patch=patch)
-    if target.exists() and not refresh:
-        cached = json.loads(target.read_text(encoding="utf-8"))
-        if cached:
-            return cached
-
-    from playwright.sync_api import sync_playwright
-
-    source_url = lolalytics_url(champion_slug, mode=mode, tier=tier, patch=patch)
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={"width": 1440, "height": 1600}, locale="en-US")
-        page.goto(source_url, wait_until="domcontentloaded", timeout=60000)
-        try:
-            page.wait_for_load_state("networkidle", timeout=60000)
-        except Exception:
-            pass
-        rows = page.evaluate(_scroll_collect_stat_cards_script(), {"label": "Boots"})
-        browser.close()
-
-    stats = _normalize_playwright_boot_rows(rows)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
-    return stats
+    return fetch_stat_tables(
+        champion_slug, tables=("Boots",), cache_dir=cache_dir, refresh=refresh,
+        mode=mode, tier=tier, patch=patch, max_age_hours=max_age_hours,
+    )["Boots"]
 
 
 def fetch_item_stats(
@@ -868,31 +982,12 @@ def fetch_item_stats(
     mode: str = DEFAULT_MODE,
     tier: str = DEFAULT_TIER,
     patch: str = DEFAULT_PATCH,
+    max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
 ) -> list[dict[str, Any]]:
-    target = item_stats_cache_path_for(champion_slug, cache_dir, table=table, mode=mode, tier=tier, patch=patch)
-    if target.exists() and not refresh:
-        cached = json.loads(target.read_text(encoding="utf-8"))
-        if cached:
-            return cached
-
-    from playwright.sync_api import sync_playwright
-
-    source_url = lolalytics_url(champion_slug, mode=mode, tier=tier, patch=patch)
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={"width": 1440, "height": 1600}, locale="en-US")
-        page.goto(source_url, wait_until="domcontentloaded", timeout=60000)
-        try:
-            page.wait_for_load_state("networkidle", timeout=60000)
-        except Exception:
-            pass
-        rows = page.evaluate(_scroll_collect_stat_cards_script(), {"label": table})
-        browser.close()
-
-    stats = _normalize_playwright_item_rows(rows, source=table)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
-    return stats
+    return fetch_stat_tables(
+        champion_slug, tables=(table,), cache_dir=cache_dir, refresh=refresh,
+        mode=mode, tier=tier, patch=patch, max_age_hours=max_age_hours,
+    )[table]
 
 
 def fetch_boot_pair_stats(
@@ -903,12 +998,12 @@ def fetch_boot_pair_stats(
     mode: str = DEFAULT_MODE,
     tier: str = DEFAULT_TIER,
     patch: str = DEFAULT_PATCH,
+    max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
 ) -> list[dict[str, Any]]:
     target = boot_pair_stats_cache_path_for(champion_slug, cache_dir, mode=mode, tier=tier, patch=patch)
-    if target.exists() and not refresh:
-        cached = json.loads(target.read_text(encoding="utf-8"))
-        if cached:
-            return cached
+    cached = _read_rows_cache(target, refresh=refresh, max_age_hours=max_age_hours)
+    if cached is not None:
+        return cached
 
     from playwright.sync_api import sync_playwright
 
@@ -976,8 +1071,8 @@ def fetch_boot_pair_stats(
         browser.close()
 
     stats = _normalize_playwright_pair_rows(rows)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
+    if stats:
+        _write_json_cache(target, stats)
     return stats
 
 
@@ -989,12 +1084,12 @@ def fetch_actual_built_sets_5(
     mode: str = DEFAULT_MODE,
     tier: str = DEFAULT_TIER,
     patch: str = DEFAULT_PATCH,
+    max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
 ) -> list[dict[str, Any]]:
     target = built_sets_cache_path_for(champion_slug, cache_dir, mode=mode, tier=tier, patch=patch)
-    if target.exists() and not refresh:
-        cached = json.loads(target.read_text(encoding="utf-8"))
-        if cached and all(row.get("data_source") == "build_itemset_api" for row in cached):
-            return cached
+    cached = _read_rows_cache(target, refresh=refresh, max_age_hours=max_age_hours)
+    if cached and all(row.get("data_source") == "build_itemset_api" for row in cached):
+        return cached
 
     try:
         payload = _fetch_item_sets_api_payload(champion_slug, mode=mode, tier=tier, patch=patch)
@@ -1002,8 +1097,7 @@ def fetch_actual_built_sets_5(
     except (OSError, TypeError, ValueError):
         sets = []
     if sets:
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(json.dumps(sets, ensure_ascii=False, indent=2), encoding="utf-8")
+        _write_json_cache(target, sets)
         return sets
 
     from playwright.sync_api import sync_playwright
@@ -1020,6 +1114,6 @@ def fetch_actual_built_sets_5(
         browser.close()
 
     sets = _normalize_playwright_sets(rows)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(sets, ensure_ascii=False, indent=2), encoding="utf-8")
+    if sets:
+        _write_json_cache(target, sets)
     return sets

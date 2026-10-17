@@ -16,14 +16,13 @@ from .history import (
     stored_recommendation,
 )
 from .live_client import (
-    build_match_context,
     build_match_key,
     build_snapshot_match_key,
     fetch_live_data,
     load_snapshot,
     save_snapshot,
 )
-from .lolalytics import DEFAULT_MODE, DEFAULT_PATCH, DEFAULT_TIER, build_cache_is_stale
+from .lolalytics import DEFAULT_CACHE_MAX_AGE_HOURS, DEFAULT_MODE, DEFAULT_TIER
 from .recommend import recommend_from_snapshot
 from .report import write_recommendation_markdown
 from .runtime_state import DEFAULT_STATUS_PATH, read_status, write_status
@@ -41,7 +40,8 @@ class RecommendationService:
         tier: str = DEFAULT_TIER,
         min_champions_analysed: int = 1_000_000,
         refresh_lolalytics: bool = False,
-        cache_max_age_hours: int = 168,
+        cache_max_age_hours: int = DEFAULT_CACHE_MAX_AGE_HOURS,
+        cache_dir: str | Path = "data/cache",
     ) -> None:
         self.out_path = Path(out_path)
         self.out_markdown_path = Path(out_markdown_path)
@@ -52,20 +52,8 @@ class RecommendationService:
         self.min_champions_analysed = min_champions_analysed
         self.refresh_lolalytics = refresh_lolalytics
         self.cache_max_age_hours = cache_max_age_hours
+        self.cache_dir = Path(cache_dir)
         self._lock = threading.Lock()
-
-    def _should_refresh(self, snapshot_path: str | Path) -> bool:
-        if self.refresh_lolalytics:
-            return True
-        context = build_match_context(load_snapshot(snapshot_path), source_path=str(snapshot_path))
-        champion_slug = str((context.get("active_player") or {}).get("champion_slug") or "")
-        return bool(champion_slug) and build_cache_is_stale(
-            champion_slug,
-            mode=self.mode,
-            tier=self.tier,
-            patch=DEFAULT_PATCH,
-            max_age_hours=self.cache_max_age_hours,
-        )
 
     def recommend_snapshot(
         self,
@@ -116,7 +104,9 @@ class RecommendationService:
             result = recommend_from_snapshot(
                 snapshot_path,
                 out_path=self.out_path,
-                refresh_lolalytics=self._should_refresh(snapshot_path),
+                refresh_lolalytics=self.refresh_lolalytics,
+                cache_max_age_hours=self.cache_max_age_hours,
+                cache_dir=self.cache_dir,
                 mode=self.mode,
                 tier=self.tier,
                 min_champions_analysed=self.min_champions_analysed,
@@ -164,6 +154,7 @@ class RecommendationService:
         return system_health(
             recommendation_path=self.out_path,
             history_path=self.history_path,
+            cache_dir=self.cache_dir,
         )
 
     def history(self, *, limit: int = 30) -> list[dict[str, Any]]:
