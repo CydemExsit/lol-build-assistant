@@ -272,4 +272,3 @@ def test_new_match_reuses_fresh_tables_even_when_summary_expires(tmp_path, monke
     audit = audit_recommendation(first)
     assert audit["passed"] is True, audit
     assert fetches == ([True] if summary_age else [])
-
