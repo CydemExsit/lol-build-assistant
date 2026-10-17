@@ -177,7 +177,9 @@ def build_cache_is_stale(
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
     age = datetime.now(timezone.utc) - parsed.astimezone(timezone.utc)
-    return not timedelta(0) <= age <= timedelta(hours=max_age_hours)
+    # Windows/Python versions can sample wall time and file timestamps at
+    # different precision. Allow sub-second skew, but reject future-dated data.
+    return max_age_hours <= 0 or not timedelta(seconds=-1) <= age <= timedelta(hours=max_age_hours)
 
 
 def _read_rows_cache(target: Path, *, refresh: bool, max_age_hours: int) -> list[dict[str, Any]] | None:
@@ -185,7 +187,7 @@ def _read_rows_cache(target: Path, *, refresh: bool, max_age_hours: int) -> list
         return None
     try:
         age = datetime.now(timezone.utc).timestamp() - target.stat().st_mtime
-        if not 0 <= age <= max_age_hours * 3600:
+        if max_age_hours <= 0 or not -1.0 <= age <= max_age_hours * 3600:
             return None
         cached = json.loads(target.read_text(encoding="utf-8"))
         ids_key = "item_ids" if target.name.endswith(("_sets5.json", "_boots_ab2.json")) else "item_id"

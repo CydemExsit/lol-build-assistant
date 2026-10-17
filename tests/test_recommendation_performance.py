@@ -189,6 +189,25 @@ def test_custom_cache_lifetime_is_honored(tmp_path, browser):
     assert parse_args(["watch"]).cache_max_age_hours == 6
 
 
+@pytest.mark.parametrize("future_seconds,refetch", [(0.001, False), (0.5, False), (60, True)])
+def test_file_timestamp_precision_does_not_trigger_duplicate_fetches(tmp_path, browser, future_seconds, refetch):
+    target = lolalytics.boot_stats_cache_path_for("ashe", tmp_path)
+    _write(target, [_stat()], age_hours=-future_seconds / 3600)
+
+    assert lolalytics.fetch_boot_stats("ashe", cache_dir=tmp_path)
+    assert ("launch" in browser.calls) is refetch
+
+
+@pytest.mark.parametrize("future_seconds,stale", [(0.001, False), (0.5, False), (60, True)])
+def test_summary_timestamp_has_bounded_clock_tolerance(tmp_path, future_seconds, stale):
+    _write(lolalytics.build_summary_cache_path_for("ashe", tmp_path), {
+        "sections": {},
+        "fetched_at": (datetime.now(timezone.utc) + timedelta(seconds=future_seconds)).isoformat(),
+    })
+
+    assert lolalytics.build_cache_is_stale("ashe", tmp_path) is stale
+
+
 def test_malformed_set_ids_do_not_break_recommendations(tmp_path, monkeypatch):
     _write(lolalytics.built_sets_cache_path_for("ashe", tmp_path), [{
         "item_ids": "not-an-item-list", "win_rate": 0.6, "pick_rate": 0.01,
