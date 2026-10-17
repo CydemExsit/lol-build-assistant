@@ -14,6 +14,7 @@ htmlcov/
 .DS_Store
 .venv/
 .env
+.codex/WORK_PROGRESS.md
 data/cache/
 data/raw/
 data/debug/

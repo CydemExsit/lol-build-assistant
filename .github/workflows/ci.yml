@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run offline regression and recommendation audits
+        run: python -B -m pytest -q -p no:cacheprovider
+      - name: Check browser JavaScript
+        run: node --check web/app.js
+      - name: Check automatic watcher command
+        run: python -B -m src.main watch --help

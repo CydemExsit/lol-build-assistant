@@ -1,10 +1,14 @@
 # LoL Build Assistant
 
+[![CI](https://github.com/CydemExsit/lol-build-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/CydemExsit/lol-build-assistant/actions/workflows/ci.yml)
+
 英雄聯盟 ARAM 賽前出裝助手。背景服務會在 Riot 本機 Live Client Data API 出現新對局時辨識十位英雄、敵我隊伍與自己的英雄，並依 LoLalytics 聚合數據產生一次性的靜態方案；已開啟的瀏覽器介面會自動更新。
 
 ## 目前行為
 
 - 固定 ARAM，預設 `gold_plus` 與最近 7 天；Champions Analysed 不足時才擴大資料窗。
+- 新對局優先使用 6 小時內有效的 LoLalytics 快取，各份資料獨立判斷效期；只補抓缺少或過期的資料。可用 `--cache-max-age-hours` 調整，`--refresh-lolalytics` 強制更新。
+- 鞋子、熱門裝備與高勝率裝備共用一次瀏覽器頁面載入；本場方案產生後仍維持凍結。
 - 五件非鞋成裝必須完整出現在 LoLalytics `Actually Built Sets: 5`。
 - 候選套裝以選取率百分比過濾，不用固定組數截斷完整資料。
 - 鞋子獨立列出，照搬勝率、選取率與場次。
@@ -17,6 +21,8 @@
 - 每場方案產生後立即凍結，局內不重新分析或改動。
 
 ## 一次性安裝
+
+需要 Python 3.11 以上版本。自動對局偵測與登入啟動以 Windows 為主要使用環境。
 
 ```powershell
 python -m venv .venv
@@ -92,6 +98,8 @@ python -B -m src.main audit
 ```
 
 `audit` 會檢查凍結標記、私人/動態欄位、五件唯一非鞋成裝、Actually Built Sets 樣本與鞋子類型。
+
+GitHub Actions 會在 Windows／Linux 與 Python 3.11／3.13 執行離線測試及 JavaScript 語法檢查。快取與頁面共用的效能測量範圍見 [效能紀錄](docs/performance.md)。
 
 ## Riot 合規
 
