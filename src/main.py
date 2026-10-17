@@ -57,7 +57,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     watch.add_argument("--host", default="127.0.0.1")
     watch.add_argument("--port", type=int, default=8765)
     watch.add_argument("--poll-interval", type=float, default=3.0)
-    watch.add_argument("--no-auto-open", action="store_true")
+    watch.add_argument(
+        "--auto-open",
+        action="store_true",
+        help="open the UI once for a detected match (disabled by default)",
+    )
     _add_recommendation_options(watch)
 
     sync = commands.add_parser("sync-data", help="refresh Riot Data Dragon static metadata")
@@ -163,7 +167,7 @@ def main(argv: list[str] | None = None) -> None:
             host=args.host,
             port=args.port,
             poll_interval=args.poll_interval,
-            auto_open=not args.no_auto_open,
+            auto_open=args.auto_open,
             service=_service_from_args(args),
         )
         return

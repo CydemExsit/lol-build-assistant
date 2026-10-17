@@ -14,6 +14,13 @@ const ui = {
   sampleInfo: document.querySelector("#sampleInfo"),
   sourceLine: document.querySelector("#sourceLine"),
   compositionNotes: document.querySelector("#compositionNotes"),
+  damageAnalysis: document.querySelector("#damageAnalysis"),
+  damageLabel: document.querySelector("#damageLabel"),
+  damagePressure: document.querySelector("#damagePressure"),
+  damageMeter: document.querySelector("#damageMeter"),
+  damageLegend: document.querySelector("#damageLegend"),
+  defenseLabel: document.querySelector("#defenseLabel"),
+  defensiveOptions: document.querySelector("#defensiveOptions"),
   bootOptions: document.querySelector("#bootOptions"),
   routes: document.querySelector("#routes"),
   constraintBadge: document.querySelector("#constraintBadge"),
@@ -48,8 +55,8 @@ function element(tag, className, text) {
   return node;
 }
 
-function fmtPct(value) {
-  return typeof value === "number" ? `${(value * 100).toFixed(2)}%` : "-";
+function fmtPct(value, digits = 2) {
+  return typeof value === "number" ? `${(value * 100).toFixed(digits)}%` : "-";
 }
 
 function fmtInt(value) {
@@ -186,6 +193,67 @@ function renderBoots(options) {
     card.append(image(itemIcon(boot.item_id), itemName(boot)), detail);
     ui.bootOptions.append(card);
   });
+}
+
+function renderDamageAnalysis(analysis, defensiveOptions) {
+  const mix = analysis?.damage_mix || {};
+  const values = ["physical", "magic", "true"].map((key) => Number(mix[key]));
+  const valid = values.every(Number.isFinite) && values.reduce((sum, value) => sum + value, 0) > 0;
+  ui.damageAnalysis.hidden = !valid;
+  if (!valid) return;
+
+  ui.damageLabel.textContent = analysis.label || "傷害類型估算";
+  ui.damagePressure.textContent = `整隊輸出權重 ${fmtPct(analysis.output_weight, 1)}`;
+  ui.damageMeter.replaceChildren();
+  ui.damageLegend.replaceChildren();
+
+  [
+    ["physical", "物理", Number(mix.physical)],
+    ["magic", "魔法", Number(mix.magic)],
+    ["true", "真實", Number(mix.true)],
+  ].forEach(([key, label, value]) => {
+    const segment = element("span", `damage-segment ${key}`);
+    segment.style.width = `${Math.max(value * 100, 0)}%`;
+    segment.title = `${label} ${fmtPct(value, 1)}`;
+    ui.damageMeter.append(segment);
+
+    const legend = element("div", "damage-legend-item");
+    legend.append(
+      element("span", `damage-swatch ${key}`),
+      element("span", "", label),
+      element("strong", "", fmtPct(value, 1)),
+    );
+    ui.damageLegend.append(legend);
+  });
+
+  ui.defenseLabel.textContent = analysis.defense_label || "暫無單一抗性需求";
+  ui.defenseLabel.className = `defense-label ${analysis.defense_strength || "none"}`;
+  ui.defensiveOptions.replaceChildren();
+  for (const option of defensiveOptions || []) {
+    const row = element("article", "defensive-option");
+    const detail = element("div", "defensive-option-detail");
+    const title = element("div", "defensive-option-title");
+    title.append(
+      element("strong", "", itemName(option)),
+      element(
+        "span",
+        "defensive-kind",
+        option.category === "pure_defense" ? "大型防裝" : "保留輸出",
+      ),
+    );
+    detail.append(title, element("p", "", option.reason || ""));
+    if (typeof option.win_rate === "number") {
+      detail.append(
+        element(
+          "span",
+          "defensive-stat",
+          `勝率 ${fmtPct(option.win_rate)} · 選取率 ${fmtPct(option.pick_rate)} · ${fmtInt(option.games)} 場`,
+        ),
+      );
+    }
+    row.append(image(itemIcon(option.item_id), itemName(option)), detail);
+    ui.defensiveOptions.append(row);
+  }
 }
 
 function feedbackFor(matchKey, key) {
@@ -352,6 +420,7 @@ function renderRecommendation(data) {
   const notes = data.composition_notes || [];
   ui.compositionNotes.hidden = !notes.length;
   ui.compositionNotes.textContent = notes.join(" · ");
+  renderDamageAnalysis(data.damage_analysis, data.build?.defensive_options || []);
   renderBoots(data.build?.boot_options || []);
   renderRoutes(data.build?.routes || []);
 }

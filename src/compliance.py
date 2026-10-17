@@ -100,6 +100,7 @@ def freeze_static_recommendation(
             "champions and teams visible for the current match",
             "LoLalytics aggregate pre-game build statistics",
             "Riot Data Dragon static item metadata",
+            "curated static champion damage-type profiles",
             "local feedback from completed prior recommendations",
         ],
         "not_used": [
