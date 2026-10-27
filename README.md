@@ -51,6 +51,12 @@ python -m src.main autostart remove
 
 ## 手動啟動
 
+Windows 開始功能表若已安裝「LoL 出裝助手」捷徑，點選即可啟動背景服務並開啟網頁；服務已執行時直接沿用。可在捷徑上按右鍵，選擇「釘選到開始畫面」。
+
+捷徑使用 `.venv\Scripts\pythonw.exe` 執行 `scripts\launch_assistant.py`。啟動失敗會顯示提示，日誌保存在 `data/runtime/assistant-stderr.log`。
+
+啟動器會確認背景對局偵測已開啟；快速重複點擊也只會啟動一份服務。若已有僅提供網頁的 `serve` 服務，會提示先關閉該服務，避免誤以為自動偵測已就緒。
+
 背景偵測與 UI：
 
 ```powershell
